@@ -1,6 +1,6 @@
 <div align="center">
     <a href="#" target="_blank">
-    <img src="https://i.postimg.cc/bN7f4YY3/logo.png" alt="zmonitor-logo" height="80">
+    <img src="https://avatars.githubusercontent.com/u/48836340?v=4" alt="zmonitor-logo" height="80">
     </a>
     <p>前端监控SDK，可用来收集并上报：代码报错、性能数据、页面录屏、用户行为、白屏检测等个性化指标数据</p>
     <div align="left">
