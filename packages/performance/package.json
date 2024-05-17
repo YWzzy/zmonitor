@@ -1,0 +1,26 @@
+{
+  "name": "@zmonitor/performance",
+  "version": "0.1.2",
+  "description": "",
+  "main": "src/index.ts",
+  "module": "dist/index.esm.js",
+  "publishConfig": {
+    "main": "dist/index.js"
+  },
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "author": "zzy",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:YWzzy/zmonitor.git"
+  },
+  "dependencies": {
+    "@zmonitor/common": "workspace:*",
+    "@zmonitor/types": "workspace:*",
+    "@zmonitor/utils": "workspace:*",
+    "web-vitals": "^3.1.0"
+  }
+}
