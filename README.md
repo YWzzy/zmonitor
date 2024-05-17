@@ -286,14 +286,3 @@ zMonitor.log({
   error: new Error('报错'),
 });
 ```
-
-## 演示
-
-后台页面
-
-![sea.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/93521acd7dd0499295bcd336a8a55fbc~tplv-k3u1fbpfcp-watermark.image?)
-
-演示效果
-
-![web-see.gif](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1ca730fd02164501a82eb492a6bf8583~tplv-k3u1fbpfcp-watermark.image?)
-
