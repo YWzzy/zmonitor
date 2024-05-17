@@ -1,14 +1,27 @@
 # @zmonitor/utils
 
-## 0.1.2
+## 1.0.0
 
-### Minor Changes
+### Major Changes
 
-- 0.1.2
+- frist release
 
 ### Patch Changes
 
 - Updated dependencies
-  - @zmonitor/common@0.1.2
-  - @zmonitor/types@0.1.2
-  - @zmonitor/core@0.1.2
+  - @zmonitor/common@1.0.0
+  - @zmonitor/core@1.0.0
+  - @zmonitor/types@1.0.0
+
+## 1.0.0
+
+### Minor Changes
+
+- 1.0.0
+
+### Patch Changes
+
+- Updated dependencies
+  - @zmonitor/common@1.0.0
+  - @zmonitor/types@1.0.0
+  - @zmonitor/core@1.0.0
