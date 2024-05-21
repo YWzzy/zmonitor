@@ -1,5 +1,5 @@
 {
-  "name": "z-monitor",
+  "name": "zmonitor",
   "private": true,
   "description": "前端监控SDK，可用来收集并上报：代码报错、性能数据、用户行为、加载资源、个性化指标等数据",
   "scripts": {
@@ -9,19 +9,21 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "publish": "changeset publish --registry=https://registry.npmjs.com/",
-    "release": "pnpm build && pnpm publish",
-    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "install": "pnpm install"
+    "release": "npm build && npm publish",
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "keywords": [
-    "web see",
+    "zmonitor",
     "web monitor",
-    "web see sdk"
+    "zmonitor sdk"
   ],
   "author": "zzy",
   "license": "MIT",
   "dependencies": {
     "@changesets/cli": "^2.26.1",
+    "@zmonitor/common": "1.0.0",
+    "@zmonitor/types": "1.0.0",
+    "@zmonitor/utils": "1.0.0",
     "core-js": "^3.19.1",
     "error-stack-parser": "^2.1.4",
     "path-to-regexp": "^6.2.0",
@@ -35,6 +37,7 @@
     "@rollup/plugin-commonjs": "^23.0.3",
     "@rollup/plugin-json": "^5.0.2",
     "@rollup/plugin-node-resolve": "^15.0.1",
+    "@types/ua-parser-js": "^0.7.39",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
     "@typescript-eslint/parser": "^5.46.1",
     "commitizen": "^4.2.6",
