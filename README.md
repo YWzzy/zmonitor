@@ -173,7 +173,7 @@ class ErrorBoundary extends React.Component {
 |   `recordScreentime`   | `number` | `10`                                                          | 单次录屏时长，默认值为 10s                                                                                                |
 | `recordScreenTypeList` | `array`  | `['error', 'unhandledrejection', 'resource', 'fetch', 'xhr']` | 上报录屏的错误列表，默认会上报所有错误发生时的录屏信息，如设置 ['error', 'unhandledrejection'] 则只会上报代码报错时的录屏 |
 
-## web-see 前端监控文章
+## z-monitor 前端监控文章
 
 这几篇文章详细介绍了该 SDK 的项目架构、功能实现、前端录屏、白屏检测等技术点
 
@@ -194,7 +194,7 @@ repeatCodeError 设置为 true 时，将开启一个缓存 map，存入已发生
 在用户的同一次会话中，如果点击一个按钮出现了错误，那么再次点击同一个按钮，必定会出现同一个错误，而这出现的多次错误，影响的是同一个用户、同一次访问；所以将其全部上报是没有意义的；
 而在同一个用户的不同会话中，如果出现了同一个错误，那么这不同会话里的错误进行上报就显得有意义了
 
-web-see 根据错误堆栈信息，将`错误信息、错误文件、错误行号`聚合生成一个 hash 值，是这个错误唯一的 ID
+z-monitor 根据错误堆栈信息，将`错误信息、错误文件、错误行号`聚合生成一个 hash 值，是这个错误唯一的 ID
 
 ```javascript
 // 对每一个错误详情，生成唯一的编码
@@ -278,7 +278,7 @@ async beforePost(data) {
 ## 手动上报错误示例
 
 ```javascript
-import zMonitor from 'web-see';
+import zMonitor from 'z-monitor';
 
 zMonitor.log({
   type: 'custom',

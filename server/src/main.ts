@@ -1,3 +1,11 @@
+/*
+ * @Author: yinhan 1738348915@qq.com
+ * @Date: 2024-05-17 15:41:42
+ * @LastEditors: yinhan 1738348915@qq.com
+ * @LastEditTime: 2024-05-21 14:50:34
+ * @FilePath: \zjiang-web-monitor\server\src\main.ts
+ * @Description:
+ */
 import { NestFactory } from "@nestjs/core";
 import { VersioningType, ValidationPipe } from "@nestjs/common";
 import { AppModule } from "./app.module";
@@ -30,7 +38,7 @@ async function bootstrap() {
     .addBearerAuth()
     .setTitle("nest测试")
     .setDescription("项目的描述")
-    .setVersion("0.0.1")
+    .setVersion("1.0.0")
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup("/api-docs", app, document);

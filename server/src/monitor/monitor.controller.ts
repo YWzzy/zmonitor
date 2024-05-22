@@ -1,34 +1,90 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { MonitorService } from './monitor.service';
-import { CreateMonitorDto } from './dto/create-monitor.dto';
-import { UpdateMonitorDto } from './dto/update-monitor.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Request,
+  Query,
+  Version,
+  Res,
+  Req,
+  ParseIntPipe,
+} from "@nestjs/common";
+import { MonitorService } from "./monitor.service";
+import { CreateMonitorDto } from "./dto/create-monitor.dto";
+import { UpdateMonitorDto } from "./dto/update-monitor.dto";
+import { ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 
-@Controller('monitor')
+@Controller("monitor")
 export class MonitorController {
   constructor(private readonly monitorService: MonitorService) {}
 
-  @Post()
-  create(@Body() createMonitorDto: CreateMonitorDto) {
-    return this.monitorService.create(createMonitorDto);
+  // @Post()
+  // create(@Body() createMonitorDto: CreateMonitorDto) {
+  //   return this.monitorService.create(createMonitorDto);
+  // }
+
+  @Get("getmap")
+  @ApiOperation({
+    summary: "获取map文件",
+    description: "获取服务器上的map文件",
+  })
+  // @Version("2")
+  getMap(
+    @Query("fileName") fileName: string,
+    @Query("env") env: string,
+    @Res() res: Response
+  ): void {
+    this.monitorService.getMap(fileName, env, res);
   }
 
-  @Get()
-  findAll() {
-    return this.monitorService.findAll();
+  @Get("getErrorList")
+  @ApiOperation({
+    summary: "获取错误日志列表",
+    description: "获取错误日志列表",
+  })
+  getErrorList(@Res() res: Response): void {
+    this.monitorService.getErrorList(res);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.monitorService.findOne(+id);
+  @Get("getRecordScreenId")
+  @ApiOperation({
+    summary: "根据id获取录屏",
+    description: "根据id获取录屏",
+  })
+  getRecordScreenId(@Query("id") id: string, @Res() res: Response): void {
+    this.monitorService.getRecordScreenId(id, res);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMonitorDto: UpdateMonitorDto) {
-    return this.monitorService.update(+id, updateMonitorDto);
+  @Post("reportData")
+  @ApiOperation({
+    summary: "上报数据",
+    description: "上报数据",
+  })
+  reportData(@Res() res: Response): void {
+    this.monitorService.reportData(res);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.monitorService.remove(+id);
-  }
+  // @Get()
+  // findAll() {
+  //   return this.monitorService.findAll();
+  // }
+
+  // @Get(":id")
+  // findOne(@Param("id") id: string) {
+  //   return this.monitorService.findOne(+id);
+  // }
+
+  // @Patch(":id")
+  // update(@Param("id") id: string, @Body() updateMonitorDto: UpdateMonitorDto) {
+  //   return this.monitorService.update(+id, updateMonitorDto);
+  // }
+
+  // @Delete(":id")
+  // remove(@Param("id") id: string) {
+  //   return this.monitorService.remove(+id);
+  // }
 }
