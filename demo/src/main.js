@@ -14,7 +14,7 @@ import recordscreen from '../../packages/recordscreen/src';
 // import recordscreen from '@zmonitor/recordscreen';
 
 Vue.use(zMonitor, {
-  dsn: 'http://localhost:8080/reportData',
+  dsn: 'http://localhost:8083/monitor/reportData',
   apikey: 'abcd',
   silentWhiteScreen: true,
   skeletonProject: true,

@@ -1,9 +1,13 @@
 import { PartialType } from "@nestjs/mapped-types";
 
-export class CreateMonitorDto {
+export class CreateRecordScreenDto {
   type: string;
   status: string;
   time: number;
+  recordScreenId: string;
+  events: string;
+  column: number;
+  userId: string;
   sdkVersion: string;
   apikey: string;
   uuid: string;
@@ -11,4 +15,4 @@ export class CreateMonitorDto {
   deviceInfo: DeviceInfo;
 }
 
-export class UpdateMonitorDto extends PartialType(CreateMonitorDto) {}
+export class UpdateRecordScreenDto extends PartialType(CreateRecordScreenDto) {}

@@ -31,7 +31,7 @@ function loadSourceMap(fileName) {
   }
   if (!file) return;
   return new Promise(resolve => {
-    fetch(`http://localhost:8083/getmap?fileName=${file}&env=${env}`).then(response => {
+    fetch(`http://localhost:8083/monitor/getmap?fileName=${file}&env=${env}`).then(response => {
       if (env == 'development') {
         resolve(response.text());
       } else {

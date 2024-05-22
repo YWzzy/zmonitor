@@ -14,11 +14,12 @@ import {
   ParseIntPipe,
 } from "@nestjs/common";
 import { MonitorService } from "./monitor.service";
-import { CreateMonitorDto } from "./dto/create-monitor.dto";
-import { UpdateMonitorDto } from "./dto/update-monitor.dto";
+// import { CreateMonitorDto } from "./dto/create-monitor.dto";
+// import { UpdateMonitorDto } from "./dto/update-monitor.dto";
 import { ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 
 @Controller("monitor")
+@ApiTags("系统监控")
 export class MonitorController {
   constructor(private readonly monitorService: MonitorService) {}
 
@@ -64,8 +65,8 @@ export class MonitorController {
     summary: "上报数据",
     description: "上报数据",
   })
-  reportData(@Res() res: Response): void {
-    this.monitorService.reportData(res);
+  reportData(@Req() req: any, @Res() res: any): void {
+    this.monitorService.reportData(req, res);
   }
 
   // @Get()

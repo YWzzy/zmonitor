@@ -19,6 +19,10 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { TestModule } from "./test/test.module";
 import { PachongModule } from "./pachong/pachong.module";
 import { MonitorModule } from "./monitor/monitor.module";
+import { PerformanceModule } from "./performance/performance.module";
+import { RecordScreenModule } from "./record-screen/record-screen.module";
+import { WhiteScreenModule } from "./white-screen/white-screen.module";
+import { ErrorMonitorModule } from "./error-monitor/error-monitor.module";
 
 @Module({
   imports: [
@@ -47,6 +51,10 @@ import { MonitorModule } from "./monitor/monitor.module";
     TestModule,
     PachongModule,
     MonitorModule,
+    PerformanceModule,
+    RecordScreenModule,
+    WhiteScreenModule,
+    ErrorMonitorModule,
   ],
   controllers: [AppController],
   providers: [AppService],

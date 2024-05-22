@@ -12,6 +12,9 @@
     <el-row>
       <el-button type="danger" @click="resourceError">加载资源报错</el-button>
     </el-row>
+    <el-row>
+      <el-button type="danger" @click="getErrorList">获取列表</el-button>
+    </el-row>
     <p class="error">报错统计</p>
     <el-table :data="tableData" style="width: 100%">
       <el-table-column type="index" width="50"></el-table-column>
@@ -109,9 +112,12 @@ export default {
     this.getTableData();
   },
   methods: {
+    getErrorList() {
+      this.getTableData();
+    },
     getTableData() {
       setTimeout(() => {
-        fetch(`http://localhost:8083/getErrorList`)
+        fetch(`http://localhost:8083/monitor/getErrorList`)
           .then(response => response.json())
           .then(res => {
             this.tableData = res.data;
@@ -169,7 +175,7 @@ export default {
       });
     },
     playRecord(id) {
-      fetch(`http://localhost:8083/getRecordScreenId?id=${id}`)
+      fetch(`http://localhost:8083/monitor/getRecordScreenId?id=${id}`)
         .then(response => response.json())
         .then(res => {
           let { code, data } = res;
