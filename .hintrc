@@ -1,6 +1,7 @@
 {
   "extends": [
     "development"
+    // "production"
   ],
   "hints": {
     "typescript-config/strict": "off"

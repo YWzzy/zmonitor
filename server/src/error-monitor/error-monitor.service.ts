@@ -23,7 +23,8 @@ export class ErrorMonitorService {
       const processedBreadcrumbs = createErrorMonitorDto.breadcrumb.map(
         (b) => ({
           ...b,
-          data: JSON.stringify(b.data),
+          // data: JSON.stringify(b.data),
+          data: "",
         })
       );
       const errorMonitor = this.errorMonitorRepository.create({

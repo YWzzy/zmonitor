@@ -1,0 +1,2 @@
+import { SpanStatus } from '@zmonitor/common';
+export declare function fromHttpStatus(httpStatus: any): SpanStatus.Ok | SpanStatus.DeadlineExceeded | SpanStatus.Unauthenticated | SpanStatus.PermissionDenied | SpanStatus.NotFound | SpanStatus.ResourceExhausted | SpanStatus.InvalidArgument | SpanStatus.Unimplemented | SpanStatus.Unavailable | SpanStatus.InternalError | SpanStatus.UnknownError | SpanStatus.AlreadyExists | SpanStatus.FailedPrecondition;

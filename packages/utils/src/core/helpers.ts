@@ -85,7 +85,9 @@ export function toStringAny(target: any, type: string): boolean {
 export function validateOption(target: any, targetName: string, expectType: string): any {
   if (!target) return false;
   if (typeofAny(target) === expectType) return true;
-  console.error(`web-see: ${targetName}期望传入${expectType}类型，目前是${typeofAny(target)}类型`);
+  console.error(
+    `z-monitor: ${targetName}期望传入${expectType}类型，目前是${typeofAny(target)}类型`
+  );
 }
 
 export function generateUUID(): string {

@@ -22,7 +22,7 @@ export function notify(type: EVENTTYPES, data?: any): void {
       },
       () => {
         // console.error(
-        //   `web-see 重写事件notify的回调函数发生错误\nType:${type}\nName: ${getFunctionName(
+        //   `z-monitor 重写事件notify的回调函数发生错误\nType:${type}\nName: ${getFunctionName(
         //     callback
         //   )}\nError: ${e}`
         // );

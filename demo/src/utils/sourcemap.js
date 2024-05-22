@@ -43,6 +43,11 @@ function loadSourceMap(fileName) {
 
 export const findCodeBySourceMap = async ({ fileName, line, column }, callback) => {
   let sourceData = await loadSourceMap(fileName);
+  console.log('====================================');
+  console.log('line', line);
+  console.log('column', column);
+  console.log('sourceData', sourceData);
+  console.log('====================================');
   if (!sourceData) return;
   let result, codeList;
   if (process.env.NODE_ENV == 'development') {
@@ -69,6 +74,9 @@ export const findCodeBySourceMap = async ({ fileName, line, column }, callback) 
       line: Number(line),
       column: Number(column),
     });
+    console.log('====================================');
+    console.log('result', result);
+    console.log('====================================');
     /**
      * result结果
      * {

@@ -74,7 +74,7 @@ export class TransportData {
       if (typeof id === 'string' || typeof id === 'number') {
         return id;
       } else {
-        console.error(`web-see userId: ${id} 期望 string 或 number 类型，但是传入 ${typeof id}`);
+        console.error(`z-monitor userId: ${id} 期望 string 或 number 类型，但是传入 ${typeof id}`);
       }
     }
     return '';
@@ -125,7 +125,7 @@ export class TransportData {
   async send(data: ReportData) {
     const dsn = this.errorDsn;
     if (isEmpty(dsn)) {
-      console.error('web-see: dsn为空，没有传入监控错误上报的dsn地址，请在init中传入');
+      console.error('z-monitor: dsn为空，没有传入监控错误上报的dsn地址，请在init中传入');
       return;
     }
     // 开启录屏，由@zmonitor/recordScreen 插件控制

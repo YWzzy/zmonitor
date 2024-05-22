@@ -43,8 +43,9 @@ export class MonitorService {
     if (env === "development") {
       mapPath = path.join(__dirname, "..", fileName);
     } else {
-      mapPath = path.join(__dirname, "..", "dist/js", `${fileName}.map`);
+      mapPath = path.join(__dirname, "..", "client/js", `${fileName}.map`);
     }
+    console.log("源码路径 mapPath:", mapPath);
 
     try {
       const data = await fs.promises.readFile(mapPath);

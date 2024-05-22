@@ -30,8 +30,8 @@ export class ErrorMonitor {
   @Column({ default: 0 })
   line: number;
 
-  @Column({ default: 0 })
-  errorColumn: number;
+  @Column({ default: -1, type: "int", name: "errorColumn" })
+  column: number;
 
   @Column({ default: "" })
   recordScreenId: string;
