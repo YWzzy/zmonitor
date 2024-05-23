@@ -13,6 +13,7 @@ import { UpdateErrorMonitorDto } from "./dto/update-error-monitor.dto";
 import { ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 
 @Controller("error-monitor")
+@ApiTags("错误日志")
 export class ErrorMonitorController {
   constructor(private readonly errorMonitorService: ErrorMonitorService) {}
 
@@ -36,6 +37,10 @@ export class ErrorMonitorController {
   }
 
   @Patch(":id")
+  @ApiOperation({
+    summary: "更新错误日志",
+    description: "更新错误日志",
+  })
   update(
     @Param("id") id: string,
     @Body() updateErrorMonitorDto: UpdateErrorMonitorDto
@@ -43,7 +48,21 @@ export class ErrorMonitorController {
     return this.errorMonitorService.update(+id, updateErrorMonitorDto);
   }
 
+  @Post("shield")
+  @ApiOperation({
+    summary: "屏蔽错误日志",
+    description: "屏蔽错误日志",
+  })
+  async shieldError(@Body("id") id: number) {
+    console.log("shieldError", id);
+    return this.errorMonitorService.shieldError(id);
+  }
+
   @Delete(":id")
+  @ApiOperation({
+    summary: "删除错误日志",
+    description: "删除错误日志",
+  })
   remove(@Param("id") id: string) {
     return this.errorMonitorService.remove(+id);
   }

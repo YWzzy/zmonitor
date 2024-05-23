@@ -43,12 +43,14 @@ export class ErrorMonitorService {
 
   async findAll(): Promise<ErrorMonitor[]> {
     try {
+      // 查询所有 isDeleted 为 false 的错误日志
       const errorMonitors = await this.errorMonitorRepository.find({
+        where: { isDeleted: false },
         relations: ["breadcrumb"],
       });
-      return errorMonitors.map((em) => ({
-        ...em,
-        breadcrumb: em.breadcrumb.map((b) => ({
+      return errorMonitors.map((errorMonitor) => ({
+        ...errorMonitor,
+        breadcrumb: errorMonitor.breadcrumb.map((b) => ({
           ...b,
           data: this.parseDataField(b.data),
         })),
@@ -110,6 +112,16 @@ export class ErrorMonitorService {
       };
     } catch (error) {
       console.error(`Error updating ErrorMonitor with id ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // 标记错误为已删除
+  async shieldError(id: number): Promise<void> {
+    try {
+      await this.errorMonitorRepository.update(id, { isDeleted: true });
+    } catch (error) {
+      console.error(`Error shielding ErrorMonitor with id ${id}:`, error);
       throw error;
     }
   }

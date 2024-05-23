@@ -67,6 +67,9 @@ export class ErrorMonitor {
     device_type: string;
   };
 
+  @Column({ default: false, comment: "是否隐藏" })
+  isDeleted: boolean;
+
   @OneToMany(() => Breadcrumb, (breadcrumb) => breadcrumb.errorMonitor, {
     cascade: true,
   })

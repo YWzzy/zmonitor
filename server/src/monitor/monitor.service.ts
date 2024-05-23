@@ -102,19 +102,27 @@ export class MonitorService {
 
   // 根据ID获取录屏数据
   async getRecordScreenById(recordScreenId: string, res: any): Promise<void> {
-    const recordingInfo = await this.recordingService.findOneByOriginalFileName(
-      recordScreenId
-    );
-    if (recordingInfo.storedFilePath) {
-      const data = fs.readFileSync(recordingInfo.storedFilePath, "base64");
-      res.status(200).send({
-        code: 200,
-        data,
-      });
-    } else {
-      res.status(404).send({
-        code: 404,
-        message: "Recording file not found.",
+    try {
+      const recordingInfo =
+        await this.recordingService.findOneByOriginalFileName(recordScreenId);
+      // 如果recordingInfo存在，并且有存储路径
+      if (!this.isEmptyObject(recordingInfo)) {
+        const data = fs.readFileSync(recordingInfo?.storedFilePath, "base64");
+        res.status(200).send({
+          code: 200,
+          data,
+        });
+      } else {
+        res.status(400).send({
+          code: 400,
+          message: "Recording file not found.",
+        });
+      }
+    } catch (err) {
+      res.status(500).send({
+        code: 500,
+        message: "Error retrieving recording file.",
+        error: err,
       });
     }
   }
@@ -143,5 +151,11 @@ export class MonitorService {
         error: err,
       });
     }
+  }
+
+  // 判断对象是否为空
+  isEmptyObject(obj: any): boolean {
+    if (typeof obj !== "object" || obj == null || obj == undefined) return true;
+    return Object.keys(obj).length === 0;
   }
 }

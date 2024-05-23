@@ -6,6 +6,7 @@ import {
   IsUrl,
   IsJSON,
   IsArray,
+  IsBoolean,
   ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
@@ -34,6 +35,8 @@ export class CreateErrorMonitorDto {
     device: string;
     device_type: string;
   };
+  @IsBoolean()
+  isDeleted: boolean;
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateBreadcrumbDto)

@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { PerformanceService } from './performance.service';
-import { CreatePerformanceDto } from './dto/create-performance.dto';
-import { UpdatePerformanceDto } from './dto/update-performance.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
+import { PerformanceService } from "./performance.service";
+import { CreatePerformanceDto } from "./dto/create-performance.dto";
+import { UpdatePerformanceDto } from "./dto/update-performance.dto";
 
-@Controller('performance')
+@Controller("performance")
+@ApiTags("性能日志")
 export class PerformanceController {
   constructor(private readonly performanceService: PerformanceService) {}
 
@@ -17,18 +27,21 @@ export class PerformanceController {
     return this.performanceService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  findOne(@Param("id") id: string) {
     return this.performanceService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePerformanceDto: UpdatePerformanceDto) {
+  @Patch(":id")
+  update(
+    @Param("id") id: string,
+    @Body() updatePerformanceDto: UpdatePerformanceDto
+  ) {
     return this.performanceService.update(+id, updatePerformanceDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete(":id")
+  remove(@Param("id") id: string) {
     return this.performanceService.remove(+id);
   }
 }

@@ -22,9 +22,6 @@ export class PerformanceService {
       const performance = this.performanceRepository.create({
         ...createPerformanceDto,
       });
-      console.log("====================================");
-      console.log("performance:", performance);
-      console.log("====================================");
       return await this.performanceRepository.save(performance);
     } catch (error) {
       console.error("Error creating Performance:", error);
