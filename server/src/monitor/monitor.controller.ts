@@ -57,7 +57,7 @@ export class MonitorController {
     description: "根据id获取录屏",
   })
   getRecordScreenId(@Query("id") id: string, @Res() res: Response): void {
-    this.monitorService.getRecordScreenId(id, res);
+    this.monitorService.getRecordScreenById(id, res);
   }
 
   @Post("reportData")

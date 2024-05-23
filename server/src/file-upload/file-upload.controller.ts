@@ -1,34 +1,36 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { FileUploadService } from './file-upload.service';
-import { CreateFileUploadDto } from './dto/create-file-upload.dto';
-import { UpdateFileUploadDto } from './dto/update-file-upload.dto';
+import {
+  Controller,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { FileUploadService } from "./file-upload.service";
+import { RecordingService } from "../recording/recording.service";
+import { CreateFileUploadDto } from "./dto/create-file-upload.dto";
+import { UpdateFileUploadDto } from "./dto/update-file-upload.dto";
 
-@Controller('file-upload')
+@Controller("upload")
 export class FileUploadController {
-  constructor(private readonly fileUploadService: FileUploadService) {}
+  constructor(
+    private readonly fileUploadService: FileUploadService,
+    private readonly recordingService: RecordingService
+  ) {}
 
   @Post()
-  create(@Body() createFileUploadDto: CreateFileUploadDto) {
-    return this.fileUploadService.create(createFileUploadDto);
-  }
+  @UseInterceptors(FileInterceptor("file"))
+  async uploadFile(@UploadedFile() file) {
+    const extractedFiles = await this.fileUploadService.handleFileUpload(file);
 
-  @Get()
-  findAll() {
-    return this.fileUploadService.findAll();
-  }
+    const savedRecordings = await Promise.all(
+      extractedFiles.map(async (filePath) => {
+        return this.recordingService.saveRecording(file.originalname, filePath);
+      })
+    );
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.fileUploadService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFileUploadDto: UpdateFileUploadDto) {
-    return this.fileUploadService.update(+id, updateFileUploadDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.fileUploadService.remove(+id);
+    return {
+      message: "File uploaded successfully",
+      files: savedRecordings,
+    };
   }
 }
