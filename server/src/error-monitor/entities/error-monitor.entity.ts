@@ -7,51 +7,56 @@ import {
 } from "typeorm";
 import { Breadcrumb } from "./breadcrumb.entity";
 
-@Entity()
+@Entity("error_monitor")
 export class ErrorMonitor {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ comment: "主键ID" })
   id: number;
 
-  @Column()
+  @Column({ comment: "错误类型" })
   type: string;
 
-  @Column()
+  @Column({ comment: "错误状态" })
   status: string;
 
-  @Column("bigint")
+  @Column("bigint", { comment: "时间戳" })
   time: number;
 
-  @Column({ default: "" })
+  @Column({ default: "", comment: "错误信息" })
   message: string;
 
-  @Column({ default: "" })
+  @Column({ default: "", comment: "文件名" })
   fileName: string;
 
-  @Column({ default: 0 })
+  @Column({ default: 0, comment: "行号" })
   line: number;
 
-  @Column({ default: -1, type: "int", name: "errorColumn" })
+  @Column({
+    default: -1,
+    type: "int",
+    name: "errorColumn",
+    comment: "错误列号",
+  })
   column: number;
 
-  @Column({ default: "" })
+  @Column({ default: "", comment: "录屏ID" })
   recordScreenId: string;
 
-  @Column({ default: "" })
+  @Column({ default: "", comment: "用户ID" })
   userId: string;
 
-  @Column({ default: "" })
+  @Column({ default: "", comment: "SDK版本" })
   sdkVersion: string;
 
-  @Column({ default: "" })
+  @Column({ default: "", comment: "API密钥" })
   apikey: string;
 
-  @Column({ default: "" })
+  @Column({ default: "", comment: "唯一标识符" })
   uuid: string;
 
-  @Column({ default: "" })
+  @Column({ default: "", comment: "页面URL" })
   pageUrl: string;
 
-  @Column("json", { nullable: true })
+  @Column("json", { nullable: true, comment: "设备信息" })
   deviceInfo: {
     browserVersion: string;
     browser: string;
@@ -67,6 +72,6 @@ export class ErrorMonitor {
   })
   breadcrumb: Breadcrumb[];
 
-  @CreateDateColumn({ type: "timestamp" })
+  @CreateDateColumn({ type: "timestamp", comment: "记录创建时间" })
   createTime: Date;
 }

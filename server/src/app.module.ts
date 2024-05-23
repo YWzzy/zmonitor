@@ -21,7 +21,6 @@ import { TestModule } from "./test/test.module";
 import { PachongModule } from "./pachong/pachong.module";
 import { MonitorModule } from "./monitor/monitor.module";
 import { PerformanceModule } from "./performance/performance.module";
-import { RecordScreenModule } from "./record-screen/record-screen.module";
 import { WhiteScreenModule } from "./white-screen/white-screen.module";
 import { ErrorMonitorModule } from "./error-monitor/error-monitor.module";
 import { FileUploadModule } from "./file-upload/file-upload.module";
@@ -64,7 +63,6 @@ import { Recording } from "./recording/entities/recording.entity";
     PachongModule,
     MonitorModule,
     PerformanceModule,
-    RecordScreenModule,
     WhiteScreenModule,
     ErrorMonitorModule,
     FileUploadModule,

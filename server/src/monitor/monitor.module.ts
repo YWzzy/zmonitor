@@ -12,6 +12,7 @@ import { Monitor } from "./entities/monitor.entity";
 import { ErrorMonitorModule } from "../error-monitor/error-monitor.module";
 import { FileUploadModule } from "../file-upload/file-upload.module";
 import { RecordingModule } from "../recording/recording.module";
+import { PerformanceModule } from "../performance/performance.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { RecordingModule } from "../recording/recording.module";
     ErrorMonitorModule,
     FileUploadModule,
     RecordingModule,
+    PerformanceModule,
   ],
   controllers: [MonitorController],
   providers: [MonitorService],

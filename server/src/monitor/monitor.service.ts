@@ -9,18 +9,20 @@ import { ErrorMonitorService } from "../error-monitor/error-monitor.service";
 import { CreateErrorMonitorDto } from "../error-monitor/dto/create-error-monitor.dto";
 import { RecordingService } from "../recording/recording.service";
 import { FileUploadService } from "../file-upload/file-upload.service";
+import { PerformanceService } from "../performance/performance.service";
+import { CreatePerformanceDto } from "src/performance/dto/create-performance.dto";
 
 @Injectable()
 export class MonitorService {
   private performanceList: any[] = [];
-  private recordScreenList: any[] = [];
   private whiteScreenList: any[] = [];
 
   constructor(
     @InjectRepository(Monitor) private readonly monitor: Repository<Monitor>,
     private readonly errorMonitorService: ErrorMonitorService,
     private readonly recordingService: RecordingService,
-    private readonly fileUploadService: FileUploadService
+    private readonly fileUploadService: FileUploadService,
+    private readonly performanceService: PerformanceService
   ) {}
 
   // 存储录屏数据
@@ -47,7 +49,8 @@ export class MonitorService {
   async saveLogByType(type: string, data: any): Promise<void> {
     try {
       if (type === "performance") {
-        this.performanceList.push(data);
+        const createPerformanceDto: CreatePerformanceDto = data;
+        await this.performanceService.create(createPerformanceDto);
       } else if (type === "recordScreen") {
         this.saveRecordScreen(data);
       } else if (type === "whiteScreen") {
