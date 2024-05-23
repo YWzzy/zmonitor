@@ -47,7 +47,8 @@
     "rxjs": "^7.2.0",
     "svg-captcha": "^1.4.0",
     "swagger-ui-express": "^4.6.0",
-    "typeorm": "^0.3.10"
+    "typeorm": "^0.3.10",
+    "unzipper": "^0.11.6"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

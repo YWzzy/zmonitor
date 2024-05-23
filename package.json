@@ -21,6 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "@changesets/cli": "^2.26.1",
+    "@nestjs/mapped-types": "*",
     "@zmonitor/common": "1.0.0",
     "@zmonitor/types": "1.0.0",
     "@zmonitor/utils": "1.0.0",

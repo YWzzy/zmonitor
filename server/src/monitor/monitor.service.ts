@@ -45,7 +45,7 @@ export class MonitorService {
     } else {
       mapPath = path.join(__dirname, "..", "client/js", `${fileName}.map`);
     }
-    console.log("源码路径 mapPath:", mapPath);
+    // console.log("源码路径 mapPath:", mapPath);
 
     try {
       const data = await fs.promises.readFile(mapPath);
@@ -89,6 +89,9 @@ export class MonitorService {
     try {
       const length = Object.keys(req.body).length;
       if (length) {
+        console.log("====================================");
+        console.log("req.body", req.body);
+        console.log("====================================");
         this.recordScreenList.push(req.body);
       } else {
         const data = await coBody.json(req);

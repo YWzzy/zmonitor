@@ -36,12 +36,18 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const options = new DocumentBuilder()
     .addBearerAuth()
-    .setTitle("nest测试")
-    .setDescription("项目的描述")
+    .setTitle("z-monitor-server")
+    .setDescription("z-monitor监控后台服务")
     .setVersion("1.0.0")
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup("/api-docs", app, document);
+
+  app.enableCors({
+    origin: "*",
+    methods: "GET,POST,PUT,DELETE,OPTIONS",
+    allowedHeaders: "Content-Type, Authorization, X-Requested-With, Accept",
+  });
 
   app.enableVersioning({
     type: VersioningType.URI,

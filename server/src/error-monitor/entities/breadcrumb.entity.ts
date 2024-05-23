@@ -18,7 +18,7 @@ export class Breadcrumb {
   @Column()
   category: string;
 
-  @Column()
+  @Column({ name: "dataContent", type: "text" })
   data: string;
 
   @Column()

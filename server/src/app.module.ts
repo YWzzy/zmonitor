@@ -23,14 +23,15 @@ import { PerformanceModule } from "./performance/performance.module";
 import { RecordScreenModule } from "./record-screen/record-screen.module";
 import { WhiteScreenModule } from "./white-screen/white-screen.module";
 import { ErrorMonitorModule } from "./error-monitor/error-monitor.module";
+import { FileUploadModule } from './file-upload/file-upload.module';
 
 @Module({
   imports: [
-    UserModule,
-    ListModule,
     ConfigModule.forRoot({
       path: "zzzyyy",
-    }),
+    }), // 加载配置模块，并设置配置文件路径为 "zzzyyy"
+    UserModule,
+    ListModule,
     UploadModule,
     SpiderModule,
     GuardModule,
@@ -55,6 +56,7 @@ import { ErrorMonitorModule } from "./error-monitor/error-monitor.module";
     RecordScreenModule,
     WhiteScreenModule,
     ErrorMonitorModule,
+    FileUploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
