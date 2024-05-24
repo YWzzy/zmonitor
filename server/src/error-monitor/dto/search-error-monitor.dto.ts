@@ -66,7 +66,7 @@ export class SearchErrorMonitorDto {
 
   @IsString()
   @IsOptional()
-  apikey: string;
+  appId: string;
 
   @IsUUID()
   @IsOptional()

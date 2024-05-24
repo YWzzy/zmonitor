@@ -6,7 +6,7 @@ export class CreateWhiteScreenDto {
   status: string;
   userId: string;
   sdkVersion: string;
-  apikey: string;
+  appId: string;
   uuid: string;
   pageUrl: string;
   deviceInfo: DeviceInfo;

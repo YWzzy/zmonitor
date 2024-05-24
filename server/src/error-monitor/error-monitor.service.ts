@@ -28,21 +28,34 @@ export class ErrorMonitorService {
   ): Promise<ErrorMonitor> {
     try {
       // 处理 breadcrumb 中的 data 字段
-      const processedBreadcrumbs = createErrorMonitorDto.breadcrumb.map((b) => {
-        const dataStr =
-          typeof b.data === "object" ? JSON.stringify(b.data) : b.data;
-        return {
-          ...b,
-          data: dataStr.length > 2048 ? dataStr.substring(0, 2048) : dataStr,
-        };
-      });
+      if (
+        createErrorMonitorDto.hasOwnProperty("breadcrumb") &&
+        createErrorMonitorDto.breadcrumb.length >= 0
+      ) {
+        const processedBreadcrumbs = createErrorMonitorDto.breadcrumb.map(
+          (b) => {
+            const dataStr =
+              typeof b.data === "object" ? JSON.stringify(b.data) : b.data;
+            return {
+              ...b,
+              data:
+                dataStr.length > 2048 ? dataStr.substring(0, 2048) : dataStr,
+            };
+          }
+        );
 
-      const errorMonitor = this.errorMonitorRepository.create({
-        ...createErrorMonitorDto,
-        breadcrumb: processedBreadcrumbs,
-      });
+        const errorMonitor = this.errorMonitorRepository.create({
+          ...createErrorMonitorDto,
+          breadcrumb: processedBreadcrumbs,
+        });
 
-      return await this.errorMonitorRepository.save(errorMonitor);
+        return await this.errorMonitorRepository.save(errorMonitor);
+      } else {
+        const errorMonitor = this.errorMonitorRepository.create({
+          ...createErrorMonitorDto,
+        });
+        return await this.errorMonitorRepository.save(errorMonitor);
+      }
     } catch (error) {
       console.error("Error creating ErrorMonitor:", error);
       throw error;
@@ -69,6 +82,7 @@ export class ErrorMonitorService {
     }
   }
 
+  // 分页查询错误日志
   async findListPage(
     searchErrorMonitorDto: SearchErrorMonitorDto
   ): Promise<ErrorMonitorList> {

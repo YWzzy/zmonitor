@@ -17,7 +17,7 @@ import { options } from './options';
  */
 export class TransportData {
   queue: Queue = new Queue(); // 消息队列
-  apikey = ''; // 每个项目对应的唯一标识
+  appId = ''; // 每个项目对应的唯一标识
   errorDsn = ''; // 监控上报接口的地址
   userId = ''; // 用户id
   uuid: string; // 每次页面加载的唯一标识
@@ -65,7 +65,7 @@ export class TransportData {
     return {
       userId: this.userId || this.getAuthId() || '',
       sdkVersion: SDK_VERSION,
-      apikey: this.apikey,
+      appId: this.appId,
     };
   }
   getAuthId(): string | number {
@@ -111,8 +111,8 @@ export class TransportData {
   }
 
   bindOptions(options: InitOptions): void {
-    const { dsn, apikey, beforeDataReport, userId, getUserId, useImgUpload } = options;
-    validateOption(apikey, 'apikey', 'string') && (this.apikey = apikey);
+    const { dsn, appId, beforeDataReport, userId, getUserId, useImgUpload } = options;
+    validateOption(appId, 'appId', 'string') && (this.appId = appId);
     validateOption(dsn, 'dsn', 'string') && (this.errorDsn = dsn);
     validateOption(userId, 'userId', 'string') && (this.userId = userId || '');
     validateOption(useImgUpload, 'useImgUpload', 'boolean') &&

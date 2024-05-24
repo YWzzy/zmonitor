@@ -59,7 +59,7 @@ export class ErrorMonitorController {
           recordScreenId: "record123",
           userId: "user123",
           sdkVersion: "1.0.0",
-          apikey: "apikey123",
+          appId: "apikey123",
           pageUrl: "http://example.com",
           isDeleted: false,
           pageSize: 10,

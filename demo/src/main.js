@@ -15,10 +15,11 @@ import recordscreen from '../../packages/recordscreen/src';
 
 Vue.use(zMonitor, {
   dsn: 'http://localhost:8083/monitor/reportData',
-  apikey: 'abcd',
+  appId: 'abcd',
   silentWhiteScreen: true,
   skeletonProject: true,
   repeatCodeError: true,
+  useImgUpload: true,
   userId: '123',
   handleHttpStatus(data) {
     console.log('data', data);

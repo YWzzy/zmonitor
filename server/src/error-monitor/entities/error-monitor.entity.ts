@@ -48,7 +48,7 @@ export class ErrorMonitor {
   sdkVersion: string;
 
   @Column({ default: "", comment: "API密钥" })
-  apikey: string;
+  appId: string;
 
   @Column({ default: "", comment: "唯一标识符" })
   uuid: string;

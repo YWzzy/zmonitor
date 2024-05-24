@@ -14,9 +14,6 @@ import { CreatePerformanceDto } from "src/performance/dto/create-performance.dto
 
 @Injectable()
 export class MonitorService {
-  private performanceList: any[] = [];
-  private whiteScreenList: any[] = [];
-
   constructor(
     @InjectRepository(Monitor) private readonly monitor: Repository<Monitor>,
     private readonly errorMonitorService: ErrorMonitorService,
@@ -54,7 +51,9 @@ export class MonitorService {
       } else if (type === "recordScreen") {
         this.saveRecordScreen(data);
       } else if (type === "whiteScreen") {
-        this.whiteScreenList.push(data);
+        // this.whiteScreenList.push(data);
+        const createErrorMonitorDto: CreateErrorMonitorDto = data;
+        await this.errorMonitorService.create(createErrorMonitorDto);
       } else {
         const createErrorMonitorDto: CreateErrorMonitorDto = data;
         await this.errorMonitorService.create(createErrorMonitorDto);

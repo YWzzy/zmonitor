@@ -23,7 +23,7 @@ export class CreateErrorMonitorDto {
   recordScreenId: string;
   userId: string;
   sdkVersion: string;
-  apikey: string;
+  appId: string;
   uuid: string;
   pageUrl: string;
   deviceInfo: {

@@ -14,7 +14,7 @@ interface WhiteScreenDto {
   status: string;
   userId: string;
   sdkVersion: string;
-  apikey: string;
+  appId: string;
   uuid: string;
   pageUrl: string;
   deviceInfo: DeviceInfo;
@@ -29,7 +29,7 @@ interface PerformanceDto {
   value: number;
   userId: string;
   sdkVersion: string;
-  apikey: string;
+  appId: string;
   uuid: string;
   pageUrl: string;
   deviceInfo: DeviceInfo;
@@ -54,7 +54,7 @@ interface ErrorDto {
   recordScreenId: string;
   userId: string;
   sdkVersion: string;
-  apikey: string;
+  appId: string;
   uuid: string;
   pageUrl: string;
   deviceInfo: DeviceInfo;
@@ -70,7 +70,7 @@ interface RecordScreenDto {
   column: number;
   userId: string;
   sdkVersion: string;
-  apikey: string;
+  appId: string;
   uuid: string;
   pageUrl: string;
   deviceInfo: DeviceInfo;

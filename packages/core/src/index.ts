@@ -14,8 +14,8 @@ import { SDK_VERSION, SDK_NAME, EVENTTYPES } from '@zmonitor/common';
 import { InitOptions, VueInstance, ViewModel } from '@zmonitor/types';
 
 function init(options: InitOptions) {
-  if (!options.dsn || !options.apikey) {
-    return console.error(`z-monitor 缺少必须配置项：${!options.dsn ? 'dsn' : 'apikey'} `);
+  if (!options.dsn || !options.appId) {
+    return console.error(`z-monitor 缺少必须配置项：${!options.dsn ? 'dsn' : 'appId'} `);
   }
   if (!('fetch' in _global) || options.disabled) return;
   // 初始化配置

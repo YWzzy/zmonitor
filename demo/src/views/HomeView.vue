@@ -25,7 +25,7 @@
           <span>{{ scope.row.time ? format(scope.row.time) : scope.row.date }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="apikey" label="项目编号"> </el-table-column>
+      <el-table-column prop="appId" label="项目编号"> </el-table-column>
       <el-table-column prop="userId" label="用户id"> </el-table-column>
       <el-table-column prop="sdkVersion" label="SDK版本"> </el-table-column>
       <el-table-column prop="deviceInfo" label="浏览器信息">

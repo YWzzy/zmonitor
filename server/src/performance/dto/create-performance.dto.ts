@@ -16,7 +16,7 @@ export class CreatePerformanceDto {
   name: string;
   userId: string;
   sdkVersion: string;
-  apikey: string;
+  appId: string;
   uuid: string;
   pageUrl: string;
   deviceInfo: {

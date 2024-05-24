@@ -6,7 +6,7 @@
  * @FilePath: \zjiang-web-monitor\server\src\app.module.ts
  * @Description:
  */
-import { Module } from "@nestjs/common";
+import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common";
 import { MulterModule } from "@nestjs/platform-express";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -27,6 +27,7 @@ import { FileUploadModule } from "./file-upload/file-upload.module";
 import { RecordingModule } from "./recording/recording.module";
 import { FileUploadService } from "./file-upload/file-upload.service";
 import { Recording } from "./recording/entities/recording.entity";
+import { ApplicationModule } from "./application/application.module";
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { Recording } from "./recording/entities/recording.entity";
     ErrorMonitorModule,
     FileUploadModule,
     RecordingModule,
+    ApplicationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

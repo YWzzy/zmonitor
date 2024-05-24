@@ -45,7 +45,7 @@ import recordscreen from '@zmonitor/recordscreen';
 
 Vue.use(zMonitor, {
   dsn: 'http://text.com/reportData', // 上报的地址
-  apikey: 'project1', // 项目唯一的id
+  appId: 'project1', // 项目唯一的id
   userId: '89757', // 用户id
   repeatCodeError: true, // 开启错误上报去重，重复的代码错误只上报一次
   silentWhiteScreen: true, // 开启白屏检测
@@ -78,7 +78,7 @@ import recordscreen from '@zmonitor/recordscreen';
 const app = createApp(App);
 app.use(zMonitor, {
   dsn: 'http://text.com/reportData',
-  apikey: 'project1',
+  appId: 'project1',
   userId: '89757',
 });
 
@@ -95,7 +95,7 @@ import recordscreen from '@zmonitor/recordscreen';
 
 zMonitor.init({
   dsn: 'http://text.com/reportData',
-  apikey: 'project1',
+  appId: 'project1',
   userId: '89757',
 });
 
@@ -138,7 +138,7 @@ class ErrorBoundary extends React.Component {
 |          Name          | Type       | Default                             | Description                                                                                                                                                                                                             |
 | :--------------------: | ---------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 |         `dsn`          | `string`   | `""`                                | (必传项) 上报接口的地址，post 方法                                                                                                                                                                                      |
-|        `apikey`        | `string`   | `""`                                | (必传项) 每个项目对应一个 apikey，唯一标识                                                                                                                                                                              |
+|        `appId`         | `string`   | `""`                                | (必传项) 每个项目对应一个 appId，唯一标识                                                                                                                                                                               |
 |        `userId`        | `string`   | `""`                                | 用户 id                                                                                                                                                                                                                 |
 |       `disabled`       | `boolean`  | `false`                             | 默认是开启 SDK，为 true 时，会将 sdk 禁用                                                                                                                                                                               |
 |  `silentWhiteScreen`   | `boolean`  | `false`                             | 注意：默认不会开启白屏检测，为 true 时，开启检测                                                                                                                                                                        |
@@ -222,7 +222,7 @@ import zMonitor from 'zMonitor';
 
 Vue.use(zMonitor, {
   dsn: 'http://test.com/reportData',
-  apikey: 'abcd',
+  appId: 'abcd',
   // handleHttpStatus 返回true表示接口正常，反之表示接口报错
   handleHttpStatus(data) {
     let { url, response } = data;
