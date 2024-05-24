@@ -3,8 +3,16 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateErrorMonitorDto } from "./dto/create-error-monitor.dto";
 import { UpdateErrorMonitorDto } from "./dto/update-error-monitor.dto";
+import { SearchErrorMonitorDto } from "./dto/search-error-monitor.dto";
 import { ErrorMonitor } from "./entities/error-monitor.entity";
 import { Breadcrumb } from "./entities/breadcrumb.entity";
+
+type ErrorMonitorList = {
+  data: ErrorMonitor[];
+  total: number;
+  currentPage: number;
+  pageSize: number;
+};
 
 @Injectable()
 export class ErrorMonitorService {
@@ -55,6 +63,41 @@ export class ErrorMonitorService {
           data: this.parseDataField(b.data),
         })),
       }));
+    } catch (error) {
+      console.error("Error finding all ErrorMonitors:", error);
+      throw error;
+    }
+  }
+
+  async findListPage(
+    searchErrorMonitorDto: SearchErrorMonitorDto
+  ): Promise<ErrorMonitorList> {
+    try {
+      const { pageSize, page, ...searchDto } = searchErrorMonitorDto;
+      // 查询条件为searchDto的错误日志，分页查询，返回当前page和total数量
+      const [errorMonitors, total] =
+        await this.errorMonitorRepository.findAndCount({
+          where: { ...searchDto, isDeleted: false },
+          relations: ["breadcrumb"],
+          order: { createTime: "DESC" },
+          take: pageSize,
+          skip: (page - 1) * pageSize,
+        });
+
+      const data = errorMonitors.map((errorMonitor) => ({
+        ...errorMonitor,
+        breadcrumb: errorMonitor.breadcrumb.map((b) => ({
+          ...b,
+          data: this.parseDataField(b.data),
+        })),
+      }));
+
+      return {
+        data,
+        total,
+        currentPage: page,
+        pageSize,
+      };
     } catch (error) {
       console.error("Error finding all ErrorMonitors:", error);
       throw error;
