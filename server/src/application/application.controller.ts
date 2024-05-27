@@ -51,12 +51,11 @@ export class ApplicationController {
   @ApiOperation({ summary: "更新应用信息" })
   @ApiOkResponse({ description: "成功更新应用信息", type: Application })
   @ApiNotFoundResponse({ description: "未找到对应的应用" })
-  @Patch("updateAppStatus/:id")
+  @Post("updateAppStatus")
   update(
-    @Param("id") id: string,
     @Body() updateApplicationDto: UpdateApplicationDto
   ) {
-    return this.applicationService.update(+id, updateApplicationDto);
+    return this.applicationService.update(updateApplicationDto);
   }
 
   @ApiOperation({ summary: "删除应用" })

@@ -2,11 +2,17 @@
  * @Author: yinhan 1738348915@qq.com
  * @Date: 2024-05-24 15:14:52
  * @LastEditors: yinhan 1738348915@qq.com
- * @LastEditTime: 2024-05-24 15:21:43
+ * @LastEditTime: 2024-05-27 15:43:26
  * @FilePath: \zjiang-web-monitor\server\src\application\dto\create-application.dto.ts
  * @Description:
  */
-import { IsString, IsNotEmpty, IsOptional, Length } from "class-validator";
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  Length,
+  IsBoolean,
+} from "class-validator";
 
 export class CreateApplicationDto {
   @IsString()
@@ -24,10 +30,8 @@ export class CreateApplicationDto {
   @Length(1, 255, { message: "应用类型长度必须在1到255个字符之间" })
   appType: string;
 
-  @IsString()
   @IsNotEmpty({ message: "应用状态不能为空" })
-  @Length(1, 255, { message: "应用状态长度必须在1到255个字符之间" })
-  appStatus: string;
+  appStatus: number;
 
   @IsString()
   @IsOptional()

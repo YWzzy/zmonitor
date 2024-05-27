@@ -2,7 +2,7 @@
  * @Author: yinhan 1738348915@qq.com
  * @Date: 2024-05-24 09:59:26
  * @LastEditors: yinhan 1738348915@qq.com
- * @LastEditTime: 2024-05-24 10:37:23
+ * @LastEditTime: 2024-05-27 16:30:36
  * @FilePath: \zjiang-web-monitor\server\src\error-monitor\dto\search-error-monitor.dto.ts
  * @Description:
  */
@@ -90,5 +90,5 @@ export class SearchErrorMonitorDto {
 
   @IsInt()
   @IsOptional()
-  page: number = 1;
+  pageNo: number = 1;
 }

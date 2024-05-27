@@ -1,3 +1,11 @@
+/*
+ * @Author: yinhan 1738348915@qq.com
+ * @Date: 2024-05-24 15:14:52
+ * @LastEditors: yinhan 1738348915@qq.com
+ * @LastEditTime: 2024-05-27 15:55:58
+ * @FilePath: \zjiang-web-monitor\server\src\application\application.service.ts
+ * @Description:
+ */
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -31,30 +39,46 @@ export class ApplicationService {
   }
 
   async update(
-    id: number,
     updateApplicationDto: UpdateApplicationDto
   ): Promise<Application> {
-    const application = await this.applicationRepository.findOne({
-      where: { appId: id },
-    });
-    if (!application) {
-      throw new Error("Application not found");
-    }
+    try {
+      const id = updateApplicationDto.id;
+      const application = await this.applicationRepository.findOne({
+        where: { id: id },
+      });
+      if (!application) {
+        throw new Error("Application not found");
+      }
+      if (updateApplicationDto.appType) {
+        application.appType = updateApplicationDto.appType;
+      }
 
-    // 更新应用状态
-    if (updateApplicationDto.appStatus) {
-      application.appStatus = updateApplicationDto.appStatus;
-    }
+      if (updateApplicationDto.appName) {
+        application.appName = updateApplicationDto.appName;
+      }
 
-    // 更新应用描述
-    if (updateApplicationDto.appDesc) {
-      application.appDesc = updateApplicationDto.appDesc;
-    }
+      if (updateApplicationDto.appSecret) {
+        application.appSecret = updateApplicationDto.appSecret;
+      }
 
-    application.updateTime = new Date(); // 更新 updateTime
-    return this.applicationRepository.save(application);
+      // 更新应用状态
+      if (updateApplicationDto.appStatus !==null || updateApplicationDto.appStatus !== undefined) {
+        application.appStatus = updateApplicationDto.appStatus;
+      }
+
+      // 更新应用描述
+      if (updateApplicationDto.appDesc) {
+        application.appDesc = updateApplicationDto.appDesc;
+      }
+
+      application.updateTime = new Date(); // 更新 updateTime
+      return this.applicationRepository.save(application);
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
+  // 删除应用
   async remove(id: number): Promise<void> {
     const application = await this.applicationRepository.findOne({
       where: { appId: id },

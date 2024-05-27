@@ -8,7 +8,7 @@ import { ErrorMonitor } from "./entities/error-monitor.entity";
 import { Breadcrumb } from "./entities/breadcrumb.entity";
 
 type ErrorMonitorList = {
-  data: ErrorMonitor[];
+  list: ErrorMonitor[];
   total: number;
   currentPage: number;
   pageSize: number;
@@ -87,15 +87,19 @@ export class ErrorMonitorService {
     searchErrorMonitorDto: SearchErrorMonitorDto
   ): Promise<ErrorMonitorList> {
     try {
-      const { pageSize, page, ...searchDto } = searchErrorMonitorDto;
+      const { pageSize, pageNo, ...searchDto } = searchErrorMonitorDto;
       // 查询条件为searchDto的错误日志，分页查询，返回当前page和total数量
+      if (pageSize < 1 || pageNo < 1) {
+        throw new Error("Invalid pageNo or pageSize");
+      }
+
       const [errorMonitors, total] =
         await this.errorMonitorRepository.findAndCount({
           where: { ...searchDto, isDeleted: false },
           relations: ["breadcrumb"],
           order: { createTime: "DESC" },
           take: pageSize,
-          skip: (page - 1) * pageSize,
+          skip: (pageNo - 1) * pageSize,
         });
 
       const data = errorMonitors.map((errorMonitor) => ({
@@ -107,9 +111,9 @@ export class ErrorMonitorService {
       }));
 
       return {
-        data,
+        list: data,
         total,
-        currentPage: page,
+        currentPage: pageNo,
         pageSize,
       };
     } catch (error) {

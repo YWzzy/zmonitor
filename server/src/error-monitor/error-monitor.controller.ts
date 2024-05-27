@@ -69,6 +69,9 @@ export class ErrorMonitorController {
     },
   })
   findListPage(@Body() searchErrorMonitorDto: SearchErrorMonitorDto) {
+    console.log("====================================");
+    console.log("searchErrorMonitorDto", searchErrorMonitorDto);
+    console.log("====================================");
     return this.errorMonitorService.findListPage(searchErrorMonitorDto);
   }
 
