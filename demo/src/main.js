@@ -19,7 +19,7 @@ Vue.use(zMonitor, {
   silentWhiteScreen: true,
   skeletonProject: true,
   repeatCodeError: true,
-  useImgUpload: true,
+  useImgUpload: false,
   userId: '123',
   handleHttpStatus(data) {
     console.log('data', data);
