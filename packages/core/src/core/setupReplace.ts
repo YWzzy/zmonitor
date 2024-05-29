@@ -3,6 +3,10 @@ import { breadcrumb } from './index';
 import { addReplaceHandler } from './replace';
 import { htmlElementAsString, getTimestamp } from '@zmonitor/utils';
 import { EVENTTYPES, STATUS_CODE } from '@zmonitor/common';
+
+/**
+ * 初始化替换，设置替换函数的入口函数，用于设置各种事件的替换处理
+ */
 export function setupReplace(): void {
   // 白屏检测
   addReplaceHandler({

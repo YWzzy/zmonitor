@@ -27,9 +27,14 @@ export class TransportData {
   constructor() {
     this.uuid = generateUUID(); // 每次页面加载的唯一标识
   }
+
+  // web api方式在页面卸载或导航时异步发送少量数据
   beacon(url: string, data: any): boolean {
+    // navigator.sendBeacon保证了在页面卸载的情况下仍能发送请求，不会阻塞页面的卸载过程
     return navigator.sendBeacon(url, JSON.stringify(data));
   }
+
+  // 使用图片打点方式发送数据
   imgRequest(data: ReportData, url: string): void {
     const requestFun = () => {
       const img = new Image();
@@ -39,6 +44,7 @@ export class TransportData {
     this.queue.addFn(requestFun);
   }
 
+  // 发送数据前的处理钩子
   async beforePost(this: any, data: ReportData): Promise<ReportData | boolean> {
     let transportData = this.getTransportData(data);
     // 配置了beforeDataReport
@@ -48,6 +54,8 @@ export class TransportData {
     }
     return transportData;
   }
+
+  // 使用 fetch 发送数据
   async xhrPost(data: ReportData, url: string): Promise<void> {
     const requestFun = () => {
       fetch(`${url}`, {
@@ -60,6 +68,7 @@ export class TransportData {
     };
     this.queue.addFn(requestFun);
   }
+
   // 获取用户信息
   getAuthInfo() {
     return {
@@ -68,6 +77,8 @@ export class TransportData {
       appId: this.appId,
     };
   }
+
+  // 获取用户id
   getAuthId(): string | number {
     if (typeof this.getUserId === 'function') {
       const id = this.getUserId();
@@ -79,6 +90,7 @@ export class TransportData {
     }
     return '';
   }
+
   // 添加公共信息
   // 这里不要添加时间戳，比如接口报错，发生的时间和上报时间不一致
   getTransportData(data: any): ReportData {
@@ -96,11 +108,13 @@ export class TransportData {
       EVENTTYPES.RECORDSCREEN,
       EVENTTYPES.WHITESCREEN,
     ];
+    // 不需要用户行为的事件
     if (!excludeRreadcrumb.includes(data.type)) {
       info.breadcrumb = breadcrumb.getStack(); // 获取用户行为栈
     }
     return info;
   }
+
   // 判断请求是否为SDK配置的接口
   isSdkTransportUrl(targetUrl: string): boolean {
     let isSdkDsn = false;
@@ -110,6 +124,7 @@ export class TransportData {
     return isSdkDsn;
   }
 
+  // 绑定初始化选项
   bindOptions(options: InitOptions): void {
     const { dsn, appId, beforeDataReport, userId, getUserId, useImgUpload } = options;
     validateOption(appId, 'appId', 'string') && (this.appId = appId);

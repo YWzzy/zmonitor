@@ -13,6 +13,7 @@ export class Breadcrumb {
    * 添加用户行为栈
    */
   push(data: BreadcrumbData): void {
+    // 如果存在 beforePushBreadcrumb 钩子函数，则在添加行为前执行该函数，并将返回的数据添加到堆栈中；否则直接将数据添加到堆栈中
     if (typeof this.beforePushBreadcrumb === 'function') {
       // 执行用户自定义的hook
       const result = this.beforePushBreadcrumb(data) as BreadcrumbData;
@@ -22,6 +23,7 @@ export class Breadcrumb {
     }
     this.immediatePush(data);
   }
+  // 立即将用户行为添加到堆栈中; 该方法不会触发 beforePushBreadcrumb 钩子函数
   immediatePush(data: BreadcrumbData): void {
     data.time || (data.time = getTimestamp());
     if (this.stack.length >= this.maxBreadcrumbs) {
@@ -30,15 +32,19 @@ export class Breadcrumb {
     this.stack.push(data);
     this.stack.sort((a, b) => a.time - b.time);
   }
+  // 删除最旧的用户行为
   shift(): boolean {
     return this.stack.shift() !== undefined;
   }
+  // 清空用户行为堆栈
   clear(): void {
     this.stack = [];
   }
+  // 获取用户行为堆栈
   getStack(): BreadcrumbData[] {
     return this.stack;
   }
+  // 根据事件类型获取用户操作面包屑类型
   getCategory(type: EVENTTYPES): BREADCRUMBTYPES {
     switch (type) {
       // 接口请求
@@ -69,6 +75,7 @@ export class Breadcrumb {
         return BREADCRUMBTYPES.CUSTOM;
     }
   }
+  // 绑定初始化选项
   bindOptions(options: InitOptions): void {
     // maxBreadcrumbs 用户行为存放的最大容量
     // beforePushBreadcrumb 添加用户行为前的处理函数

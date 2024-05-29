@@ -20,6 +20,7 @@ function init(options: InitOptions) {
   if (!('fetch' in _global) || options.disabled) return;
   // 初始化配置
   handleOptions(options);
+  // 初始化重写事件
   setupReplace();
 }
 
