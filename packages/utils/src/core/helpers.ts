@@ -75,6 +75,9 @@ export function getYMDHMS(): string {
 }
 
 export function typeofAny(target: any): string {
+  // 1. 获取目标值的字符串表示形式，例如 "[object Array]"
+  // 2. 然后使用 .slice(8, -1) 来去除开头的 "[object " 和末尾的 "]"，从而得到实际的类型字符串，例如 "Array"
+  // 3. 最后通过 .toLowerCase() 将类型字符串转换为小写字母形式
   return Object.prototype.toString.call(target).slice(8, -1).toLowerCase();
 }
 export function toStringAny(target: any, type: string): boolean {

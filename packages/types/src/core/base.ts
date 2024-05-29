@@ -115,7 +115,7 @@ export interface ReportData
   pageUrl: string; // 页面地址
   time: number; // 发生时间
   uuid: string; // 页面唯一标识
-  apikey: string; // 项目id
+  appId: string; // 项目id
   status: string; // 事件状态
   sdkVersion: string; // 版本信息
   breadcrumb?: BreadcrumbData[]; // 用户行为
@@ -156,7 +156,7 @@ export interface ResourceTarget {
 
 // 通用信息
 export interface AuthInfo {
-  apikey: string;
+  appId: string;
   sdkVersion: string;
   userId?: string;
 }

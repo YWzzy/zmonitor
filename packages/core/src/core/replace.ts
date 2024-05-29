@@ -47,14 +47,19 @@ function replace(type: EVENTTYPES): void {
       break;
   }
 }
+
+// 添加替换处理程序 -- 利用 replaceAop 进行对象属性重写
 export function addReplaceHandler(handler: ReplaceHandler): void {
   if (!subscribeEvent(handler)) return;
   replace(handler.type);
 }
+
+// 替换 XMLHttpRequest 的 open 和 send 方法，以便在请求发送前记录请求的相关信息，并在请求完成后通知监控系统
 function xhrReplace(): void {
   if (!('XMLHttpRequest' in _global)) {
     return;
   }
+  // 获取XMLHttpRequest的原型对象
   const originalXhrProto = XMLHttpRequest.prototype;
   replaceAop(originalXhrProto, 'open', (originalOpen: voidFun) => {
     return function (this: any, ...args: any[]): void {
@@ -100,6 +105,8 @@ function xhrReplace(): void {
     };
   });
 }
+
+// 替换 fetch 方法，以便在请求完成后通知监控系统
 function fetchReplace(): void {
   if (!('fetch' in _global)) {
     return;
@@ -166,6 +173,8 @@ function fetchReplace(): void {
     };
   });
 }
+
+// 监听 hashchange 事件，以便在 URL 的哈希部分发生变化时通知监控系统
 function listenHashchange(): void {
   // 通过onpopstate事件，来监听hash模式下路由的变化
   if (isExistProperty(_global, 'onhashchange')) {
@@ -175,6 +184,7 @@ function listenHashchange(): void {
   }
 }
 
+// 监听全局JavaScript的错误
 function listenError(): void {
   on(
     _global,
@@ -187,6 +197,7 @@ function listenError(): void {
   );
 }
 
+// 重写 history.pushState 和 history.replaceState 方法，以便在路由变化时通知监控系统
 // last time route
 let lastHref: string = getLocationHref();
 function historyReplace(): void {
@@ -223,12 +234,16 @@ function historyReplace(): void {
   replaceAop(_global.history, 'pushState', historyReplaceFn);
   replaceAop(_global.history, 'replaceState', historyReplaceFn);
 }
+
+// 监听未处理的 Promise rejection 事件，以便在 Promise 被拒绝但未被捕获时通知监控系统
 function unhandledrejectionReplace(): void {
   on(_global, EVENTTYPES.UNHANDLEDREJECTION, function (ev: PromiseRejectionEvent) {
     // ev.preventDefault() 阻止默认行为后，控制台就不会再报红色错误
     notify(EVENTTYPES.UNHANDLEDREJECTION, ev);
   });
 }
+
+// 监听 click 事件，以便在用户点击页面元素时通知监控系统
 function domReplace(): void {
   if (!('document' in _global)) return;
   // 节流，默认0s
@@ -245,6 +260,8 @@ function domReplace(): void {
     true
   );
 }
+
+// 触发白屏事件，并通知监控系统
 function whiteScreen(): void {
   notify(EVENTTYPES.WHITESCREEN);
 }

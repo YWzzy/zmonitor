@@ -1,7 +1,7 @@
 import { ReportData, BreadcrumbData } from './base';
 export interface InitOptions {
     dsn: string;
-    apikey: string;
+    appId: string;
     userId?: string;
     disabled?: boolean;
     silentXhr?: boolean;

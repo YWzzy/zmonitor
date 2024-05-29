@@ -3,8 +3,16 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateErrorMonitorDto } from "./dto/create-error-monitor.dto";
 import { UpdateErrorMonitorDto } from "./dto/update-error-monitor.dto";
+import { SearchErrorMonitorDto } from "./dto/search-error-monitor.dto";
 import { ErrorMonitor } from "./entities/error-monitor.entity";
 import { Breadcrumb } from "./entities/breadcrumb.entity";
+
+type ErrorMonitorList = {
+  list: ErrorMonitor[];
+  total: number;
+  currentPage: number;
+  pageSize: number;
+};
 
 @Injectable()
 export class ErrorMonitorService {
@@ -20,21 +28,34 @@ export class ErrorMonitorService {
   ): Promise<ErrorMonitor> {
     try {
       // 处理 breadcrumb 中的 data 字段
-      const processedBreadcrumbs = createErrorMonitorDto.breadcrumb.map((b) => {
-        const dataStr =
-          typeof b.data === "object" ? JSON.stringify(b.data) : b.data;
-        return {
-          ...b,
-          data: dataStr.length > 2048 ? dataStr.substring(0, 2048) : dataStr,
-        };
-      });
+      if (
+        createErrorMonitorDto.hasOwnProperty("breadcrumb") &&
+        createErrorMonitorDto.breadcrumb.length >= 0
+      ) {
+        const processedBreadcrumbs = createErrorMonitorDto.breadcrumb.map(
+          (b) => {
+            const dataStr =
+              typeof b.data === "object" ? JSON.stringify(b.data) : b.data;
+            return {
+              ...b,
+              data:
+                dataStr.length > 2048 ? dataStr.substring(0, 2048) : dataStr,
+            };
+          }
+        );
 
-      const errorMonitor = this.errorMonitorRepository.create({
-        ...createErrorMonitorDto,
-        breadcrumb: processedBreadcrumbs,
-      });
+        const errorMonitor = this.errorMonitorRepository.create({
+          ...createErrorMonitorDto,
+          breadcrumb: processedBreadcrumbs,
+        });
 
-      return await this.errorMonitorRepository.save(errorMonitor);
+        return await this.errorMonitorRepository.save(errorMonitor);
+      } else {
+        const errorMonitor = this.errorMonitorRepository.create({
+          ...createErrorMonitorDto,
+        });
+        return await this.errorMonitorRepository.save(errorMonitor);
+      }
     } catch (error) {
       console.error("Error creating ErrorMonitor:", error);
       throw error;
@@ -43,16 +64,58 @@ export class ErrorMonitorService {
 
   async findAll(): Promise<ErrorMonitor[]> {
     try {
+      // 查询所有 isDeleted 为 false 的错误日志
       const errorMonitors = await this.errorMonitorRepository.find({
+        where: { isDeleted: false },
         relations: ["breadcrumb"],
       });
-      return errorMonitors.map((em) => ({
-        ...em,
-        breadcrumb: em.breadcrumb.map((b) => ({
+      return errorMonitors.map((errorMonitor) => ({
+        ...errorMonitor,
+        breadcrumb: errorMonitor.breadcrumb.map((b) => ({
           ...b,
           data: this.parseDataField(b.data),
         })),
       }));
+    } catch (error) {
+      console.error("Error finding all ErrorMonitors:", error);
+      throw error;
+    }
+  }
+
+  // 分页查询错误日志
+  async findListPage(
+    searchErrorMonitorDto: SearchErrorMonitorDto
+  ): Promise<ErrorMonitorList> {
+    try {
+      const { pageSize, pageNo, ...searchDto } = searchErrorMonitorDto;
+      // 查询条件为searchDto的错误日志，分页查询，返回当前page和total数量
+      if (pageSize < 1 || pageNo < 1) {
+        throw new Error("Invalid pageNo or pageSize");
+      }
+
+      const [errorMonitors, total] =
+        await this.errorMonitorRepository.findAndCount({
+          where: { ...searchDto, isDeleted: false },
+          relations: ["breadcrumb"],
+          order: { createTime: "DESC" },
+          take: pageSize,
+          skip: (pageNo - 1) * pageSize,
+        });
+
+      const data = errorMonitors.map((errorMonitor) => ({
+        ...errorMonitor,
+        breadcrumb: errorMonitor.breadcrumb.map((b) => ({
+          ...b,
+          data: this.parseDataField(b.data),
+        })),
+      }));
+
+      return {
+        list: data,
+        total,
+        currentPage: pageNo,
+        pageSize,
+      };
     } catch (error) {
       console.error("Error finding all ErrorMonitors:", error);
       throw error;
@@ -110,6 +173,16 @@ export class ErrorMonitorService {
       };
     } catch (error) {
       console.error(`Error updating ErrorMonitor with id ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // 标记错误为已删除
+  async shieldError(id: number): Promise<void> {
+    try {
+      await this.errorMonitorRepository.update(id, { isDeleted: true });
+    } catch (error) {
+      console.error(`Error shielding ErrorMonitor with id ${id}:`, error);
       throw error;
     }
   }

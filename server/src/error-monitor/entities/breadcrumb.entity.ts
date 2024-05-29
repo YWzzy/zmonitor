@@ -7,7 +7,7 @@ import {
 } from "typeorm";
 import { ErrorMonitor } from "./error-monitor.entity";
 
-@Entity()
+@Entity("breadcrumb_error")
 export class Breadcrumb {
   @PrimaryGeneratedColumn()
   id: number;

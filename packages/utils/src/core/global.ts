@@ -8,9 +8,12 @@ export const isBrowserEnv = variableTypeDetection.isWindow(
 
 // 获取全局变量
 export function getGlobal(): Window {
+  // 如果当前环境是浏览器环境，则直接返回 window；否则返回一个空对象
   return window as unknown as Window;
 }
+// _global常量: 全局变量window的引用
 const _global = getGlobal();
+// _support常量: 全局变量__zMonitor__的引用地址,如果不存在则初始化为一个空对象。这个对象用于存储监控 SDK 的支持信息和状态
 const _support = getGlobalSupport();
 const uaResult = new UAParser().getResult();
 
@@ -30,6 +33,7 @@ _support.hasError = false;
 // errorMap 存储代码错误的集合
 _support.errorMap = new Map();
 
+// _support.replaceFlag 对象和 setFlag()、getFlag() 函数：用于设置和获取错误替换的标志
 _support.replaceFlag = _support.replaceFlag || {};
 const replaceFlag = _support.replaceFlag;
 export function setFlag(replaceType: string, isSet: boolean) {
@@ -39,13 +43,17 @@ export function setFlag(replaceType: string, isSet: boolean) {
 export function getFlag(replaceType: string) {
   return replaceFlag[replaceType] ? true : false;
 }
+
 // 获取全部变量__zMonitor__的引用地址
 export function getGlobalSupport() {
   _global.__zMonitor__ = _global.__zMonitor__ || ({} as ZMonitor);
   return _global.__zMonitor__;
 }
+
+// 检测浏览器是否支持 HTML5 History API，主要是检查浏览器是否支持 history.pushState() 和 history.replaceState() 方法
 export function supportsHistory(): boolean {
   const chrome = _global.chrome;
+  // 检查当前环境是否是 Chrome 打包应用
   const isChromePackagedApp = chrome && chrome.app && chrome.app.runtime;
   const hasHistoryApi =
     'history' in _global &&

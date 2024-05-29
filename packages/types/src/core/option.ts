@@ -2,7 +2,7 @@ import { ReportData, BreadcrumbData } from './base';
 
 export interface InitOptions {
   dsn: string; // 上报的地址
-  apikey: string; // 项目id
+  appId: string; // 项目id
   userId?: string; // 用户id
   disabled?: boolean; // 是否禁用SDK
   silentXhr?: boolean; // 是否监控 xhr 请求

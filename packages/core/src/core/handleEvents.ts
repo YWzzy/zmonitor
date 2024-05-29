@@ -37,8 +37,11 @@ const HandleEvents = {
       transportData.send({ ...result, type, status: STATUS_CODE.ERROR });
     }
   },
+
+  //  处理JavaScript 错误事件，包括资源加载错误和异步错误
   handleError(ev: ErrorTarget): void {
     const target = ev.target;
+    // 如果是异步错误，target为空
     if (!target || (ev.target && !ev.target.localName)) {
       // vue和react捕获的报错使用ev解析，异步错误使用ev.error解析
       const stackFrame = ErrorStackParser.parse(!target ? ev : ev.error)[0];
@@ -86,6 +89,8 @@ const HandleEvents = {
       });
     }
   },
+
+  // 处理History路由变化
   handleHistory(data: RouteHistory): void {
     const { from, to } = data;
     // 定义parsedFrom变量，值为relative
@@ -102,6 +107,8 @@ const HandleEvents = {
       status: STATUS_CODE.OK,
     });
   },
+
+  // 处理hashchange路由变化
   handleHashchange(data: HashChangeEvent): void {
     const { oldURL, newURL } = data;
     const { relative: from } = parseUrlToObj(oldURL);
@@ -117,6 +124,8 @@ const HandleEvents = {
       status: STATUS_CODE.OK,
     });
   },
+
+  // 处理未捕获的Promise错误
   handleUnhandleRejection(ev: PromiseRejectionEvent): void {
     const stackFrame = ErrorStackParser.parse(ev.reason)[0];
     const { fileName, columnNumber, lineNumber } = stackFrame;
@@ -146,6 +155,8 @@ const HandleEvents = {
       transportData.send(data);
     }
   },
+
+  // 处理白屏
   handleWhiteScreen(): void {
     openWhiteScreen((res: any) => {
       // 上报白屏检测信息

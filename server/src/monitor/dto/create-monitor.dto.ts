@@ -5,7 +5,7 @@ export class CreateMonitorDto {
   status: string;
   time: number;
   sdkVersion: string;
-  apikey: string;
+  appId: string;
   uuid: string;
   pageUrl: string;
   deviceInfo: DeviceInfo;

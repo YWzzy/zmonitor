@@ -12,7 +12,7 @@ export class Monitor {
   id: string;
 
   @Column({ type: "varchar", length: 255 })
-  apikey: string;
+  appId: string;
 
   @Column({ type: "varchar", length: 255 })
   type: string;

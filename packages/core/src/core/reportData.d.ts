@@ -5,7 +5,7 @@ import { ReportData, InitOptions } from '@zmonitor/types';
  */
 export declare class TransportData {
     queue: Queue;
-    apikey: string;
+    appId: string;
     errorDsn: string;
     userId: string;
     uuid: string;
@@ -20,7 +20,7 @@ export declare class TransportData {
     getAuthInfo(): {
         userId: string | number;
         sdkVersion: string;
-        apikey: string;
+        appId: string;
     };
     getAuthId(): string | number;
     getTransportData(data: any): ReportData;

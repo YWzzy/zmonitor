@@ -25,7 +25,7 @@
           <span>{{ scope.row.time ? format(scope.row.time) : scope.row.date }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="apikey" label="项目编号"> </el-table-column>
+      <el-table-column prop="appId" label="项目编号"> </el-table-column>
       <el-table-column prop="userId" label="用户id"> </el-table-column>
       <el-table-column prop="sdkVersion" label="SDK版本"> </el-table-column>
       <el-table-column prop="deviceInfo" label="浏览器信息">
@@ -58,11 +58,16 @@
           >
         </template>
       </el-table-column>
-      <el-table-column fixed="right" prop="breadcrumb" label="用户行为记录" width="125">
+      <el-table-column fixed="right" prop="breadcrumb" label="用户行为记录" width="100">
         <template slot-scope="scope">
           <el-button v-if="scope.row.breadcrumb" type="primary" @click="revertBehavior(scope.row)"
-            >查看用户行为</el-button
+            >查看行为</el-button
           >
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" prop="breadcrumb" label="用户行为记录" width="80">
+        <template slot-scope="scope">
+          <el-button type="danger" @click="shield(scope.row)">屏蔽</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -141,6 +146,31 @@ export default {
           this.getTableData();
         });
     },
+    // 屏蔽
+    shield(row) {
+      fetch(`http://localhost:8083/error-monitor/shield`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: row.id }),
+      })
+        .then(response => response.json())
+        .then(res => {
+          if (res.code == 200) {
+            this.$message({
+              message: '屏蔽成功',
+              type: 'success',
+            });
+            this.getTableData();
+          } else {
+            this.$message({
+              message: '屏蔽失败',
+              type: 'error',
+            });
+          }
+        });
+    },
     revertBehavior({ breadcrumb }) {
       this.dialogTitle = '查看用户行为';
       this.fullscreen = false;
@@ -178,9 +208,10 @@ export default {
       fetch(`http://localhost:8083/monitor/getRecordScreenId?id=${id}`)
         .then(response => response.json())
         .then(res => {
-          let { code, data } = res;
-          if (code == 200 && Array.isArray(data) && data[0] && data[0].events) {
-            let events = unzip(data[0].events);
+          let { code, data, message } = res;
+          // if (code == 200 && Array.isArray(data) && data[0] && data[0].events) {
+          if (code == 200 && data) {
+            let events = unzip(data);
             this.fullscreen = true;
             this.dialogTitle = '播放录屏';
             this.revertdialog = true;
@@ -199,7 +230,7 @@ export default {
             });
           } else {
             this.$message({
-              message: '暂无数据，请稍后重试~',
+              message: message ? message : '暂无数据，请稍后重试~',
               type: 'warning',
             });
           }

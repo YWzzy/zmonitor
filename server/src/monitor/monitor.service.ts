@@ -1,33 +1,59 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Monitor } from "./entities/monitor.entity";
-import { ErrorMonitorService } from "../error-monitor/error-monitor.service";
-import { CreateErrorMonitorDto } from "../error-monitor/dto/create-error-monitor.dto";
 import * as fs from "fs";
 import * as path from "path";
 import * as coBody from "co-body";
+import { Monitor } from "./entities/monitor.entity";
+import { ErrorMonitorService } from "../error-monitor/error-monitor.service";
+import { CreateErrorMonitorDto } from "../error-monitor/dto/create-error-monitor.dto";
+import { RecordingService } from "../recording/recording.service";
+import { FileUploadService } from "../file-upload/file-upload.service";
+import { PerformanceService } from "../performance/performance.service";
+import { CreatePerformanceDto } from "src/performance/dto/create-performance.dto";
 
 @Injectable()
 export class MonitorService {
-  private performanceList: any[] = [];
-  private errorList: any[] = [];
-  private recordScreenList: any[] = [];
-  private whiteScreenList: any[] = [];
   constructor(
     @InjectRepository(Monitor) private readonly monitor: Repository<Monitor>,
-    private readonly errorMonitorService: ErrorMonitorService
+    private readonly errorMonitorService: ErrorMonitorService,
+    private readonly recordingService: RecordingService,
+    private readonly fileUploadService: FileUploadService,
+    private readonly performanceService: PerformanceService
   ) {}
+
+  // 存储录屏数据
+  async saveRecordScreen(data: any): Promise<void> {
+    try {
+      const extractedFiles = await this.fileUploadService.saveRecordingFile(
+        data.events,
+        data.recordScreenId
+      );
+      console.log("====================================");
+      console.log("File uploaded successfully", extractedFiles);
+      console.log("====================================");
+
+      await this.recordingService.saveRecording(
+        extractedFiles.filePath,
+        extractedFiles.fileName
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   // 存储上报信息
   async saveLogByType(type: string, data: any): Promise<void> {
     try {
       if (type === "performance") {
-        this.performanceList.push(data);
+        const createPerformanceDto: CreatePerformanceDto = data;
+        await this.performanceService.create(createPerformanceDto);
       } else if (type === "recordScreen") {
-        this.recordScreenList.push(data);
+        this.saveRecordScreen(data);
       } else if (type === "whiteScreen") {
-        this.whiteScreenList.push(data);
+        // this.whiteScreenList.push(data);
+        const createErrorMonitorDto: CreateErrorMonitorDto = data;
+        await this.errorMonitorService.create(createErrorMonitorDto);
       } else {
         const createErrorMonitorDto: CreateErrorMonitorDto = data;
         await this.errorMonitorService.create(createErrorMonitorDto);
@@ -74,14 +100,30 @@ export class MonitorService {
   }
 
   // 根据ID获取录屏数据
-  async getRecordScreenId(id: string, res: any): Promise<void> {
-    const data = this.recordScreenList.filter(
-      (item) => item.recordScreenId === id
-    );
-    res.status(200).send({
-      code: 200,
-      data,
-    });
+  async getRecordScreenById(recordScreenId: string, res: any): Promise<void> {
+    try {
+      const recordingInfo =
+        await this.recordingService.findOneByOriginalFileName(recordScreenId);
+      // 如果recordingInfo存在，并且有存储路径
+      if (!this.isEmptyObject(recordingInfo)) {
+        const data = fs.readFileSync(recordingInfo?.storedFilePath, "base64");
+        res.status(200).send({
+          code: 200,
+          data,
+        });
+      } else {
+        res.status(400).send({
+          code: 400,
+          message: "Recording file not found.",
+        });
+      }
+    } catch (err) {
+      res.status(500).send({
+        code: 500,
+        message: "Error retrieving recording file.",
+        error: err,
+      });
+    }
   }
 
   // 数据上报
@@ -89,10 +131,8 @@ export class MonitorService {
     try {
       const length = Object.keys(req.body).length;
       if (length) {
-        console.log("====================================");
-        console.log("req.body", req.body);
-        console.log("====================================");
-        this.recordScreenList.push(req.body);
+        // this.recordScreenList.push(req.body);
+        this.saveRecordScreen(req.body);
       } else {
         const data = await coBody.json(req);
         if (!data) return;
@@ -110,5 +150,11 @@ export class MonitorService {
         error: err,
       });
     }
+  }
+
+  // 判断对象是否为空
+  isEmptyObject(obj: any): boolean {
+    if (typeof obj !== "object" || obj == null || obj == undefined) return true;
+    return Object.keys(obj).length === 0;
   }
 }
