@@ -26,7 +26,10 @@
     "react-redux": "^9.0.4",
     "react-router": "^6.21.1",
     "react-router-dom": "^6.21.1",
-    "redux": "^5.0.1"
+    "redux": "^5.0.1",
+    "rrweb": "^2.0.0-alpha.3",
+    "rrweb-player": "^1.0.0-alpha.3",
+    "source-map-js": "^1.0.2"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",

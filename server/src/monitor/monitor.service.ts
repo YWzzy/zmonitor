@@ -66,10 +66,27 @@ export class MonitorService {
   // 获取js.map源码文件
   async getMap(fileName: string, env: string, res: any): Promise<void> {
     let mapPath: string;
+    let originalFileName;
+    const regex = /\/([^\/]+)$/; // 匹配最后一个斜杠后的内容作为文件名
+    const match = regex.exec(fileName);
+      if (match) {
+        originalFileName = match[1]; // 返回匹配到的文件名部分
+      } else {
+        originalFileName = fileName; // 如果未匹配到，返回null或其他默认值
+      }
     if (env === "development") {
-      mapPath = path.join(__dirname, "..", fileName);
+      mapPath = path.join(
+        __dirname,
+        "..",
+        originalFileName ? originalFileName : fileName
+      );
     } else {
-      mapPath = path.join(__dirname, "..", "client/js", `${fileName}.map`);
+      mapPath = path.join(
+        __dirname,
+        "..",
+        "client/js",
+        `${originalFileName ? originalFileName : fileName}.map`
+      );
     }
     // console.log("源码路径 mapPath:", mapPath);
 

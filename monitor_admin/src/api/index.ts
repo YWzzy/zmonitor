@@ -28,6 +28,9 @@ http.interceptors.response.use(({ data, status }) => {
     return data;
   }
   const res = data as BluBiuRes<any>;
+  if (!data['code'] && (status == 200 || status == 304)) {
+    return res;
+  }
 
   if (res.code === BluBiuResponseCode.NOLOGIN || res.code === BluBiuResponseCode.NOTFOUNDACCOUNT) {
     if (!isShowNoLogin) {
@@ -121,6 +124,10 @@ export const getJsErrorList = async (params: AnalyseReq): BluBiuResponse<JsError
 
 export const getIssueErrorList = async (params: AnalyseReq): BluBiuResponse<ErrorMsgItem[]> =>
   await http.get('/monitor/getErrorList', { params });
+
+// 查询错误源码
+export const getCodeBySourceMap = async (params: any): BluBiuResponse<any> =>
+  await http.get('/monitor/getmap', { params });
 
 export const getNearbyCode = async (formateData: FormData): BluBiuResponse<NearbyCodeMsg> =>
   await http.post('/jsError/getNearbyCode', formateData, {

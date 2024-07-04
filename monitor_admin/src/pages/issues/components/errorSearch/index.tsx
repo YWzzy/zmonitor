@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, Button, DatePicker, Drawer, Form, Table } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { Alert, Button, DatePicker, Drawer, Form, Table, Popover } from 'antd';
 import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
 import { Card, CodeShow } from '@/src/components';
-import { getIssueErrorList } from '@/src/api';
+import { getIssueErrorList, getCodeBySourceMap } from '@/src/api';
+import SourceMapUtils from '@/src/utils/sourcemap';
 import { useAppStore } from '@/src/hooks';
 
 export const ErrorSearch = () => {
@@ -14,17 +15,18 @@ export const ErrorSearch = () => {
   const { active } = useAppStore();
 
   const [loading, setLoading] = useState(false);
+  const revertRef = useRef(null);
 
   const [codeMsg, setCodeMsg] = useState({
     open: false,
-    code: [],
-    originalPosition: {
-      source: '',
-      line: 0,
-      column: 0,
-      name: '',
-    },
-    start: 12,
+    // code: [],
+    // originalPosition: {
+    //   source: '',
+    //   line: 0,
+    //   column: 0,
+    //   name: '',
+    // },
+    // start: 12,
   });
 
   const toSearch = async () => {
@@ -46,17 +48,17 @@ export const ErrorSearch = () => {
     });
   };
 
-  const search = async (searchQuery: AnalyseReq) => {
+  const search = async searchQuery => {
     setLoading(true);
     const { data } = await getIssueErrorList(searchQuery);
-
-    console.log('====================================');
-    console.log(data);
-    console.log('====================================');
 
     setTableData(data);
     setLoading(false);
   };
+
+  useEffect(() => {
+    toSearch();
+  }, []);
 
   const columns: TableColumnsType<ErrorMsgItem> = [
     {
@@ -64,6 +66,7 @@ export const ErrorSearch = () => {
       dataIndex: 'index',
       key: 'index',
       width: 50,
+      align: 'center',
       render: (text, record, index) => index + 1,
     },
     {
@@ -71,20 +74,33 @@ export const ErrorSearch = () => {
       dataIndex: 'message',
       key: 'message',
       width: 200,
+      align: 'left',
+      render: text => (
+        <Popover content={<div className="popoverContent">{text}</div>}>
+          <div className="tableCell">{text}</div>
+        </Popover>
+      ),
     },
     {
       title: '报错页面',
       dataIndex: 'pageUrl',
       key: 'pageUrl',
       width: 100,
+      align: 'left',
+      render: text => (
+        <Popover content={<div className="popoverContent">{text}</div>}>
+          <div className="tableCell">{text}</div>
+        </Popover>
+      ),
     },
     {
       title: '报错时间',
       dataIndex: 'time',
       key: 'time',
       width: 150,
+      align: 'center',
       render: (text, record) => (
-        <span>
+        <span className="tableCell">
           {record.time
             ? dayjs(record.time).format('YYYY-MM-DD HH:mm:ss')
             : dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss')}
@@ -95,28 +111,44 @@ export const ErrorSearch = () => {
       title: '项目编号',
       dataIndex: 'apikey',
       key: 'apikey',
+      align: 'center',
+      render: text => <div className="tableCell">{text}</div>,
     },
     {
       title: '用户ID',
       dataIndex: 'userId',
       key: 'userId',
+      align: 'center',
+      render: text => <div className="tableCell">{text}</div>,
     },
     {
       title: 'SDK版本',
       dataIndex: 'sdkVersion',
       key: 'sdkVersion',
+      align: 'center',
+      render: text => <div className="tableCell">{text}</div>,
     },
     {
       title: '浏览器信息',
       dataIndex: 'deviceInfo',
       key: 'browserInfo',
-      render: (text, record) => <span>{record.deviceInfo.browser}</span>,
+      align: 'center',
+      render: (text, record) => (
+        <Popover content={<div className="popoverContent">{record.deviceInfo.browser}</div>}>
+          <div className="tableCell">{record.deviceInfo.browser}</div>
+        </Popover>
+      ),
     },
     {
       title: '操作系统',
       dataIndex: 'deviceInfo',
       key: 'osInfo',
-      render: (text, record) => <span>{record.deviceInfo.os}</span>,
+      align: 'center',
+      render: (text, record) => (
+        <Popover content={<div className="popoverContent">{record.deviceInfo.os}</div>}>
+          <div className="tableCell">{record.deviceInfo.os}</div>
+        </Popover>
+      ),
     },
     {
       title: '还原错误代码',
@@ -159,9 +191,30 @@ export const ErrorSearch = () => {
     },
   ];
 
-  const revertCode = record => {
+  const revertCode = async record => {
     // 还原错误代码的逻辑
     console.log('还原错误代码', record);
+    await SourceMapUtils.findCodeBySourceMap({
+      ...record,
+    }).then(res => {
+      if (revertRef.current) {
+        revertRef.current.innerHTML = res; // 在事件处理函数中设置innerHTML
+      }
+    });
+    // await getCodeBySourceMap({
+    //   fileName: record.fileName,
+    //   env: 'production',
+    // }).then(res => {
+    //   console.log('====================================');
+    //   console.log(res);
+    //   console.log('====================================');
+    //   setCodeMsg({
+    //     open: true,
+    //   });
+    //   if (revertRef.current) {
+    //     revertRef.current.innerHTML = res; // 在事件处理函数中设置innerHTML
+    //   }
+    // });
   };
 
   const playRecord = recordScreenId => {
@@ -215,7 +268,7 @@ export const ErrorSearch = () => {
         }}
         open={codeMsg.open}
       >
-        <Alert
+        {/* <Alert
           message={
             <span>
               源代码位置：{codeMsg.originalPosition.source}
@@ -223,14 +276,15 @@ export const ErrorSearch = () => {
             </span>
           }
           type="info"
-        />
+        /> */}
 
-        <CodeShow
+        <div ref={revertRef}></div>
+        {/* <CodeShow
           start={codeMsg.start}
           hightLine={codeMsg.originalPosition?.line - codeMsg.start + 1}
         >
           {codeMsg.code.join('\n')}
-        </CodeShow>
+        </CodeShow> */}
       </Drawer>
     </Card>
   );

@@ -1,22 +1,17 @@
-.upload{
-  width: 40px;
-  height: 20px;
-  position: relative;
-  a{
-    width: 40px;
-    height: 20px;
-    display: block;
-    text-align: center;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-  .input{
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-  }
+.tableCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  height: 100%;
+  /* 让内容在单元格内垂直居中 */
+}
+
+.popoverContent {
+  max-width: 300px;
+  /* 设置弹窗内容的最大宽度 */
+  word-break: break-word;
+  /* 确保长单词在弹窗中能正常换行 */
 }
