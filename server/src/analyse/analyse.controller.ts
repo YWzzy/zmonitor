@@ -68,10 +68,6 @@ export class AnalyseController {
     @Query("appId") appId: string,
     @Query("date") dateString: string
   ) {
-    console.log("====================================");
-    console.log("appId", appId);
-    console.log("dateString", dateString);
-    console.log("====================================");
     return this.analyseService.getDayActiveUsers(appId, dateString);
   }
 

@@ -22,11 +22,8 @@ export const http = axios.create({
 });
 
 http.interceptors.response.use(({ data, status }) => {
-  console.log('====================================');
-  console.log('data', data);
-  console.log('status', status);
-  console.log('====================================');
-  if (status !== 200) {
+  const statusCode = data['code'] || status;
+  if (statusCode !== 200) {
     message.error('网络异常');
     return data;
   }
@@ -121,6 +118,9 @@ export const getJsErrorRang = async (params: AnalyseReq): BluBiuResponse<Options
 
 export const getJsErrorList = async (params: AnalyseReq): BluBiuResponse<JsErrorMsgItem[]> =>
   await http.get('/jsError/getJsErrorList', { params });
+
+export const getIssueErrorList = async (params: AnalyseReq): BluBiuResponse<ErrorMsgItem[]> =>
+  await http.get('/monitor/getErrorList', { params });
 
 export const getNearbyCode = async (formateData: FormData): BluBiuResponse<NearbyCodeMsg> =>
   await http.post('/jsError/getNearbyCode', formateData, {

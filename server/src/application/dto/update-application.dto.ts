@@ -1,10 +1,21 @@
 import { PartialType } from "@nestjs/swagger";
 import { CreateApplicationDto } from "./create-application.dto";
-import { IsNotEmpty, IsOptional, IsString, Length } from "class-validator";
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Length,
+} from "class-validator";
 
 export class UpdateApplicationDto {
   @IsNotEmpty({ message: "id不能为空" })
   id: number;
+
+  @IsString()
+  @IsOptional()
+  appId: string;
 
   @IsString()
   @IsOptional()
@@ -14,9 +25,9 @@ export class UpdateApplicationDto {
   @IsOptional()
   appSecret: string;
 
-  @IsString()
+  @IsNumber()
   @IsOptional()
-  appType: string;
+  appType: number;
 
   @IsOptional()
   appStatus: number;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface LoginRegsiterIn {
   account: string;
   password: string;
@@ -33,7 +34,7 @@ interface AppInfo {
   appName: string;
   createId: number;
   appType: number;
-  status: number;
+  appStatus: number;
 }
 
 type TopKeys = 'webVisit' | 'browser' | 'deviceVendor' | 'city' | 'osName';
@@ -150,6 +151,37 @@ type JsErrorMsgItem = JsErrorReportMsg & {
   errorCount: number;
   userIds: string[];
   id: number;
+};
+
+type DeviceInfo = {
+  os: string;
+  browser: string;
+  browserVersion: string;
+  device: string;
+  device_type: string;
+  osVersion: string;
+  ua: string;
+};
+
+type ErrorMsgItem = {
+  appId: string;
+  breadcrumb: any[]; // 可以根据具体内容进一步定义
+  column: number;
+  createTime: string;
+  deviceInfo: DeviceInfo;
+  fileName: string;
+  id: number;
+  isDeleted: boolean;
+  line: number;
+  message: string;
+  pageUrl: string;
+  recordScreenId: string;
+  sdkVersion: string;
+  status: string;
+  time: string;
+  type: string;
+  userId: string;
+  uuid: string;
 };
 
 type NearbyCodeMsg = {

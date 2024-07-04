@@ -25,10 +25,10 @@ export const AppItem: React.FC<AppItemIn> = ({ appInfo }) => {
     await updateAppStatus({
       appId: appInfo.appId,
       id: appInfo.id,
-      appStatus: appInfo.status === 1 ? 0 : 1,
+      appStatus: appInfo.appStatus === 1 ? 0 : 1,
     });
     await appDispatch.getAppList();
-    message.success(appInfo.status === 1 ? '已停用' : '已启用');
+    message.success(appInfo.appStatus === 1 ? '已停用' : '已启用');
   };
 
   return (
@@ -57,7 +57,7 @@ export const AppItem: React.FC<AppItemIn> = ({ appInfo }) => {
             >
               进入
             </span>
-            {appInfo.status === 1 && (
+            {appInfo.appStatus === 1 && (
               <span
                 className={cls(styles.insert, styles.stop)}
                 onClick={() => {
@@ -96,7 +96,7 @@ export const AppItem: React.FC<AppItemIn> = ({ appInfo }) => {
           </div>
         </>
       )}
-      {appInfo.status !== 1 && (
+      {appInfo.appStatus !== 1 && (
         <div className={styles.mask}>
           <span style={{ textAlign: 'center', color: 'white' }}>
             <div className={styles.openText}>应用已关闭，点击重新开启</div>

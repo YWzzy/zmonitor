@@ -12,9 +12,11 @@ export class Application {
   id: number;
 
   @Column({
+    type: "varchar",
+    length: 128,
     comment: "应用ID",
   })
-  appId: number;
+  appId: string;
 
   @Column({
     type: "varchar",
@@ -31,11 +33,10 @@ export class Application {
   appSecret: string;
 
   @Column({
-    type: "varchar",
-    length: 255,
+    type: "int",
     comment: "应用类型",
   })
-  appType: string;
+  appType: number;
 
   @Column({
     comment: "应用状态",

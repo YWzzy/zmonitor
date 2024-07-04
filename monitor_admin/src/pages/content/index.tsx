@@ -17,10 +17,6 @@ import { munuRouters, hasAppRouters } from '@/src/router';
 import { useAppStore } from '@/src/hooks';
 const { Sider } = Layout;
 
-console.log('====================================');
-console.log(stylels.content);
-console.log('====================================');
-
 function Home() {
   const [collapsed, setCollapsed] = useState(false);
 
