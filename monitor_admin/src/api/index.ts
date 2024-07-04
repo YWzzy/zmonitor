@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
 import { message } from 'antd';
-import { config } from '@/src/config';
+// import { config } from '@/src/config';
 
 let isShowNoLogin = false;
 
@@ -15,8 +16,8 @@ enum BluBiuResponseCode {
 }
 
 export const http = axios.create({
-  // baseURL: `${config.apiHost}/api/desktop`,
-  baseURL: `${config.apiHost}/`,
+  baseURL: `/api/`,
+  // baseURL: `${config.apiHost}/`,
   withCredentials: true,
 });
 
