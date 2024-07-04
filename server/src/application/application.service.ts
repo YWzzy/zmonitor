@@ -1,11 +1,3 @@
-/*
- * @Author: yinhan 1738348915@qq.com
- * @Date: 2024-05-24 15:14:52
- * @LastEditors: yinhan 1738348915@qq.com
- * @LastEditTime: 2024-05-27 15:55:58
- * @FilePath: \zjiang-web-monitor\server\src\application\application.service.ts
- * @Description:
- */
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -62,7 +54,10 @@ export class ApplicationService {
       }
 
       // 更新应用状态
-      if (updateApplicationDto.appStatus !==null || updateApplicationDto.appStatus !== undefined) {
+      if (
+        updateApplicationDto.appStatus !== null ||
+        updateApplicationDto.appStatus !== undefined
+      ) {
         application.appStatus = updateApplicationDto.appStatus;
       }
 

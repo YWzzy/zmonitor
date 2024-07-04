@@ -6,7 +6,7 @@ import { message } from 'antd';
 let isShowNoLogin = false;
 
 enum BluBiuResponseCode {
-  SUCCESS = 1000, // 非异常请求
+  SUCCESS = 200, // 非异常请求
   QUERYERROR = 1001, // 请求参数错误
   APPIDNOUSE = 1002, // APPID错误或者AppID未启用
   LOGINERROR = 1003, // 登录账号或密码错误
@@ -22,6 +22,10 @@ export const http = axios.create({
 });
 
 http.interceptors.response.use(({ data, status }) => {
+  console.log('====================================');
+  console.log('data', data);
+  console.log('status', status);
+  console.log('====================================');
   if (status !== 200) {
     message.error('网络异常');
     return data;

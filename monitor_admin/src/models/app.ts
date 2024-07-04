@@ -38,13 +38,13 @@ const userModel = createModel<RootModel>()({
       if (data.length === 1) {
         dispatch.app.updateAppModel({
           isLoading: false,
-          apps: code === 1000 ? data : [],
+          apps: code === 200 ? data : [],
           active: data[0].appId,
         });
       } else {
         dispatch.app.updateAppModel({
           isLoading: false,
-          apps: code === 1000 ? data : [],
+          apps: code === 200 ? data : [],
         });
       }
     },
@@ -56,7 +56,7 @@ const userModel = createModel<RootModel>()({
       const { code, data } = await getAppList();
       dispatch.app.updateAppModel({
         isLoading: false,
-        apps: code === 1000 ? data : [],
+        apps: code === 200 ? data : [],
         active: data.length > 0 ? data[0].appId : '',
       });
     },

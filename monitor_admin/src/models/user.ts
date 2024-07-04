@@ -35,7 +35,7 @@ const userModel = createModel<RootModel>()({
     async getUserInfo() {
       dispatch.user.setLoading(true);
       const { code, data } = await getUserInfo();
-      if (code === 1000) {
+      if (code === 200) {
         dispatch.user.setUserInfo(data);
       }
       dispatch.user.setLoading(false);

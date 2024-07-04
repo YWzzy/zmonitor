@@ -1,11 +1,3 @@
-/*
- * @Author: yinhan 1738348915@qq.com
- * @Date: 2024-05-17 15:41:42
- * @LastEditors: yinhan 1738348915@qq.com
- * @LastEditTime: 2024-05-21 14:50:34
- * @FilePath: \zjiang-web-monitor\server\src\main.ts
- * @Description:
- */
 import { NestFactory } from "@nestjs/core";
 import { VersioningType, ValidationPipe } from "@nestjs/common";
 import { AppModule } from "./app.module";

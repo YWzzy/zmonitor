@@ -1,11 +1,3 @@
-/*
- * @Author: yinhan 1738348915@qq.com
- * @Date: 2024-05-24 15:14:52
- * @LastEditors: yinhan 1738348915@qq.com
- * @LastEditTime: 2024-05-27 15:43:26
- * @FilePath: \zjiang-web-monitor\server\src\application\dto\create-application.dto.ts
- * @Description:
- */
 import {
   IsString,
   IsNotEmpty,

@@ -1,9 +1,9 @@
-interface LoginRegsiterIn{
+interface LoginRegsiterIn {
   account: string;
   password: string;
 }
 
-interface UserInfo{
+interface UserInfo {
   /** 用户ID */
   id?: number;
   /** 登录账号 */
@@ -16,18 +16,18 @@ interface UserInfo{
   updatedAt?: string;
 }
 
-interface CreateAppIn{
+interface CreateAppIn {
   appType: number;
   appName: string;
 }
 
-interface UpdateAppInfo{
+interface UpdateAppInfo {
   appId: string;
   id: number;
-  status: number;
+  appStatus: number;
 }
 
-interface AppInfo{
+interface AppInfo {
   id: number;
   appId: string;
   appName: string;
@@ -38,24 +38,24 @@ interface AppInfo{
 
 type TopKeys = 'webVisit' | 'browser' | 'deviceVendor' | 'city' | 'osName';
 
-interface AnalyseReq{
+interface AnalyseReq {
   appId: string;
   date?: string;
   beginTime?: string;
   endTime?: string;
 }
-interface TopReq{
+interface TopReq {
   appId: string;
   type?: TopKeys;
   top?: number;
 }
 
-interface Options{
+interface Options {
   label: string;
-  value: string|number;
+  value: string | number;
 }
 
-interface TodayTrafficRes{
+interface TodayTrafficRes {
   allUsers: number;
   newUsers: [number, number];
   pv: [number, number];
@@ -63,36 +63,38 @@ interface TodayTrafficRes{
   activeUsers: [number, number];
 }
 
-interface TrafficTimesReq{
+interface TrafficTimesReq {
   appId: string;
   date: string;
   pageUrl: string;
 }
 
-interface TrafficDaysReq{
+interface TrafficDaysReq {
   appId: string;
   pageUrl: string;
   beginTime: string;
   endTime: string;
 }
 
-interface TrafficTimesRes{
+interface TrafficTimesRes {
   pageViews: Record<string, number>;
   uniqueIPsCount: Record<string, number>;
   uniqueVisitors: Record<string, number>;
 }
 
-
-interface PerformanceInPage{
+interface PerformanceInPage {
   key: string;
   doc_count: number;
 }
 
-type PerformanceInValue = Record<string, {
-  value: number;
-}>
+type PerformanceInValue = Record<
+  string,
+  {
+    value: number;
+  }
+>;
 
-interface GetPerformanceReq{
+interface GetPerformanceReq {
   appId: string;
   from: number | undefined;
   size: number | undefined;
@@ -105,19 +107,18 @@ interface GetPerformanceReq{
   sorterKey?: string;
 }
 
-
-type PaginationData<T> ={
-  '_id': 'NIa1H40Bx791ks39qTfs';
-  '_source': T;
-}
-interface Pagination<T>{
+type PaginationData<T> = {
+  _id: 'NIa1H40Bx791ks39qTfs';
+  _source: T;
+};
+interface Pagination<T> {
   total: number;
   data: PaginationData<T>[];
 }
 
-type GetPerformanceRes = Pagination<PerfamceReportMsg & PublicMsg>
+type GetPerformanceRes = Pagination<PerfamceReportMsg & PublicMsg>;
 
-interface HttpErrorRankRes{
+interface HttpErrorRankRes {
   doc_count: number;
   avg_cost: {
     value: number;
@@ -130,7 +131,7 @@ interface HttpErrorRankRes{
   };
 }
 
-interface GetHttpListReq{
+interface GetHttpListReq {
   appId: string;
   from: number | undefined;
   size: number | undefined;
@@ -138,19 +139,18 @@ interface GetHttpListReq{
   link?: string | undefined;
   beginTime?: string | undefined;
   endTime?: string | undefined;
-  requestType?: 'done'|'error'|string;
+  requestType?: 'done' | 'error' | string;
   sorterName?: string;
   sorterKey?: string;
 }
 
-type GetHttpListRes = Pagination<RequestReportMsg & PublicMsg>
-
+type GetHttpListRes = Pagination<RequestReportMsg & PublicMsg>;
 
 type JsErrorMsgItem = JsErrorReportMsg & {
   errorCount: number;
   userIds: string[];
   id: number;
-}
+};
 
 type NearbyCodeMsg = {
   code: string[];
@@ -162,4 +162,4 @@ type NearbyCodeMsg = {
   };
   source: string;
   start: number;
-}
+};

@@ -1,12 +1,5 @@
-/*
- * @Author: yinhan 1738348915@qq.com
- * @Date: 2024-05-17 15:41:42
- * @LastEditors: yinhan 1738348915@qq.com
- * @LastEditTime: 2024-05-21 14:54:47
- * @FilePath: \zjiang-web-monitor\server\src\app.module.ts
- * @Description:
- */
 import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common";
+import { LoggerMiddleware } from "./logger.middleware";
 import { MulterModule } from "@nestjs/platform-express";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -28,6 +21,7 @@ import { RecordingModule } from "./recording/recording.module";
 import { FileUploadService } from "./file-upload/file-upload.service";
 import { Recording } from "./recording/entities/recording.entity";
 import { ApplicationModule } from "./application/application.module";
+import { AnalyseModule } from "./analyse/analyse.module";
 
 @Module({
   imports: [
@@ -69,8 +63,13 @@ import { ApplicationModule } from "./application/application.module";
     FileUploadModule,
     RecordingModule,
     ApplicationModule,
+    AnalyseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes("*");
+  }
+}

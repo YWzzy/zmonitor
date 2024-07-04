@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import dayjs from 'dayjs';
 import { CopyOutlined } from '@ant-design/icons';
 import { Button, Tooltip, message } from 'antd';
 import cls from 'classnames';
@@ -26,7 +25,7 @@ export const AppItem: React.FC<AppItemIn> = ({ appInfo }) => {
     await updateAppStatus({
       appId: appInfo.appId,
       id: appInfo.id,
-      status: appInfo.status === 1 ? 0 : 1,
+      appStatus: appInfo.status === 1 ? 0 : 1,
     });
     await appDispatch.getAppList();
     message.success(appInfo.status === 1 ? '已停用' : '已启用');

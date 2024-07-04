@@ -1,11 +1,3 @@
-/*
- * @Author: yinhan 1738348915@qq.com
- * @Date: 2024-05-24 15:14:52
- * @LastEditors: yinhan 1738348915@qq.com
- * @LastEditTime: 2024-05-27 15:52:38
- * @FilePath: \zjiang-web-monitor\server\src\application\dto\update-application.dto.ts
- * @Description:
- */
 import { PartialType } from "@nestjs/swagger";
 import { CreateApplicationDto } from "./create-application.dto";
 import { IsNotEmpty, IsOptional, IsString, Length } from "class-validator";

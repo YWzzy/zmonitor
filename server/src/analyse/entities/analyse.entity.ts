@@ -6,48 +6,54 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
-@Entity("application")
-export class Application {
+@Entity("analyse")
+export class Analyse {
   @PrimaryGeneratedColumn({ comment: "主键ID" })
   id: number;
 
   @Column({
+    type: "varchar",
+    length: 255,
     comment: "应用ID",
   })
-  appId: number;
+  appId: string;
 
   @Column({
     type: "varchar",
     length: 255,
-    comment: "应用名称",
+    comment: "类型",
   })
-  appName: string;
+  type: string;
 
   @Column({
-    type: "varchar",
-    length: 255,
-    comment: "应用密钥",
+    type: "int",
+    comment: "每日活跃用户数",
   })
-  appSecret: string;
+  activeUsers: number;
 
   @Column({
-    type: "varchar",
-    length: 255,
-    comment: "应用类型",
+    type: "int",
+    comment: "每日新增用户数",
   })
-  appType: string;
+  newUsers: number;
 
   @Column({
-    comment: "应用状态",
+    type: "int",
+    comment: "每日页面访问量",
   })
-  appStatus: number;
+  pv: number;
 
   @Column({
-    type: "text",
-    nullable: true,
-    comment: "应用描述",
+    type: "int",
+    comment: "每日IP数",
   })
-  appDesc: string;
+  ip: number;
+
+  @Column({
+    type: "date",
+    comment: "日期",
+  })
+  date: string;
 
   @CreateDateColumn({
     type: "timestamp",
