@@ -122,12 +122,16 @@ export const getJsErrorRang = async (params: AnalyseReq): BluBiuResponse<Options
 export const getJsErrorList = async (params: AnalyseReq): BluBiuResponse<JsErrorMsgItem[]> =>
   await http.get('/jsError/getJsErrorList', { params });
 
-export const getIssueErrorList = async (params: AnalyseReq): BluBiuResponse<ErrorMsgItem[]> =>
+export const getIssueErrorList = async (params: any): BluBiuResponse<ErrorMsgItem[]> =>
   await http.get('/monitor/getErrorList', { params });
 
 // 查询错误源码
 export const getCodeBySourceMap = async (params: any): BluBiuResponse<any> =>
   await http.get('/monitor/getmap', { params });
+
+// 查询录屏文件
+export const getRecordScreenFile = async (params: any): BluBiuResponse<any> =>
+  await http.get('/monitor/getRecordScreenId', { params });
 
 export const getNearbyCode = async (formateData: FormData): BluBiuResponse<NearbyCodeMsg> =>
   await http.post('/jsError/getNearbyCode', formateData, {

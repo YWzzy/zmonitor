@@ -1,12 +1,15 @@
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { Button, DatePicker, Form, Table, Popover, Space } from 'antd';
 import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
 import { Card } from '@/src/components';
-import { getIssueErrorList } from '@/src/api';
+import { getIssueErrorList, getRecordScreenFile } from '@/src/api';
 import SourceMapUtils from '@/src/utils/sourcemap';
 import { useAppStore } from '@/src/hooks';
-import { CodeAnalysisDrawer, RevertBehavior } from '@/src/pages/issues/components';
+import { CodeAnalysisDrawer, RevertBehavior, RecordScreen } from '@/src/pages/issues/components';
+import styles from './index.module.less';
 
 export const ErrorSearch = () => {
   const [form] = Form.useForm();
@@ -34,6 +37,11 @@ export const ErrorSearch = () => {
   const [breadcrumbMsg, setBreadcrumbMsg] = useState({
     open: false,
     breadcrumb: [],
+  });
+
+  const [recordScreenDataMsg, setRecordScreenDataMsg] = useState({
+    open: false,
+    recordScreenData: '',
   });
 
   const toSearch = async () => {
@@ -72,7 +80,7 @@ export const ErrorSearch = () => {
       title: '序号',
       dataIndex: 'index',
       key: 'index',
-      width: 50,
+      width: 70,
       align: 'center',
       render: (text, record, index) => index + 1,
     },
@@ -81,10 +89,10 @@ export const ErrorSearch = () => {
       dataIndex: 'message',
       key: 'message',
       width: 200,
-      align: 'left',
+      align: 'center',
       render: text => (
         <Popover content={<div className="popoverContent">{text}</div>}>
-          <div className="tableCell">{text}</div>
+          <div className={styles.tableCell}>{text}</div>
         </Popover>
       ),
     },
@@ -96,7 +104,7 @@ export const ErrorSearch = () => {
       align: 'left',
       render: text => (
         <Popover content={<div className="popoverContent">{text}</div>}>
-          <div className="tableCell">{text}</div>
+          <div className={styles.tableCell}>{text}</div>
         </Popover>
       ),
     },
@@ -107,7 +115,7 @@ export const ErrorSearch = () => {
       width: 150,
       align: 'center',
       render: (text, record) => (
-        <span className="tableCell">
+        <span className={styles.tableCell}>
           {record.time
             ? dayjs(record.time).format('YYYY-MM-DD HH:mm:ss')
             : dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss')}
@@ -119,21 +127,21 @@ export const ErrorSearch = () => {
       dataIndex: 'apikey',
       key: 'apikey',
       align: 'center',
-      render: text => <div className="tableCell">{text}</div>,
+      render: text => <div className={styles.tableCell}>{text}</div>,
     },
     {
       title: '用户ID',
       dataIndex: 'userId',
       key: 'userId',
       align: 'center',
-      render: text => <div className="tableCell">{text}</div>,
+      render: text => <div className={styles.tableCell}>{text}</div>,
     },
     {
       title: 'SDK版本',
       dataIndex: 'sdkVersion',
       key: 'sdkVersion',
       align: 'center',
-      render: text => <div className="tableCell">{text}</div>,
+      render: text => <div className={styles.tableCell}>{text}</div>,
     },
     {
       title: '浏览器信息',
@@ -142,7 +150,7 @@ export const ErrorSearch = () => {
       align: 'center',
       render: (text, record) => (
         <Popover content={<div className="popoverContent">{record.deviceInfo.browser}</div>}>
-          <div className="tableCell">{record.deviceInfo.browser}</div>
+          <div className={styles.tableCell}>{record.deviceInfo.browser}</div>
         </Popover>
       ),
     },
@@ -153,7 +161,7 @@ export const ErrorSearch = () => {
       align: 'center',
       render: (text, record) => (
         <Popover content={<div className="popoverContent">{record.deviceInfo.os}</div>}>
-          <div className="tableCell">{record.deviceInfo.os}</div>
+          <div className={styles.tableCell}>{record.deviceInfo.os}</div>
         </Popover>
       ),
     },
@@ -174,7 +182,7 @@ export const ErrorSearch = () => {
               录屏
             </Button>
           ) : null}
-          {record.breadcrumb ? (
+          {record.breadcrumb.length ? (
             <Button type="link" block onClick={() => revertBehavior(record)}>
               行为
             </Button>
@@ -199,9 +207,16 @@ export const ErrorSearch = () => {
     });
   };
 
-  const playRecord = recordScreenId => {
-    // 播放录屏的逻辑
+  // 播放录屏
+  const playRecord = async recordScreenId => {
     console.log('播放录屏', recordScreenId);
+    const { data } = await getRecordScreenFile({ id: recordScreenId });
+    if (data) {
+      setRecordScreenDataMsg({
+        open: true,
+        recordScreenData: data,
+      });
+    }
   };
 
   // 查看用户行为
@@ -250,6 +265,10 @@ export const ErrorSearch = () => {
       <CodeAnalysisDrawer
         codeMsg={codeMsg}
         onClose={() => setCodeMsg({ ...codeMsg, open: false })}
+      />
+      <RecordScreen
+        recordScreenDataMsg={recordScreenDataMsg}
+        onClose={() => setRecordScreenDataMsg({ ...recordScreenDataMsg, open: false })}
       />
     </Card>
   );

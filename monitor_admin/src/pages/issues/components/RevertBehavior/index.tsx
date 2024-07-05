@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from 'react';
 import { Drawer, Timeline } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -46,36 +47,34 @@ export const RevertBehavior: React.FC<RevertBehaviorProps> = ({ breadcrumbMsg, o
   };
 
   return (
-    <>
-      <Drawer
-        width={800}
-        title="用户行为 Timeline"
-        placement="right"
-        onClose={onClose}
-        visible={breadcrumbMsg.open}
-      >
-        <Timeline>
-          {breadcrumbMsg.breadcrumb.map((item, index) => (
-            <Timeline.Item
-              key={index}
-              dot={getActivityIcon(item)}
-              color={item.status === 'ok' ? '#5FF713' : '#F70B0B'}
+    <Drawer
+      width={800}
+      title="用户行为 Timeline"
+      placement="right"
+      onClose={onClose}
+      open={breadcrumbMsg.open}
+    >
+      <Timeline>
+        {breadcrumbMsg.breadcrumb.map((item, index) => (
+          <Timeline.Item
+            key={index}
+            dot={getActivityIcon(item)}
+            color={item.status === 'ok' ? '#5FF713' : '#F70B0B'}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                flexDirection: 'column',
+              }}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  flexDirection: 'column',
-                }}
-              >
-                <span>{getActivityContent(item)}</span>
-                <span>{dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}</span>
-              </div>
-            </Timeline.Item>
-          ))}
-        </Timeline>
-      </Drawer>
-    </>
+              <span>{getActivityContent(item)}</span>
+              <span>{dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}</span>
+            </div>
+          </Timeline.Item>
+        ))}
+      </Timeline>
+    </Drawer>
   );
 };

@@ -4,7 +4,7 @@ import { CodeShow } from '@/src/components';
 
 export const CodeAnalysisDrawer = ({ codeMsg, onClose }) => {
   return (
-    <Drawer width={800} title="代码解析结果" onClose={onClose} visible={codeMsg.open}>
+    <Drawer width={800} title="代码解析结果" onClose={onClose} open={codeMsg.open}>
       <Alert
         message={
           <span>

@@ -27,11 +27,11 @@
     "react-router": "^6.21.1",
     "react-router-dom": "^6.21.1",
     "redux": "^5.0.1",
+    "js-base64": "^3.7.3",
+    "pako": "^2.1.0",
     "rrweb": "^2.0.0-alpha.3",
     "rrweb-player": "^1.0.0-alpha.3",
-    "source-map-js": "^1.0.2",
-    "rrweb": "^2.0.0-alpha.3",
-    "rrweb-player": "^1.0.0-alpha.3"
+    "source-map-js": "^1.0.2"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",

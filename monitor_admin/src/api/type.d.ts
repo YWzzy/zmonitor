@@ -40,6 +40,7 @@ interface AppInfo {
 type TopKeys = 'webVisit' | 'browser' | 'deviceVendor' | 'city' | 'osName';
 
 interface AnalyseReq {
+  id: any;
   appId: string;
   date?: string;
   beginTime?: string;

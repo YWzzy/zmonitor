@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Menu, Modal, Select, Button } from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import cls from 'classnames';
+// import cls from 'classnames';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -56,22 +56,6 @@ function Home() {
   return (
     <div className={stylels.content}>
       <div className={stylels.left} style={{ width: leftSideWidth }}>
-        <svg
-          className={cls(stylels.prefixCircle, stylels.top)}
-          width="35"
-          height="35"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M35,0 A35,35 0 0,0 0,35 L0,0 Z" fill="#4684ff" stroke="#4684ff" />
-        </svg>
-        <svg
-          width="35"
-          height="35"
-          className={cls(stylels.prefixCircle, stylels.bottom)}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M0,0 A35,35 0 0,0 35,35 L0,35 Z" fill="#4684ff" stroke="#4684ff" />
-        </svg>
         {
           <div className={stylels.logo}>
             <div className={stylels['logo-content']}>
