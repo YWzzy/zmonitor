@@ -3,7 +3,7 @@ import { Alert, Button, DatePicker, Drawer, Form, Table, Popover } from 'antd';
 import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
 import { Card, CodeShow } from '@/src/components';
-import { getIssueErrorList, getCodeBySourceMap } from '@/src/api';
+import { getIssueErrorList } from '@/src/api';
 import SourceMapUtils from '@/src/utils/sourcemap';
 import { useAppStore } from '@/src/hooks';
 
@@ -19,14 +19,16 @@ export const ErrorSearch = () => {
 
   const [codeMsg, setCodeMsg] = useState({
     open: false,
-    // code: [],
-    // originalPosition: {
-    //   source: '',
-    //   line: 0,
-    //   column: 0,
-    //   name: '',
-    // },
-    // start: 12,
+    code: [],
+    originalPosition: {
+      source: '',
+      line: 0,
+      column: 0,
+      name: '',
+      hightLine: 0,
+    },
+    start: 0,
+    end: 20,
   });
 
   const toSearch = async () => {
@@ -197,9 +199,13 @@ export const ErrorSearch = () => {
     await SourceMapUtils.findCodeBySourceMap({
       ...record,
     }).then(res => {
-      if (revertRef.current) {
-        revertRef.current.innerHTML = res; // 在事件处理函数中设置innerHTML
-      }
+      setCodeMsg({
+        ...res,
+        open: true,
+      });
+      // if (revertRef.current) {
+      //   revertRef.current.innerHTML = res; // 在事件处理函数中设置innerHTML
+      // }
     });
     // await getCodeBySourceMap({
     //   fileName: record.fileName,
@@ -268,7 +274,7 @@ export const ErrorSearch = () => {
         }}
         open={codeMsg.open}
       >
-        {/* <Alert
+        <Alert
           message={
             <span>
               源代码位置：{codeMsg.originalPosition.source}
@@ -276,15 +282,15 @@ export const ErrorSearch = () => {
             </span>
           }
           type="info"
-        /> */}
-
+        />
         <div ref={revertRef}></div>
-        {/* <CodeShow
+        <CodeShow
           start={codeMsg.start}
+          end={codeMsg.end}
           hightLine={codeMsg.originalPosition?.line - codeMsg.start + 1}
         >
           {codeMsg.code.join('\n')}
-        </CodeShow> */}
+        </CodeShow>
       </Drawer>
     </Card>
   );

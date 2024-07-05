@@ -29,7 +29,9 @@
     "redux": "^5.0.1",
     "rrweb": "^2.0.0-alpha.3",
     "rrweb-player": "^1.0.0-alpha.3",
-    "source-map-js": "^1.0.2"
+    "source-map-js": "^1.0.2",
+    "rrweb": "^2.0.0-alpha.3",
+    "rrweb-player": "^1.0.0-alpha.3"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
@@ -48,6 +50,8 @@
     "eslint-plugin-react-refresh": "^0.4.7",
     "less": "^4.2.0",
     "typescript": "^5.2.2",
-    "vite": "^5.3.1"
+    "vite": "^5.3.1",
+    "autoprefixer": "^10.4.4",
+    "postcss": "^8.4.14"
   }
 }

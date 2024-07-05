@@ -13,6 +13,9 @@ export default defineConfig(({ mode }) => {
         '@/src': path.resolve(__dirname, './src'),
       },
     },
+    css: {
+      postcss: './postcss.config.js',
+    },
     server: {
       // 设置开发服务器代理
       proxy: {

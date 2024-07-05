@@ -69,11 +69,11 @@ export class MonitorService {
     let originalFileName;
     const regex = /\/([^\/]+)$/; // 匹配最后一个斜杠后的内容作为文件名
     const match = regex.exec(fileName);
-      if (match) {
-        originalFileName = match[1]; // 返回匹配到的文件名部分
-      } else {
-        originalFileName = fileName; // 如果未匹配到，返回null或其他默认值
-      }
+    if (match) {
+      originalFileName = match[1]; // 返回匹配到的文件名部分
+    } else {
+      originalFileName = fileName; // 如果未匹配到，返回null或其他默认值
+    }
     if (env === "development") {
       mapPath = path.join(
         __dirname,

@@ -1,8 +1,7 @@
-/* eslint-disable prefer-const */
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import sourceMap from 'source-map-js';
 import { message } from 'antd';
-import { getCodeBySourceMap } from '@/src/api';
 
 interface CodeDetail {
   source: string;
@@ -26,10 +25,10 @@ export default class SourceMapUtils {
     return res && Array.isArray(res) ? res[1] : null;
   }
 
-  static async loadSourceMap(fileName: string): Promise<any> {
-    let file;
-    file = fileName;
+  static async loadSourceMap(fileName: string): Promise<string | null> {
+    const file = fileName;
     // const env = process.env.NODE_ENV;
+    const env = 'production';
 
     // if (env === 'development') {
     //   file = this.getFileLink(fileName);
@@ -40,10 +39,15 @@ export default class SourceMapUtils {
     if (!file) return null;
 
     try {
-      return await getCodeBySourceMap({
-        fileName: file,
-        env: 'production',
-      });
+      const response = await fetch(
+        `http://localhost:8083/monitor/getmap?fileName=${file}&env=${env}`
+      );
+      return await response.json();
+      //   if (env == 'development') {
+      //     return await response.text();
+      //   } else {
+      //     return await response.json();
+      //   }
     } catch (error) {
       console.error('加载源码映射失败:', error);
       return null;
@@ -59,17 +63,16 @@ export default class SourceMapUtils {
     line: number;
     column: number;
   }): Promise<any> {
-    console.log('fileName', fileName, 'line', line, 'column', column);
-
     const sourceData: any = await this.loadSourceMap(fileName);
-    console.log('sourceData', sourceData);
+
     if (!sourceData) return;
 
     let result: CodeDetail;
     let codeList: string[];
 
-    if (process.env.NODE_ENV === 'development') {
-      const source = this.matchStr(fileName);
+    // if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV !== 'development') {
+      const source = this.getFileLink(fileName);
       let isStart = false;
       result = {
         source,
@@ -117,25 +120,57 @@ export default class SourceMapUtils {
     const len = codeList.length - 1;
     const start = row - 5 >= 0 ? row - 5 : 0;
     const end = start + 9 >= len ? len : start + 9;
+    console.log('====================================');
+    console.log('codeList', codeList);
+    console.log('result', result);
+    console.log('row', row);
+    console.log('len', len);
+    console.log('start', start);
+    console.log('end', end);
+    console.log('====================================');
 
     const newLines = [];
+    let hightLine = 0;
     for (let i = start; i <= end; i++) {
-      newLines.push(
-        `<div class="code-line ${i + 1 === row ? 'heightlight' : ''}" title="${
-          i + 1 === row ? result.source : ''
-        }">
-          ${i + 1}. ${this.repalceAll(codeList[i])}
-        </div>`
-      );
+      //   newLines.push(
+      //     `<div class="code-line ${i + 1 === row ? 'heightlight' : ''}" style="${
+      //       i + 1 === row ? 'color: red' : ''
+      //     }" title="${i + 1 === row ? result.source : ''}">
+      //       ${i + 1}. ${this.repalceAll(codeList[i])}
+      //     </div>`
+      //   );
+      if (i + 1 === row) {
+        hightLine = i;
+      }
+      newLines.push(codeList[i]);
     }
 
-    const innerHTML = `
-      <div class="errdetail">
-        <div class="errheader">${result.source} at line ${result.column}:${row}</div>
-        <div class="errdetail">${newLines.join('')}</div>
-      </div>
-    `;
+    // const innerHTML = `
+    //   <div class="errdetail">
+    //     <div class="errheader">${result.source} at line ${result.column}:${row}</div>
+    //     <div class="errdetail">${newLines.join('')}</div>
+    //   </div>
+    // `;
 
-    return innerHTML;
+    const info = {
+      code: newLines,
+      originalPosition: {
+        source: result.source,
+        line: result.line - 1,
+        column: result.column,
+        name: '',
+        hightLine: hightLine,
+      },
+      start: start,
+      end: end,
+    };
+
+    if (result.hasOwnProperty('name')) {
+      info.originalPosition.name = result['name'];
+    }
+
+    console.log('info', info);
+
+    return info;
   }
 }
