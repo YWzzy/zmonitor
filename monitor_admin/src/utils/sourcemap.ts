@@ -120,14 +120,6 @@ export default class SourceMapUtils {
     const len = codeList.length - 1;
     const start = row - 5 >= 0 ? row - 5 : 0;
     const end = start + 9 >= len ? len : start + 9;
-    console.log('====================================');
-    console.log('codeList', codeList);
-    console.log('result', result);
-    console.log('row', row);
-    console.log('len', len);
-    console.log('start', start);
-    console.log('end', end);
-    console.log('====================================');
 
     const newLines = [];
     let hightLine = 0;

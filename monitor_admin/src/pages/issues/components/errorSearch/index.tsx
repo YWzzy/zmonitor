@@ -6,7 +6,7 @@ import { Card, CodeShow } from '@/src/components';
 import { getIssueErrorList } from '@/src/api';
 import SourceMapUtils from '@/src/utils/sourcemap';
 import { useAppStore } from '@/src/hooks';
-import { CodeAnalysisDrawer } from '@/src/pages/issues/components/CodeAnalysisDrawer';
+import { CodeAnalysisDrawer, RevertBehavior } from '@/src/pages/issues/components';
 
 export const ErrorSearch = () => {
   const [form] = Form.useForm();
@@ -30,6 +30,11 @@ export const ErrorSearch = () => {
     },
     start: 0,
     end: 20,
+  });
+
+  const [breadcrumbMsg, setBreadcrumbMsg] = useState({
+    open: false,
+    breadcrumb: [],
   });
 
   const toSearch = async () => {
@@ -217,6 +222,10 @@ export const ErrorSearch = () => {
   // 查看用户行为
   const revertBehavior = record => {
     console.log('查看用户行为', record);
+    setBreadcrumbMsg({
+      open: true,
+      breadcrumb: record.breadcrumb,
+    });
   };
 
   useEffect(() => {
@@ -248,6 +257,10 @@ export const ErrorSearch = () => {
         columns={columns}
         dataSource={tableData}
         scroll={{ x: 1300 }}
+      />
+      <RevertBehavior
+        breadcrumbMsg={breadcrumbMsg}
+        onClose={() => setBreadcrumbMsg({ ...breadcrumbMsg, open: false })}
       />
       <CodeAnalysisDrawer
         codeMsg={codeMsg}
