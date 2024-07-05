@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, DatePicker, Form, Table, Popover } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Button, DatePicker, Form, Table, Popover, Space } from 'antd';
 import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
-import { Card, CodeShow } from '@/src/components';
+import { Card } from '@/src/components';
 import { getIssueErrorList } from '@/src/api';
 import SourceMapUtils from '@/src/utils/sourcemap';
 import { useAppStore } from '@/src/hooks';
@@ -16,7 +16,6 @@ export const ErrorSearch = () => {
   const { active } = useAppStore();
 
   const [loading, setLoading] = useState(false);
-  const revertRef = useRef(null);
 
   const [codeMsg, setCodeMsg] = useState({
     open: false,
@@ -159,43 +158,29 @@ export const ErrorSearch = () => {
       ),
     },
     {
-      title: '还原错误代码',
-      dataIndex: 'recordScreenId',
-      key: 'revertCode',
-      width: 100,
+      title: '操作',
+      width: 200,
       fixed: 'right',
-      render: (text, record) =>
-        record.type === 'error' || record.type === 'unhandledrejection' ? (
-          <Button type="primary" onClick={() => revertCode(record)}>
-            查看源码
-          </Button>
-        ) : null,
-    },
-    {
-      title: '播放录屏',
-      dataIndex: 'recordScreenId',
-      key: 'playRecord',
-      width: 100,
-      fixed: 'right',
-      render: (text, record) =>
-        record.recordScreenId ? (
-          <Button type="primary" onClick={() => playRecord(record.recordScreenId)}>
-            播放录屏
-          </Button>
-        ) : null,
-    },
-    {
-      title: '用户行为记录',
-      dataIndex: 'breadcrumb',
-      key: 'userBehavior',
-      width: 125,
-      fixed: 'right',
-      render: (text, record) =>
-        record.breadcrumb ? (
-          <Button type="primary" onClick={() => revertBehavior(record)}>
-            查看用户行为
-          </Button>
-        ) : null,
+      align: 'center',
+      render: (text, record) => (
+        <Space>
+          {record.type === 'error' || record.type === 'unhandledrejection' ? (
+            <Button type="link" block onClick={() => revertCode(record)}>
+              源码
+            </Button>
+          ) : null}
+          {record.recordScreenId ? (
+            <Button type="link" block onClick={() => playRecord(record.recordScreenId)}>
+              录屏
+            </Button>
+          ) : null}
+          {record.breadcrumb ? (
+            <Button type="link" block onClick={() => revertBehavior(record)}>
+              行为
+            </Button>
+          ) : null}
+        </Space>
+      ),
     },
   ];
 
