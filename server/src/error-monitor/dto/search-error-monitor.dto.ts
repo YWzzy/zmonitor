@@ -2,8 +2,8 @@
  * @Author: yinhan 1738348915@qq.com
  * @Date: 2024-05-24 09:59:26
  * @LastEditors: yinhan 1738348915@qq.com
- * @LastEditTime: 2024-05-27 16:30:36
- * @FilePath: \zjiang-web-monitor\server\src\error-monitor\dto\search-error-monitor.dto.ts
+ * @LastEditTime: 2024-07-05 16:17:45
+ * @FilePath: \server\src\error-monitor\dto\search-error-monitor.dto.ts
  * @Description:
  */
 import {
@@ -79,6 +79,14 @@ export class SearchErrorMonitorDto {
   @IsBoolean()
   @IsOptional()
   isDeleted: boolean = false;
+
+  @IsString()
+  @IsOptional()
+  beginTime?: string;
+
+  @IsString()
+  @IsOptional()
+  endTime?: string;
 
   @IsDate()
   @IsOptional()

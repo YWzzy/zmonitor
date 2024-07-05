@@ -2,10 +2,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { Button, DatePicker, Form, Table, Popover, Space } from 'antd';
-import type { TableColumnsType } from 'antd';
+import type { TableColumnsType, TablePaginationConfig } from 'antd';
 import dayjs from 'dayjs';
 import { Card } from '@/src/components';
-import { getIssueErrorList, getRecordScreenFile } from '@/src/api';
+import { getIssueErrorListPage, getRecordScreenFile } from '@/src/api';
 import SourceMapUtils from '@/src/utils/sourcemap';
 import { useAppStore } from '@/src/hooks';
 import { CodeAnalysisDrawer, RevertBehavior, RecordScreen } from '@/src/pages/issues/components';
@@ -13,13 +13,9 @@ import styles from './index.module.less';
 
 export const ErrorSearch = () => {
   const [form] = Form.useForm();
-
   const [tableData, setTableData] = useState([]);
-
   const { active } = useAppStore();
-
   const [loading, setLoading] = useState(false);
-
   const [codeMsg, setCodeMsg] = useState({
     open: false,
     code: [],
@@ -33,47 +29,60 @@ export const ErrorSearch = () => {
     start: 0,
     end: 20,
   });
-
   const [breadcrumbMsg, setBreadcrumbMsg] = useState({
     open: false,
     breadcrumb: [],
   });
-
   const [recordScreenDataMsg, setRecordScreenDataMsg] = useState({
     open: false,
     recordScreenData: '',
   });
+  const [pagination, setPagination] = useState<TablePaginationConfig>({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
 
-  const toSearch = async () => {
+  const toSearch = async (page = 1, pageSize = 10) => {
     const { date } = form.getFieldsValue();
     const query = {
       appId: active,
       beginTime: date ? date[0].format('YYYY-MM-DD 00:00:00') : undefined,
       endTime: date ? date[1].format('YYYY-MM-DD 23:59:59') : undefined,
+      page,
+      pageSize,
     };
     search(query);
   };
 
   const toReset = () => {
     form.resetFields();
-    search({
-      appId: active,
-      beginTime: dayjs().format('YYYY-MM-DD 00:00:00'),
-      endTime: dayjs().format('YYYY-MM-DD 23:59:59'),
-    });
+    toSearch(1, pagination.pageSize);
   };
 
   const search = async searchQuery => {
     setLoading(true);
-    const { data } = await getIssueErrorList(searchQuery);
+    const {
+      data: { total, data },
+    } = await getIssueErrorListPage(searchQuery);
 
     setTableData(data);
+    setPagination({
+      ...pagination,
+      current: searchQuery.page,
+      pageSize: searchQuery.pageSize,
+      total,
+    });
     setLoading(false);
   };
 
   useEffect(() => {
     toSearch();
   }, []);
+
+  const handleTableChange = (pagination: TablePaginationConfig) => {
+    toSearch(pagination.current, pagination.pageSize);
+  };
 
   const columns: TableColumnsType<ErrorMsgItem> = [
     {
@@ -100,8 +109,8 @@ export const ErrorSearch = () => {
       title: '报错页面',
       dataIndex: 'pageUrl',
       key: 'pageUrl',
-      width: 100,
-      align: 'left',
+      width: 180,
+      align: 'center',
       render: text => (
         <Popover content={<div className="popoverContent">{text}</div>}>
           <div className={styles.tableCell}>{text}</div>
@@ -124,8 +133,8 @@ export const ErrorSearch = () => {
     },
     {
       title: '项目编号',
-      dataIndex: 'apikey',
-      key: 'apikey',
+      dataIndex: 'appId',
+      key: 'appId',
       align: 'center',
       render: text => <div className={styles.tableCell}>{text}</div>,
     },
@@ -167,7 +176,7 @@ export const ErrorSearch = () => {
     },
     {
       title: '操作',
-      width: 200,
+      width: 240,
       fixed: 'right',
       align: 'center',
       render: (text, record) => (
@@ -201,15 +210,11 @@ export const ErrorSearch = () => {
         ...res,
         open: true,
       });
-      // if (revertRef.current) {
-      //   revertRef.current.innerHTML = res; // 在事件处理函数中设置innerHTML
-      // }
     });
   };
 
   // 播放录屏
   const playRecord = async recordScreenId => {
-    console.log('播放录屏', recordScreenId);
     const { data } = await getRecordScreenFile({ id: recordScreenId });
     if (data) {
       setRecordScreenDataMsg({
@@ -221,7 +226,6 @@ export const ErrorSearch = () => {
 
   // 查看用户行为
   const revertBehavior = record => {
-    console.log('查看用户行为', record);
     setBreadcrumbMsg({
       open: true,
       breadcrumb: record.breadcrumb,
@@ -241,7 +245,7 @@ export const ErrorSearch = () => {
           <DatePicker.RangePicker />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" onClick={toSearch}>
+          <Button type="primary" onClick={() => toSearch(pagination.current, pagination.pageSize)}>
             查询
           </Button>
         </Form.Item>
@@ -251,11 +255,12 @@ export const ErrorSearch = () => {
       </Form>
 
       <Table
-        sticky
         rowKey={'id'}
         loading={loading}
         columns={columns}
         dataSource={tableData}
+        pagination={pagination}
+        onChange={handleTableChange}
         scroll={{ x: 1300 }}
       />
       <RevertBehavior

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
 import { CreateErrorMonitorDto } from "./dto/create-error-monitor.dto";
 import { UpdateErrorMonitorDto } from "./dto/update-error-monitor.dto";
 import { SearchErrorMonitorDto } from "./dto/search-error-monitor.dto";
@@ -87,15 +87,38 @@ export class ErrorMonitorService {
     searchErrorMonitorDto: SearchErrorMonitorDto
   ): Promise<ErrorMonitorList> {
     try {
-      const { pageSize, pageNo, ...searchDto } = searchErrorMonitorDto;
-      // 查询条件为searchDto的错误日志，分页查询，返回当前page和total数量
+      const { pageSize, pageNo, beginTime, endTime, ...searchDto } =
+        searchErrorMonitorDto;
+
+      // 转换字符串时间为 Date 对象
+      const startDate = beginTime ? new Date(beginTime + "Z") : undefined; // 添加 'Z' 表示 UTC 时间
+      const endDate = endTime ? new Date(endTime + "Z") : undefined; // 添加 'Z' 表示 UTC 时间
+
+      // 检查分页参数是否合法
       if (pageSize < 1 || pageNo < 1) {
         throw new Error("Invalid pageNo or pageSize");
       }
 
+      // 过滤掉空字符串的查询条件
+      Object.keys(searchDto).forEach(
+        (key) => searchDto[key] === "" && delete searchDto[key]
+      );
+
+      // 构建查询条件
+      const whereConditions: any = { ...searchDto, isDeleted: false };
+
+      // 添加时间区间过滤条件
+      if (startDate && endDate) {
+        whereConditions.createTime = Between(startDate, endDate);
+      } else if (startDate) {
+        whereConditions.createTime = MoreThanOrEqual(startDate);
+      } else if (endDate) {
+        whereConditions.createTime = LessThanOrEqual(endDate);
+      }
+
       const [errorMonitors, total] =
         await this.errorMonitorRepository.findAndCount({
-          where: { ...searchDto, isDeleted: false },
+          where: whereConditions,
           relations: ["breadcrumb"],
           order: { createTime: "DESC" },
           take: pageSize,

@@ -51,6 +51,29 @@ export class MonitorController {
     this.monitorService.getErrorList(res);
   }
 
+  @Get("getErrorListPage")
+  @ApiOperation({
+    summary: "获取错误日志列表分页",
+    description: "获取错误日志列表分页",
+  })
+  async getErrorListPage(
+    @Query("appId") appId: string,
+    @Query("beginTime") beginTime: string,
+    @Query("endTime") endTime: string,
+    @Query("page") page: string,
+    @Query("pageSize") pageSize: string,
+    @Res() res: Response
+  ): Promise<void> {
+    this.monitorService.findPaginatedAndFiltered(
+      appId,
+      beginTime,
+      endTime,
+      page,
+      pageSize,
+      res
+    );
+  }
+
   @Get("getRecordScreenId")
   @ApiOperation({
     summary: "根据id获取录屏",

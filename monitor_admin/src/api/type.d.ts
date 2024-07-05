@@ -164,6 +164,13 @@ type DeviceInfo = {
   ua: string;
 };
 
+type IssuesListPage = {
+  data: ErrorMsgItem[];
+  total: number;
+};
+
+type IssuesListPageRes = Pagination<IssuesListPage & PublicMsg>;
+
 type ErrorMsgItem = {
   appId: string;
   breadcrumb: any[]; // 可以根据具体内容进一步定义

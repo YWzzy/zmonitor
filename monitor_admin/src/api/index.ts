@@ -122,8 +122,13 @@ export const getJsErrorRang = async (params: AnalyseReq): BluBiuResponse<Options
 export const getJsErrorList = async (params: AnalyseReq): BluBiuResponse<JsErrorMsgItem[]> =>
   await http.get('/jsError/getJsErrorList', { params });
 
+// 查询所有错误
 export const getIssueErrorList = async (params: any): BluBiuResponse<ErrorMsgItem[]> =>
   await http.get('/monitor/getErrorList', { params });
+
+// 查询错误列表 -分页
+export const getIssueErrorListPage = async (params: any): BluBiuResponse<IssuesListPageRes> =>
+  await http.get('/monitor/getErrorListPage', { params });
 
 // 查询错误源码
 export const getCodeBySourceMap = async (params: any): BluBiuResponse<any> =>

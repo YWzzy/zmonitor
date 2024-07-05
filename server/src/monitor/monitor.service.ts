@@ -11,6 +11,7 @@ import { RecordingService } from "../recording/recording.service";
 import { FileUploadService } from "../file-upload/file-upload.service";
 import { PerformanceService } from "../performance/performance.service";
 import { CreatePerformanceDto } from "src/performance/dto/create-performance.dto";
+import { SearchErrorMonitorDto } from "src/error-monitor/dto/search-error-monitor.dto";
 
 @Injectable()
 export class MonitorService {
@@ -106,6 +107,44 @@ export class MonitorService {
       res.status(200).send({
         code: 200,
         data: errors,
+      });
+    } catch (err) {
+      res.status(500).send({
+        code: 500,
+        message: "Error retrieving error list.",
+        error: err,
+      });
+    }
+  }
+
+  // 获取分页错误列表
+  async findPaginatedAndFiltered(
+    appId: string,
+    beginTime: string,
+    endTime: string,
+    page: string,
+    pageSize: string,
+    res: any
+  ): Promise<any> {
+    try {
+      const pageNumber = parseInt(page, 10) || 1;
+      const pageSizeNumber = parseInt(pageSize, 10) || 10;
+
+      const { list, total } = await this.errorMonitorService.findListPage({
+        appId,
+        beginTime,
+        endTime,
+        pageNo: pageNumber,
+        pageSize: pageSizeNumber,
+      } as SearchErrorMonitorDto);
+
+      res.status(200).send({
+        code: 200,
+        data: {
+          data: list,
+          total,
+        },
+        message: "Issues list retrieved successfully.",
       });
     } catch (err) {
       res.status(500).send({
