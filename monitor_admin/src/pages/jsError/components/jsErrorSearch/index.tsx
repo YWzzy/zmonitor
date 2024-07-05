@@ -110,6 +110,7 @@ export const JsErrorSearch = () => {
         <span className={styles.upload}>
           <a>解析</a>
           <input
+            title="Upload"
             type="file"
             onChange={e => {
               onUpLoadData(e.target.files[0], record.colno, record.lineno);
@@ -134,7 +135,9 @@ export const JsErrorSearch = () => {
           <DatePicker.RangePicker />
         </Form.Item>
         <Form.Item>
-          <Button onClick={toReset}>重置</Button>
+          <Button onClick={toReset} title="Reset">
+            重置
+          </Button>
         </Form.Item>
         <Form.Item>
           <Button type="primary" onClick={toSearch}>

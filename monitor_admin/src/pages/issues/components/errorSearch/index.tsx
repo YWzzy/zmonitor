@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Button, DatePicker, Drawer, Form, Table, Popover } from 'antd';
+import { Button, DatePicker, Form, Table, Popover } from 'antd';
 import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
 import { Card, CodeShow } from '@/src/components';
 import { getIssueErrorList } from '@/src/api';
 import SourceMapUtils from '@/src/utils/sourcemap';
 import { useAppStore } from '@/src/hooks';
+import { CodeAnalysisDrawer } from '@/src/pages/issues/components/CodeAnalysisDrawer';
 
 export const ErrorSearch = () => {
   const [form] = Form.useForm();
@@ -193,9 +194,8 @@ export const ErrorSearch = () => {
     },
   ];
 
+  // 还原错误代码
   const revertCode = async record => {
-    // 还原错误代码的逻辑
-    console.log('还原错误代码', record);
     await SourceMapUtils.findCodeBySourceMap({
       ...record,
     }).then(res => {
@@ -207,20 +207,6 @@ export const ErrorSearch = () => {
       //   revertRef.current.innerHTML = res; // 在事件处理函数中设置innerHTML
       // }
     });
-    // await getCodeBySourceMap({
-    //   fileName: record.fileName,
-    //   env: 'production',
-    // }).then(res => {
-    //   console.log('====================================');
-    //   console.log(res);
-    //   console.log('====================================');
-    //   setCodeMsg({
-    //     open: true,
-    //   });
-    //   if (revertRef.current) {
-    //     revertRef.current.innerHTML = res; // 在事件处理函数中设置innerHTML
-    //   }
-    // });
   };
 
   const playRecord = recordScreenId => {
@@ -228,8 +214,8 @@ export const ErrorSearch = () => {
     console.log('播放录屏', recordScreenId);
   };
 
+  // 查看用户行为
   const revertBehavior = record => {
-    // 查看用户行为的逻辑
     console.log('查看用户行为', record);
   };
 
@@ -263,35 +249,10 @@ export const ErrorSearch = () => {
         dataSource={tableData}
         scroll={{ x: 1300 }}
       />
-      <Drawer
-        width={800}
-        title={'代码解析结果'}
-        onClose={() => {
-          setCodeMsg({
-            ...codeMsg,
-            open: false,
-          });
-        }}
-        open={codeMsg.open}
-      >
-        <Alert
-          message={
-            <span>
-              源代码位置：{codeMsg.originalPosition.source}
-              {`(${codeMsg.originalPosition.line}, ${codeMsg.originalPosition.column})`}
-            </span>
-          }
-          type="info"
-        />
-        <div ref={revertRef}></div>
-        <CodeShow
-          start={codeMsg.start}
-          end={codeMsg.end}
-          hightLine={codeMsg.originalPosition?.line - codeMsg.start + 1}
-        >
-          {codeMsg.code.join('\n')}
-        </CodeShow>
-      </Drawer>
+      <CodeAnalysisDrawer
+        codeMsg={codeMsg}
+        onClose={() => setCodeMsg({ ...codeMsg, open: false })}
+      />
     </Card>
   );
 };
