@@ -1,10 +1,10 @@
 import {
   Entity,
   Column,
-  CreateDateColumn,
   PrimaryGeneratedColumn,
-  OneToMany,
+  CreateDateColumn,
   OneToOne,
+  OneToMany,
   JoinColumn,
 } from "typeorm";
 import { Resource } from "./resource.entity";
@@ -15,43 +15,35 @@ export class Performance {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ comment: "性能监控的类型" })
+  @Column({ type: "varchar", length: 255, comment: "性能监控的类型" })
   type: string;
 
-  @Column({ comment: "性能监控的状态" })
+  @Column({ type: "varchar", length: 255, comment: "性能监控的状态" })
   status: string;
 
-  @Column("bigint", { comment: "时间戳" })
+  @Column({ type: "bigint", comment: "时间戳" })
   time: number;
 
-  @Column({ default: "", comment: "名称" })
+  @Column({ type: "varchar", length: 255, default: "", comment: "名称" })
   name: string;
 
-  @Column({ default: "", comment: "用户ID" })
+  @Column({ type: "varchar", length: 255, default: "", comment: "用户ID" })
   userId: string;
 
-  @Column({ default: "", comment: "SDK版本" })
+  @Column({ type: "varchar", length: 255, default: "", comment: "SDK版本" })
   sdkVersion: string;
 
-  @Column({ default: "", comment: "API密钥" })
+  @Column({ type: "varchar", length: 255, default: "", comment: "API密钥" })
   appId: string;
 
-  @Column({ default: "", comment: "唯一标识符" })
+  @Column({ type: "varchar", length: 255, default: "", comment: "唯一标识符" })
   uuid: string;
 
-  @Column({ default: "", comment: "页面URL" })
+  @Column({ type: "varchar", length: 255, default: "", comment: "页面URL" })
   pageUrl: string;
 
-  @Column("json", { nullable: true, comment: "设备信息" })
-  deviceInfo: {
-    browserVersion: string;
-    browser: string;
-    osVersion: string;
-    os: string;
-    ua: string;
-    device: string;
-    device_type: string;
-  };
+  @Column({ type: "json", nullable: true, comment: "设备信息" })
+  deviceInfo: Record<string, any>;
 
   @OneToMany(() => Resource, (resource) => resource.performance, {
     cascade: true, // 保存时级联保存
@@ -63,6 +55,9 @@ export class Performance {
   })
   @JoinColumn()
   longTask: LongTask;
+
+  @Column({ type: "double", nullable: true, comment: "性能值" })
+  performanceValue: number;
 
   @CreateDateColumn({ type: "timestamp", comment: "记录创建时间" })
   createTime: Date;

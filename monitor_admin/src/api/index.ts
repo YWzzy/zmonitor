@@ -13,6 +13,7 @@ enum BluBiuResponseCode {
   ACCOUNTEXIST = 1004, // 该账号已被注
   NOLOGIN = 1005, // 登录已过期
   NOTFOUNDACCOUNT = 1006, // 没有找到用户信息
+  BUSSNIESS = 400, // 业务异常400
 }
 
 export const http = axios.create({

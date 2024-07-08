@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as fs from "fs";
@@ -46,6 +46,9 @@ export class MonitorService {
   // 存储上报信息
   async saveLogByType(type: string, data: any): Promise<void> {
     try {
+      if (data.apikey) {
+        data.appId = data.apikey;
+      }
       if (type === "performance") {
         const createPerformanceDto: CreatePerformanceDto = data;
         await this.performanceService.create(createPerformanceDto);
@@ -96,7 +99,7 @@ export class MonitorService {
 
     try {
       const data = await fs.promises.readFile(mapPath);
-      res.status(200).send(data);
+      res.status(HttpStatus.OK).send(data);
     } catch (err) {
       console.error(err);
       res.status(500).send("Error reading the map file.");
@@ -107,7 +110,7 @@ export class MonitorService {
   async getErrorList(res: any): Promise<void> {
     try {
       const errors = await this.errorMonitorService.findAll();
-      res.status(200).send({
+      res.status(HttpStatus.OK).send({
         code: 200,
         data: errors,
       });
@@ -130,7 +133,7 @@ export class MonitorService {
     res: any
   ): Promise<any> {
     try {
-      if(!appId)
+      if (!appId)
         return res.status(400).send({
           code: 400,
           message: "App ID is required.",
@@ -146,7 +149,7 @@ export class MonitorService {
         pageSize: pageSizeNumber,
       } as SearchErrorMonitorDto);
 
-      res.status(200).send({
+      res.status(HttpStatus.OK).send({
         code: 200,
         data: {
           data: list,
@@ -171,7 +174,7 @@ export class MonitorService {
       // 如果recordingInfo存在，并且有存储路径
       if (!this.isEmptyObject(recordingInfo)) {
         const data = fs.readFileSync(recordingInfo?.storedFilePath, "base64");
-        res.status(200).send({
+        res.status(HttpStatus.OK).send({
           code: 200,
           data,
         });
@@ -203,7 +206,7 @@ export class MonitorService {
 
         await this.saveLogByType(data.type, data);
       }
-      res.status(200).send({
+      res.status(HttpStatus.OK).send({
         code: 200,
         message: "Report successful!",
       });

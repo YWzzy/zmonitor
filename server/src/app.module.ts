@@ -22,6 +22,7 @@ import { FileUploadService } from "./file-upload/file-upload.service";
 import { Recording } from "./recording/entities/recording.entity";
 import { ApplicationModule } from "./application/application.module";
 import { AnalyseModule } from "./analyse/analyse.module";
+import { ReportPerformanceEsModule } from './report-performance-es/report-performance-es.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { AnalyseModule } from "./analyse/analyse.module";
     RecordingModule,
     ApplicationModule,
     AnalyseModule,
+    ReportPerformanceEsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
