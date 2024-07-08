@@ -1,7 +1,7 @@
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
-import { Button, DatePicker, Form, Table, Popover, Space } from 'antd';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { Button, DatePicker, Form, Table, Popover, Space, message } from 'antd';
 import type { TableColumnsType, TablePaginationConfig } from 'antd';
 import dayjs from 'dayjs';
 import { Card } from '@/src/components';
@@ -11,7 +11,11 @@ import { useAppStore } from '@/src/hooks';
 import { CodeAnalysisDrawer, RevertBehavior, RecordScreen } from '@/src/pages/issues/components';
 import styles from './index.module.less';
 
-export const ErrorSearch = () => {
+export interface ErrorSearchHandle {
+  toSearch: () => void;
+}
+
+export const ErrorSearch = forwardRef<ErrorSearchHandle>((props, ref) => {
   const [form] = Form.useForm();
   const [tableData, setTableData] = useState([]);
   const { active } = useAppStore();
@@ -29,6 +33,7 @@ export const ErrorSearch = () => {
     start: 0,
     end: 20,
   });
+
   const [breadcrumbMsg, setBreadcrumbMsg] = useState({
     open: false,
     breadcrumb: [],
@@ -79,6 +84,10 @@ export const ErrorSearch = () => {
   useEffect(() => {
     toSearch();
   }, []);
+
+  useImperativeHandle(ref, () => ({
+    toSearch,
+  }));
 
   const handleTableChange = (pagination: TablePaginationConfig) => {
     toSearch(pagination.current, pagination.pageSize);
@@ -203,14 +212,19 @@ export const ErrorSearch = () => {
 
   // 还原错误代码
   const revertCode = async record => {
-    await SourceMapUtils.findCodeBySourceMap({
-      ...record,
-    }).then(res => {
-      setCodeMsg({
-        ...res,
-        open: true,
+    try {
+      await SourceMapUtils.findCodeBySourceMap({
+        ...record,
+      }).then(res => {
+        if (res)
+          setCodeMsg({
+            ...res,
+            open: true,
+          });
       });
-    });
+    } catch (error) {
+      message.error(`还原错误代码失败:${error}`);
+    }
   };
 
   // 播放录屏
@@ -277,4 +291,4 @@ export const ErrorSearch = () => {
       />
     </Card>
   );
-};
+});

@@ -50,7 +50,7 @@ export default class SourceMapUtils {
       //   }
     } catch (error) {
       console.error('加载源码映射失败:', error);
-      return null;
+      throw new Error(error);
     }
   }
 
@@ -124,25 +124,11 @@ export default class SourceMapUtils {
     const newLines = [];
     let hightLine = 0;
     for (let i = start; i <= end; i++) {
-      //   newLines.push(
-      //     `<div class="code-line ${i + 1 === row ? 'heightlight' : ''}" style="${
-      //       i + 1 === row ? 'color: red' : ''
-      //     }" title="${i + 1 === row ? result.source : ''}">
-      //       ${i + 1}. ${this.repalceAll(codeList[i])}
-      //     </div>`
-      //   );
       if (i + 1 === row) {
         hightLine = i;
       }
       newLines.push(codeList[i]);
     }
-
-    // const innerHTML = `
-    //   <div class="errdetail">
-    //     <div class="errheader">${result.source} at line ${result.column}:${row}</div>
-    //     <div class="errdetail">${newLines.join('')}</div>
-    //   </div>
-    // `;
 
     const info = {
       code: newLines,

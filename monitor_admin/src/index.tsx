@@ -5,6 +5,18 @@ import zhCN from 'antd/locale/zh_CN';
 // import { Monitor } from './sdk';
 import App from '@/src/app';
 import './index.css';
+import zMonitor from '@zmonitor/core';
+import performance from '@zmonitor/performance';
+import recordscreen from '@zmonitor/recordscreen';
+
+zMonitor.init({
+  dsn: 'http://localhost:8083/monitor/reportData',
+  apikey: '7845254399804114',
+  userId: '88888888',
+});
+
+zMonitor.use(performance, null);
+zMonitor.use(recordscreen, { recordScreentime: 20 });
 
 // new Monitor({
 //   appId: 'wgnfezuv1706513953473',

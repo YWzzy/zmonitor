@@ -30,9 +30,9 @@ export class MonitorService {
         data.events,
         data.recordScreenId
       );
-      console.log("====================================");
-      console.log("File uploaded successfully", extractedFiles);
-      console.log("====================================");
+      // console.log("====================================");
+      // console.log("File uploaded successfully", extractedFiles);
+      // console.log("====================================");
 
       await this.recordingService.saveRecording(
         extractedFiles.filePath,
@@ -57,6 +57,9 @@ export class MonitorService {
         await this.errorMonitorService.create(createErrorMonitorDto);
       } else {
         const createErrorMonitorDto: CreateErrorMonitorDto = data;
+        if (data.apikey) {
+          createErrorMonitorDto.appId = data.apikey;
+        }
         await this.errorMonitorService.create(createErrorMonitorDto);
       }
     } catch (err) {
@@ -127,6 +130,11 @@ export class MonitorService {
     res: any
   ): Promise<any> {
     try {
+      if(!appId)
+        return res.status(400).send({
+          code: 400,
+          message: "App ID is required.",
+        });
       const pageNumber = parseInt(page, 10) || 1;
       const pageSizeNumber = parseInt(pageSize, 10) || 10;
 
