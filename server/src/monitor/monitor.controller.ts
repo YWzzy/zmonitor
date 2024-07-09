@@ -74,6 +74,33 @@ export class MonitorController {
     );
   }
 
+  @Get("getHttpErrorListPage")
+  @ApiOperation({
+    summary: "获取错误日志列表分页",
+    description: "获取错误日志列表分页",
+  })
+  async getHttpErrorListPage(
+    @Query("appId") appId: string,
+    @Query("beginTime") beginTime: string,
+    @Query("endTime") endTime: string,
+    @Query("from") from: string,
+    @Query("size") size: string,
+    @Query("sorterKey") sorterKey: string,
+    @Query("sorterName") sorterName: string,
+    @Res() res: Response
+  ): Promise<void> {
+    this.monitorService.getHttpErrorListPage(
+      appId,
+      beginTime,
+      endTime,
+      from,
+      size,
+      sorterKey,
+      sorterName,
+      res
+    );
+  }
+
   @Get("getRecordScreenId")
   @ApiOperation({
     summary: "根据id获取录屏",

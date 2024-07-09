@@ -24,6 +24,18 @@ export class SearchErrorMonitorDto {
   @IsOptional()
   id?: number;
 
+  @IsArray()
+  @IsOptional()
+  types?: string[];
+
+  @IsString()
+  @IsOptional()
+  sorterKey: string;
+
+  @IsString()
+  @IsOptional()
+  sorterName: string;
+
   @IsString()
   @IsOptional()
   type: string;

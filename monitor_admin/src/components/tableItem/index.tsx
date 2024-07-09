@@ -4,9 +4,9 @@ import { Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import styles from './index.module.less';
 import { getStatusColor } from '@/src/utils/getStatusColor';
-import { copyTextToClipboard } from '@/src/utils';
+import { copyTextToClipboard, parseUrlPath } from '@/src/utils';
 const renderHttpCost = (val: number) => (
-  <span style={{ color: getStatusColor(val, 'requestTime') }}>{val.toFixed(0)}ms</span>
+  <span style={{ color: getStatusColor(val, 'requestTime') }}>{val ? val.toFixed(0) : '-'}ms</span>
 );
 
 const renderUrl = (url: string, maxLen: number, copy: boolean) => {
@@ -14,6 +14,7 @@ const renderUrl = (url: string, maxLen: number, copy: boolean) => {
     return '-';
   }
   let str = url;
+  str = parseUrlPath(str);
   if (url.length > maxLen) {
     str = `${str.substring(0, maxLen + 2)}...`;
   }
@@ -39,7 +40,7 @@ const renderUrl = (url: string, maxLen: number, copy: boolean) => {
 const renderText = (url: string, maxLen: number, copy: boolean) => {
   if (url === '') return '-';
   let str = url;
-  if (url.length > maxLen) {
+  if (url.length) {
     str = `${str.substring(0, maxLen + 2)}...`;
   }
   return (

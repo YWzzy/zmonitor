@@ -166,6 +166,69 @@ export class MonitorService {
     }
   }
 
+  // 获取分页错误列表 -- 请求类
+  async getHttpErrorListPage(
+    appId: string,
+    beginTime: string,
+    endTime: string,
+    from: string,
+    size: string,
+    sorterKey: string,
+    sorterName: string,
+    res: any
+  ): Promise<any> {
+    try {
+      if (!appId)
+        return res.status(400).send({
+          code: 400,
+          message: "App ID is required.",
+        });
+      const pageNumber = parseInt(from, 10) || 1;
+      const pageSizeNumber = parseInt(size, 10) || 10;
+
+      const { list, total } = await this.errorMonitorService.findListPage({
+        appId,
+        beginTime,
+        endTime,
+        pageNo: pageNumber,
+        pageSize: pageSizeNumber,
+        sorterKey,
+        sorterName,
+        types: [
+          "fetch",
+          "xmlhttprequest",
+          "send",
+          "xhr",
+          "fetch",
+          "post",
+          "get",
+          "put",
+          "delete",
+          "options",
+          "head",
+          "patch",
+          "trace",
+          "connect",
+        ],
+      } as SearchErrorMonitorDto);
+
+      res.status(HttpStatus.OK).send({
+        code: 200,
+        data: {
+          data: list,
+          total,
+        },
+        message: "Issues list retrieved successfully.",
+      });
+    } catch (err) {
+      res.status(500).send({
+        code: 500,
+        message: "Error retrieving error list.",
+        error: err,
+      });
+    }
+  }
+
   // 根据ID获取录屏数据
   async getRecordScreenById(recordScreenId: string, res: any): Promise<void> {
     try {

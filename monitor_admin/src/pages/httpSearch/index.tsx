@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { Button, DatePicker, Form, Input, Radio, Table } from 'antd';
 import dayjs from 'dayjs';
 import { Card } from '@/src/components';
-import { getHttpList } from '@/src/api';
+import { getZMonitorHttpList } from '@/src/api';
 import { useAppStore } from '@/src/hooks';
 import { httpTableColumns } from '@/src/components/httpTableColumns';
 
@@ -30,12 +31,12 @@ const HttpSearch = () => {
   const [total, setTotal] = useState(0);
 
   const toSearch = async () => {
-    const { url, date, requestType } = form.getFieldsValue();
+    const { pageUrl, date, requestType } = form.getFieldsValue();
     const query = {
       from: 1,
       size: defaultSize,
       appId: active,
-      url,
+      pageUrl,
       beginTime: date ? date[0].format('YYYY-MM-DD 00:00:00') : undefined,
       endTime: date ? date[1].format('YYYY-MM-DD 23:59:59') : undefined,
       requestType,
@@ -73,12 +74,12 @@ const HttpSearch = () => {
   };
 
   const onTableChange = (pagination, __, sorter: any) => {
-    const { url, date, requestType } = form.getFieldsValue();
+    const { pageUrl, date, requestType } = form.getFieldsValue();
     const query = {
       from: pagination.current,
       size: pagination.pageSize,
       appId: active,
-      url,
+      pageUrl,
       beginTime: date ? date[0].format('YYYY-MM-DD 00:00:00') : undefined,
       endTime: date ? date[1].format('YYYY-MM-DD 23:59:59') : undefined,
       requestType,
@@ -103,16 +104,16 @@ const HttpSearch = () => {
     search(query);
   };
 
-  const search = async (searchQuery: GetHttpListReq) => {
+  const search = async searchQuery => {
     setLoading(true);
     const {
       data: { total, data },
-    } = await getHttpList(searchQuery);
+    } = await getZMonitorHttpList(searchQuery);
     setTotal(total);
     setData(
       data.map(item => ({
-        key: item._id,
-        ...item._source,
+        key: item.id,
+        ...item,
       }))
     );
     setLoading(false);
@@ -127,7 +128,7 @@ const HttpSearch = () => {
   return (
     <Card title="请求查询">
       <Form form={form} style={{ paddingBottom: 20 }} name="horizontal_login" layout="inline">
-        <Form.Item name="url" label="接口地址">
+        <Form.Item name="pageUrl" label="接口地址">
           <Input placeholder="请输入接口地址" />
         </Form.Item>
         <Form.Item name="date" label="日期" initialValue={[dayjs(), dayjs()]}>
@@ -152,7 +153,7 @@ const HttpSearch = () => {
 
       <Table
         sticky
-        key="_id"
+        key="id"
         loading={loading}
         columns={httpTableColumns(sorter)}
         dataSource={data}

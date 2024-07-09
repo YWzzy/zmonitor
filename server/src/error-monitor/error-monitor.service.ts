@@ -1,6 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
+import {
+  Between,
+  In,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from "typeorm";
 import { CreateErrorMonitorDto } from "./dto/create-error-monitor.dto";
 import { UpdateErrorMonitorDto } from "./dto/update-error-monitor.dto";
 import { SearchErrorMonitorDto } from "./dto/search-error-monitor.dto";
@@ -87,8 +93,16 @@ export class ErrorMonitorService {
     searchErrorMonitorDto: SearchErrorMonitorDto
   ): Promise<ErrorMonitorList> {
     try {
-      const { pageSize, pageNo, beginTime, endTime, ...searchDto } =
-        searchErrorMonitorDto;
+      const {
+        pageSize,
+        pageNo,
+        beginTime,
+        endTime,
+        sorterKey,
+        sorterName,
+        types,
+        ...searchDto
+      } = searchErrorMonitorDto;
 
       // 转换字符串时间为 Date 对象
       const startDate = beginTime ? new Date(beginTime + "Z") : undefined; // 添加 'Z' 表示 UTC 时间
@@ -116,6 +130,11 @@ export class ErrorMonitorService {
         whereConditions.createTime = LessThanOrEqual(endDate);
       }
 
+      // type 等于types数组中任意一种
+      if (types && types.length > 0) {
+        whereConditions.type = In(types);
+      }
+
       const [errorMonitors, total] =
         await this.errorMonitorRepository.findAndCount({
           where: whereConditions,
@@ -133,8 +152,22 @@ export class ErrorMonitorService {
         })),
       }));
 
+      let resData = data;
+      // 内存中排序
+      if (sorterName && sorterKey) {
+        resData = data.sort((a: any, b: any) => {
+          const aValue = a[sorterName];
+          const bValue = b[sorterName];
+          if (sorterKey.toUpperCase() === "ASC") {
+            return aValue - bValue;
+          } else {
+            return bValue - aValue;
+          }
+        });
+      }
+
       return {
-        list: data,
+        list: resData,
         total,
         currentPage: pageNo,
         pageSize,

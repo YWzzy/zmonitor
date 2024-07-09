@@ -8,6 +8,7 @@ type BluBiuRes<T> = {
   code: number;
   message: string;
   data: T;
+  total?: number;
 };
 
 type BluBiuResponse<T> = Promise<BluBiuRes<T>>;

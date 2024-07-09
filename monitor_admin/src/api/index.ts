@@ -106,7 +106,7 @@ export const getPerformance = async (
 ): BluBiuResponse<GetPerformanceRes> => await http.get('/performance/getPerformance', { params });
 
 // 根据ids查询资源
-export const getResourcesByPerformanceIds = async (data) =>
+export const getResourcesByPerformanceIds = async data =>
   await http.post('/performance/resources', data);
 
 export const getHttpErrorRank = async (params: AnalyseReq): BluBiuResponse<HttpErrorRankRes[]> =>
@@ -120,6 +120,10 @@ export const getHttpErrorRang = async (params: AnalyseReq): BluBiuResponse<Optio
 
 export const getHttpList = async (params: GetHttpListReq): BluBiuResponse<GetHttpListRes> =>
   await http.get('/httpError/getHttpList', { params });
+
+//接口查询 - 异常请求数据
+export const getZMonitorHttpList = async (params): BluBiuResponse<GetHttpListRes> =>
+  await http.get('/monitor/getHttpErrorListPage', { params });
 
 export const getJsErrorRang = async (params: AnalyseReq): BluBiuResponse<Options[]> =>
   await http.get('/jsError/getJsErrorRang', { params });

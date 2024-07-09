@@ -19,3 +19,10 @@ export function parseUrl(url) {
   a.href = url;
   return a.hostname;
 }
+
+// 解析url路径，不附带hostname和请求参数
+export function parseUrlPath(url) {
+  const a = document.createElement('a');
+  a.href = url;
+  return a.pathname;
+}

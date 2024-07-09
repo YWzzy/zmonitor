@@ -134,9 +134,7 @@ export const ErrorSearch = forwardRef<ErrorSearchHandle>((props, ref) => {
       align: 'center',
       render: (text, record) => (
         <span className={styles.tableCell}>
-          {record.time
-            ? dayjs(record.time).format('YYYY-MM-DD HH:mm:ss')
-            : dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss')}
+          {record.createTime && dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss')}
         </span>
       ),
     },
