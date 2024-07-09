@@ -1,9 +1,9 @@
-/* eslint-disable react/no-multi-comp */
 import React from 'react';
 import { Drawer, Table, TableColumnsType, Tag } from 'antd';
 import { Col, Row } from 'antd';
 import styles from './index.module.less';
 import { getStatusColor } from '@/src/utils/getStatusColor';
+import { parseUrl } from '@/src/utils';
 
 interface Detail {
   data: (PerfamceReportMsg & PublicMsg) | null;
@@ -21,6 +21,7 @@ const mapping = [
   {
     name: '域名',
     key: 'domain',
+    render: item => <span>{parseUrl(item['pageUrl'])}</span>,
   },
   {
     name: '网页路径',
@@ -32,13 +33,24 @@ const mapping = [
   },
   {
     name: '用户信息',
-    key: 'markUserId',
+    key: 'userId',
     render: (item: PerfamceReportMsg & PublicMsg) =>
-      [item?.markUserId, item?.userId].filter(item => item).join('、'),
+      [item?.userId, item?.userId].filter(item => item).join('、'),
+  },
+  {
+    name: 'browser',
+    key: 'browser',
+    render: item => <span>{item['deviceInfo']['browser']}</span>,
+  },
+  {
+    name: '设备类型',
+    key: 'device_type',
+    render: item => <span>{item['deviceInfo']['device_type']}</span>,
   },
   {
     name: 'UserAgent',
     key: 'ua',
+    render: item => <span>{item['deviceInfo']['ua']}</span>,
   },
   {
     name: 'IP信息',
@@ -57,19 +69,19 @@ const mapping = [
         },
         {
           name: 'FCP',
-          key: 'fcp',
+          key: 'FCP',
         },
         {
           name: 'LCP',
-          key: 'lcp',
+          key: 'LCP',
         },
         {
           name: 'FID',
-          key: 'fid',
+          key: 'FID',
         },
         {
           name: 'TTFB',
-          key: 'ttfb',
+          key: 'TTFB',
         },
         {
           name: 'DNS解析时长',

@@ -16,8 +16,8 @@ type PerformanceInKey =
   | 'dnsTime'
   | 'tcpTime'
   | 'whiteTime'
-  | 'fcp'
-  | 'ttfb'
-  | 'lcp'
-  | 'fid'
+  | 'FCP'
+  | 'TTFB'
+  | 'LCP'
+  | 'FID'
   | 'requestTime';

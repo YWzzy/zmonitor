@@ -40,10 +40,10 @@ export class Monitor {
       dnsTime: 0,
       tcpTime: 0,
       whiteTime: 0,
-      fcp: 0,
-      ttfb: 0,
-      lcp: 0,
-      fid: 0,
+      FCP: 0,
+      TTFB: 0,
+      LCP: 0,
+      FID: 0,
       rescources: [],
     };
 
@@ -186,16 +186,16 @@ export class Monitor {
         });
       });
     this.performance.rescources = this.getEnteries();
-    const [fcp, ttfp, lcp, fid] = await Promise.all([
+    const [FCP, ttfp, LCP, FID] = await Promise.all([
       getWebvitals(onFCP),
       getWebvitals(onTTFB),
       getWebvitals(onLCP),
       getWebvitals(onFID),
     ]);
-    this.performance.fcp = fcp;
-    this.performance.ttfb = ttfp;
-    this.performance.lcp = lcp;
-    this.performance.fid = fid;
+    this.performance.FCP = FCP;
+    this.performance.TTFB = ttfp;
+    this.performance.LCP = LCP;
+    this.performance.FID = FID;
     this.toReport({
       type: 'performance',
       ...this.firstPageMsg,

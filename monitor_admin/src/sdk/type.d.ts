@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface PageMsg {
   /** 是否是首屏 */
   isFirst?: boolean;
@@ -32,15 +33,17 @@ interface PerfamceReportMsg {
   /** 页面白屏时间 */
   whiteTime: number;
   /** 首次内容 */
-  fcp: number;
+  FCP: number;
   /** 首字节时间 */
-  ttfb: number;
+  TTFB: number;
   /** 最大内容绘制 */
-  lcp: number;
+  LCP: number;
   /** 用户首次与页面交互 */
-  fid: number;
+  FID: number;
   /** 资源加载数据 */
   rescources: ResourceStatus[];
+  /** 一次性能数据的唯一id */
+  uuid: string;
 }
 
 interface ResourceStatus {

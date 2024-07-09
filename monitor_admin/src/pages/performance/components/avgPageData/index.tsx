@@ -10,10 +10,10 @@ import { RootState } from '@/src/models/store';
 interface DataType {
   pageUrl: string;
   whiteTime: number;
-  fcp: number;
-  lcp: number;
-  fid: number;
-  ttfb: number;
+  FCP: number;
+  LCP: number;
+  FID: number;
+  TTFB: number;
   dnsTime: number;
   tcpTime: number;
 }
@@ -88,35 +88,35 @@ export const AvgPageData = () => {
     },
     {
       title: 'FCP',
-      dataIndex: 'fcp',
-      key: 'fcp',
+      dataIndex: 'FCP',
+      key: 'FCP',
       width: 100,
-      sorter: (a, b) => a.fcp - b.fcp,
-      render: (val: number) => <ShowTime name="fcp" value={val} />,
+      sorter: (a, b) => a.FCP - b.FCP,
+      render: (val: number) => <ShowTime name="FCP" value={val} />,
     },
     {
       title: 'LCP',
-      dataIndex: 'lcp',
-      key: 'lcp',
+      dataIndex: 'LCP',
+      key: 'LCP',
       width: 100,
-      sorter: (a, b) => a.lcp - b.lcp,
-      render: (val: number) => <ShowTime name="lcp" value={val} />,
+      sorter: (a, b) => a.LCP - b.LCP,
+      render: (val: number) => <ShowTime name="LCP" value={val} />,
     },
     {
       title: 'FID',
-      dataIndex: 'fid',
-      key: 'fid',
+      dataIndex: 'FID',
+      key: 'FID',
       width: 100,
-      sorter: (a, b) => a.fid - b.fid,
-      render: (val: number) => <ShowTime name="fid" value={val} />,
+      sorter: (a, b) => a.FID - b.FID,
+      render: (val: number) => <ShowTime name="FID" value={val} />,
     },
     {
       title: 'TTFB',
-      dataIndex: 'ttfb',
-      key: 'ttfb',
+      dataIndex: 'TTFB',
+      key: 'TTFB',
       width: 100,
-      sorter: (a, b) => a.ttfb - b.ttfb,
-      render: (val: number) => <ShowTime name="ttfb" value={val} />,
+      sorter: (a, b) => a.TTFB - b.TTFB,
+      render: (val: number) => <ShowTime name="TTFB" value={val} />,
     },
     {
       title: 'DNS解析时长',

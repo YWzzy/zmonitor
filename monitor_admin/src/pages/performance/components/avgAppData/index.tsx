@@ -8,7 +8,7 @@ import { RootState } from '@/src/models/store';
 import { getAppAvgPerformance } from '@/src/api';
 interface AvgItemIn {
   name: string;
-  key: 'whiteTime' | 'fcp' | 'lcp' | 'fid' | 'ttfb' | 'fastRote' | 'slowRote';
+  key: 'whiteTime' | 'FCP' | 'LCP' | 'FID' | 'TTFB' | 'fastRote' | 'slowRote';
   value: number;
   tip?: string;
 }
@@ -17,10 +17,10 @@ export const AvgAppData = () => {
 
   const [data, setAppData] = useState({
     whiteTime: 0,
-    fcp: 0,
-    lcp: 0,
-    fid: 0,
-    ttfb: 0,
+    FCP: 0,
+    LCP: 0,
+    FID: 0,
+    TTFB: 0,
     fastRote: 0,
     slowRote: 0,
   });
@@ -65,26 +65,26 @@ export const AvgAppData = () => {
     },
     {
       name: 'FCP',
-      key: 'fcp',
-      value: data.fcp || 0,
+      key: 'FCP',
+      value: data.FCP || 0,
       tip: '首次内容绘制时间',
     },
     {
       name: 'LCP',
-      key: 'lcp',
-      value: data.lcp || 0,
+      key: 'LCP',
+      value: data.LCP || 0,
       tip: '最大内容绘制时间，该指标会在用户首次交互后停止记录',
     },
     {
       name: 'FID',
-      key: 'fid',
-      value: data.fid || 0,
+      key: 'FID',
+      value: data.FID || 0,
       tip: '用户首次输入到页面响应的时间',
     },
     {
       name: 'TTFB',
-      key: 'ttfb',
-      value: data.ttfb || 0,
+      key: 'TTFB',
+      value: data.TTFB || 0,
       tip: '首字节时间',
     },
   ];

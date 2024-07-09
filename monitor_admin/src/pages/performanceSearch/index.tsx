@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { Button, DatePicker, Form, Input, Radio, Table } from 'antd';
 import type { TableColumnsType } from 'antd';
@@ -116,8 +117,8 @@ const PerformanceSearch = () => {
     setTotal(total);
     setData(
       data.map(item => ({
-        key: item._id,
-        ...item._source,
+        key: item.uuid,
+        ...item,
       }))
     );
     setLoading(false);
@@ -142,39 +143,39 @@ const PerformanceSearch = () => {
     },
     {
       title: 'FCP',
-      dataIndex: 'fcp',
-      key: 'fcp',
+      dataIndex: 'FCP',
+      key: 'FCP',
       width: 100,
       sorter: true,
-      sortOrder: sorter.sorterName === 'fcp' ? sorter.sorterKey : null,
-      render: (val: number) => <ShowTime name="fcp" value={val} />,
+      sortOrder: sorter.sorterName === 'FCP' ? sorter.sorterKey : null,
+      render: (val: number) => <ShowTime name="FCP" value={val} />,
     },
     {
       title: 'LCP',
-      dataIndex: 'lcp',
-      key: 'lcp',
+      dataIndex: 'LCP',
+      key: 'LCP',
       width: 100,
       sorter: true,
-      sortOrder: sorter.sorterName === 'lcp' ? sorter.sorterKey : null,
-      render: (val: number) => <ShowTime name="lcp" value={val} />,
+      sortOrder: sorter.sorterName === 'LCP' ? sorter.sorterKey : null,
+      render: (val: number) => <ShowTime name="LCP" value={val} />,
     },
     {
       title: 'FID',
-      dataIndex: 'fid',
-      key: 'fid',
+      dataIndex: 'FID',
+      key: 'FID',
       width: 100,
       sorter: true,
-      sortOrder: sorter.sorterName === 'fid' ? sorter.sorterKey : null,
-      render: (val: number) => <ShowTime name="fid" value={val} />,
+      sortOrder: sorter.sorterName === 'FID' ? sorter.sorterKey : null,
+      render: (val: number) => <ShowTime name="FID" value={val} />,
     },
     {
       title: 'TTFB',
-      dataIndex: 'ttfb',
-      key: 'ttfb',
+      dataIndex: 'TTFB',
+      key: 'TTFB',
       width: 100,
       sorter: true,
-      sortOrder: sorter.sorterName === 'ttfb' ? sorter.sorterKey : null,
-      render: (val: number) => <ShowTime name="ttfb" value={val} />,
+      sortOrder: sorter.sorterName === 'TTFB' ? sorter.sorterKey : null,
+      render: (val: number) => <ShowTime name="TTFB" value={val} />,
     },
     {
       title: 'DNS解析时长',

@@ -12,3 +12,10 @@ export function copyTextToClipboard(text) {
   document.body.removeChild(textarea);
   message.success('已复制');
 }
+
+// 解析url域名
+export function parseUrl(url) {
+  const a = document.createElement('a');
+  a.href = url;
+  return a.hostname;
+}

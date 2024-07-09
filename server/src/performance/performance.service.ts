@@ -163,10 +163,6 @@ export class PerformanceService {
       sorterKey,
     } = query;
 
-    if (!appId) {
-      throw new Error("appId is required");
-    }
-
     const qb = this.performanceRepository
       .createQueryBuilder("pm")
       .select([
@@ -174,7 +170,11 @@ export class PerformanceService {
         "pm.type",
         "pm.appId",
         "pm.pageUrl",
+        "pm.time",
+        "pm.type",
         "pm.createTime",
+        "pm.name",
+        "pm.performanceValue",
         // Add other fields needed for grouping or sorting
       ])
       .where("pm.appId = :appId", { appId });
@@ -206,26 +206,100 @@ export class PerformanceService {
       });
     }
 
-    // 获取总数
-    const total = await qb.getCount();
-
-    // 查询不重复的 uuid
-    const distinctUuidsQuery = this.performanceRepository
+    // 查询不重复的 uuid 数量
+    const distinctUuidCountQuery = this.performanceRepository
       .createQueryBuilder("pm")
-      .select("DISTINCT(pm.uuid)")
+      .select("COUNT(DISTINCT pm.uuid)", "count")
       .where("pm.appId = :appId", { appId });
 
-    // 获取分页后的 uuid
+    if (pageUrl) {
+      distinctUuidCountQuery.andWhere("pm.pageUrl LIKE :pageUrl", {
+        pageUrl: `%${pageUrl}%`,
+      });
+    }
+
+    if (beginTime && endTime) {
+      distinctUuidCountQuery.andWhere(
+        "pm.createTime BETWEEN :beginTime AND :endTime",
+        {
+          beginTime: new Date(beginTime),
+          endTime: new Date(endTime),
+        }
+      );
+    }
+
+    if (whiteTime) {
+      const whiteTimeRanges = {
+        1: [0, 1000],
+        2: [1001, 2000],
+        3: [2001, 3000],
+        4: [3001, 3000000],
+      };
+      const [whiteTimeStart, whiteTimeEnd] = whiteTimeRanges[whiteTime];
+      distinctUuidCountQuery.andWhere(
+        "pm.whiteTime BETWEEN :whiteTimeStart AND :whiteTimeEnd",
+        {
+          whiteTimeStart,
+          whiteTimeEnd,
+        }
+      );
+    }
+
+    // 获取总数
+    // const { count: total } = await distinctUuidCountQuery.getRawOne();
+
+    // 查询分页后的唯一 uuid
     const offset = (from - 1) * size;
-    const distinctUuids = await distinctUuidsQuery
+
+    const distinctUuids = this.performanceRepository
+      .createQueryBuilder("pm")
+      .select("DISTINCT(pm.uuid)")
+      .where("pm.appId = :appId", { appId })
       .orderBy("pm.uuid", "ASC")
       .offset(offset)
-      .limit(size)
-      .getRawMany();
+      .limit(size);
+
+    if (pageUrl) {
+      distinctUuids.andWhere("pm.pageUrl LIKE :pageUrl", {
+        pageUrl: `%${pageUrl}%`,
+      });
+    }
+
+    if (beginTime && endTime) {
+      distinctUuids.andWhere("pm.createTime BETWEEN :beginTime AND :endTime", {
+        beginTime: new Date(beginTime),
+        endTime: new Date(endTime),
+      });
+    }
+
+    if (whiteTime) {
+      const whiteTimeRanges = {
+        1: [0, 1000],
+        2: [1001, 2000],
+        3: [2001, 3000],
+        4: [3001, 3000000],
+      };
+      const [whiteTimeStart, whiteTimeEnd] = whiteTimeRanges[whiteTime];
+      distinctUuids.andWhere(
+        "pm.whiteTime BETWEEN :whiteTimeStart AND :whiteTimeEnd",
+        {
+          whiteTimeStart,
+          whiteTimeEnd,
+        }
+      );
+    }
+
+    // 获取总数
+    const distinctUuidsData = await distinctUuids.getRawMany();
+    const { count: total } = await distinctUuids.getRawOne();
+
+    console.log("====================================");
+    console.log(distinctUuidsData);
+    console.log("====================================");
 
     // 根据获取的 uuid 查询数据
-    const uuids = distinctUuids.map((item) => item.uuid);
-    const results = await this.performanceRepository
+    const uuids = distinctUuidsData.map((item) => item.uuid);
+    const results = this.performanceRepository
       .createQueryBuilder("pm")
       .select([
         "pm.uuid",
@@ -233,38 +307,95 @@ export class PerformanceService {
         "pm.appId",
         "pm.pageUrl",
         "pm.createTime",
-        // Add other fields needed for grouping or sorting
+        "pm.name",
+        "pm.deviceInfo",
+        "pm.userId",
+        "pm.performanceValue",
       ])
       .where("pm.appId = :appId", { appId })
-      .andWhere("pm.uuid IN (:...uuids)", { uuids })
-      .orderBy(`pm.${sorterName}`, sorterKey.toUpperCase())
-      .getMany();
+      .andWhere("pm.uuid IN (:...uuids)", { uuids });
+
+    if (pageUrl) {
+      results.andWhere("pm.pageUrl LIKE :pageUrl", {
+        pageUrl: `%${pageUrl}%`,
+      });
+    }
+
+    if (beginTime && endTime) {
+      results.andWhere("pm.createTime BETWEEN :beginTime AND :endTime", {
+        beginTime: new Date(beginTime),
+        endTime: new Date(endTime),
+      });
+    }
+
+    if (whiteTime) {
+      const whiteTimeRanges = {
+        1: [0, 1000],
+        2: [1001, 2000],
+        3: [2001, 3000],
+        4: [3001, 3000000],
+      };
+      const [whiteTimeStart, whiteTimeEnd] = whiteTimeRanges[whiteTime];
+      results.andWhere(
+        "pm.whiteTime BETWEEN :whiteTimeStart AND :whiteTimeEnd",
+        {
+          whiteTimeStart,
+          whiteTimeEnd,
+        }
+      );
+    }
+
+    const fetchedResults = await results.getMany();
 
     // 根据 uuid 分组合并数据，并转换格式
-    const groupedData = results.reduce((acc, curr) => {
+    const groupedData = fetchedResults.reduce((acc, curr) => {
       if (!acc[curr.uuid]) {
         acc[curr.uuid] = {
           uuid: curr.uuid,
           type: curr.type,
           appId: curr.appId,
+          deviceInfo: curr.deviceInfo,
+          userId: curr.userId,
           pageUrl: curr.pageUrl,
           createTime: curr.createTime.toISOString(),
+          performanceData: {}, // 初始化 performanceData 字段
         };
       }
-      // 只保留第一个非空的性能数据
-      if (!acc[curr.uuid][curr.name]) {
-        acc[curr.uuid][curr.name] =
-          curr.performanceValue !== null
-            ? curr.performanceValue.toFixed(2)
-            : null;
-      }
+      // 将 name 和 performanceValue 添加到 performanceData 中
+      acc[curr.uuid][curr.name] = curr.performanceValue ?? null;
+
       return acc;
     }, {});
 
     // 转换为数组形式
-    const formattedData = Object.values(groupedData);
+    let formattedData = Object.values(groupedData);
 
-    return { data: formattedData, total };
+    // 内存中排序
+    if (sorterName && sorterKey) {
+      formattedData = formattedData.sort((a: any, b: any) => {
+        const aValue = a[sorterName];
+        const bValue = b[sorterName];
+        if (sorterKey.toUpperCase() === "ASC") {
+          return aValue - bValue;
+        } else {
+          return bValue - aValue;
+        }
+      });
+    }
+
+    // 分页
+    const paginatedData = formattedData.slice((from - 1) * size, from * size);
+
+    return {
+      message: "success",
+      data: {
+        data: paginatedData,
+        total,
+      },
+      total,
+      currentPage: from,
+      pageSize: size,
+    };
   }
 
   async getPageOpenRate(appId: string, whiteRange?: number[]): Promise<number> {

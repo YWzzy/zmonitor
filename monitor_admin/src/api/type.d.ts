@@ -40,7 +40,7 @@ interface AppInfo {
 type TopKeys = 'webVisit' | 'browser' | 'deviceVendor' | 'city' | 'osName';
 
 interface AnalyseReq {
-  id: any;
+  // id: any;
   appId: string;
   date?: string;
   beginTime?: string;
@@ -110,6 +110,7 @@ interface GetPerformanceReq {
 }
 
 type PaginationData<T> = {
+  [x: string]: any;
   _id: 'NIa1H40Bx791ks39qTfs';
   _source: T;
 };
