@@ -6,7 +6,12 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  Res,
+  HttpStatus,
+  BadRequestException,
 } from "@nestjs/common";
+import { Response } from "express";
 import { ErrorMonitorService } from "./error-monitor.service";
 import { CreateErrorMonitorDto } from "./dto/create-error-monitor.dto";
 import { UpdateErrorMonitorDto } from "./dto/update-error-monitor.dto";
@@ -72,12 +77,46 @@ export class ErrorMonitorController {
     return this.errorMonitorService.findListPage(searchErrorMonitorDto);
   }
 
+  @Get("getJsErrorRange")
+  @ApiOperation({
+    summary: "获取指定时间区间内的JavaScript错误数据",
+    description: "获取指定时间区间内的JavaScript错误数据",
+  })
+  @ApiQuery({ name: "appId", type: String, description: "应用ID" })
+  @ApiQuery({ name: "beginTime", type: String, description: "开始时间" })
+  @ApiQuery({ name: "endTime", type: String, description: "结束时间" })
+  async getJsErrorRange(
+    @Query("appId") appId: string,
+    @Query("beginTime") beginTime: string,
+    @Query("endTime") endTime: string,
+    @Res() res: Response
+  ) {
+    if (!appId || !beginTime || !endTime) {
+      throw new BadRequestException("Missing required query parameters.");
+    }
+
+    // 验证日期格式
+    if (isNaN(Date.parse(beginTime)) || isNaN(Date.parse(endTime))) {
+      throw new BadRequestException(
+        "Invalid date format for beginTime or endTime."
+      );
+    }
+
+    const data = await this.errorMonitorService.getJsErrorRange(
+      appId,
+      beginTime,
+      endTime
+    );
+
+    return res.status(HttpStatus.OK).json({ data });
+  }
+
   @Get(":id")
   @ApiOperation({
     summary: "通过id查找错误日志",
     description: "通过id查找错误日志",
   })
-  findOne(@Param("id") id: string) {
+  findOne(@Param("id") id: number) {
     return this.errorMonitorService.findOne(+id);
   }
 

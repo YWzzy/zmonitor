@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import * as echarts from 'echarts';
 import { useSelector } from 'react-redux';
@@ -5,7 +6,7 @@ import { DatePicker } from 'antd';
 import dayjs from 'dayjs';
 import { Card } from '@/src/components';
 import { useEchart } from '@/src/hooks';
-import { getJsErrorRang } from '@/src/api';
+import { getZMonitorJsErrorRang } from '@/src/api';
 import { RootState } from '@/src/models/store';
 export const JsErrorDayLine = () => {
   const { ref, setOption } = useEchart();
@@ -13,10 +14,10 @@ export const JsErrorDayLine = () => {
   const [date, setDate] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([dayjs().add(-31, 'day'), dayjs()]);
 
   const getData = async () => {
-    const { data } = await getJsErrorRang({
+    const { data } = await getZMonitorJsErrorRang({
       appId: active,
-      beginTime: date[0].format('YYYY-MM-DD:00:00:00'),
-      endTime: date[1].format('YYYY-MM-DD 23:59:59'),
+      beginTime: date[0].format('YYYY-MM-DD HH:mm:ss'),
+      endTime: date[1].format('YYYY-MM-DD HH:mm:ss'),
     });
 
     const [xAxis, yAxis] = data.reduce(
@@ -106,6 +107,7 @@ export const JsErrorDayLine = () => {
     };
     setOption(option);
   };
+
   useEffect(() => {
     if (active && date) {
       getData();

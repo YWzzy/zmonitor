@@ -52,7 +52,7 @@ export const AppItem: React.FC<AppItemIn> = ({ appInfo }) => {
               className={styles.insert}
               onClick={() => {
                 appDispatch.updateActive(appInfo.appId);
-                navigate('/issues');
+                navigate('/jsError');
               }}
             >
               进入

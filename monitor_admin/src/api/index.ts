@@ -124,6 +124,9 @@ export const getHttpList = async (params: GetHttpListReq): BluBiuResponse<GetHtt
 export const getJsErrorRang = async (params: AnalyseReq): BluBiuResponse<Options[]> =>
   await http.get('/jsError/getJsErrorRang', { params });
 
+export const getZMonitorJsErrorRang = async (params: AnalyseReq): BluBiuResponse<Options[]> =>
+  await http.get('/error-monitor/getJsErrorRange', { params });
+
 export const getJsErrorList = async (params: AnalyseReq): BluBiuResponse<JsErrorMsgItem[]> =>
   await http.get('/jsError/getJsErrorList', { params });
 

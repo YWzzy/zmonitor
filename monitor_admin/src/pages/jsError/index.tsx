@@ -1,9 +1,11 @@
 import React, { } from 'react';
-import { JsErrorDayLine, JsErrorSearch } from './components';
+import { JsErrorDayLine } from './components';
+import { ErrorSearch } from '../issues/components';
 const JsError = () => (
   <>
     <JsErrorDayLine />
-    <JsErrorSearch/>
+    {/* <JsErrorSearch/> */}
+    <ErrorSearch />
   </>
 );
 
