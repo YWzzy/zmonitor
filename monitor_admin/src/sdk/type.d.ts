@@ -65,7 +65,7 @@ type RequestReportMsg = {
   reqHeaders: string;
   reqBody: string;
   status: number;
-  requestType: 'done' | 'error';
+  requestType: 'done' | 'error' | 'ok';
   cost: number;
 };
 

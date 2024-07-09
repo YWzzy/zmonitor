@@ -12,6 +12,7 @@ export const httpTableColumns = (sorter: {
     dataIndex: 'pageUrl',
     key: 'pageUrl',
     width: 220,
+    align: 'left',
     fixed: 'left',
     render: pageUrl => TableItem.renderUrl(pageUrl, 30, true),
   },
@@ -19,6 +20,7 @@ export const httpTableColumns = (sorter: {
     title: '请求类型',
     dataIndex: 'type',
     key: 'type',
+    align: 'center',
     width: 80,
   },
   {
@@ -26,8 +28,9 @@ export const httpTableColumns = (sorter: {
     dataIndex: 'status',
     key: 'status',
     width: 100,
+    align: 'center',
     render: (status, record) => (
-      <Tag color={record.requestType === 'done' ? '#1f8800' : '#c33300'}>{status}</Tag>
+      <Tag color={record.requestType === 'ok' ? '#1f8800' : '#c33300'}>{status}</Tag>
     ),
   },
   {
@@ -35,6 +38,7 @@ export const httpTableColumns = (sorter: {
     dataIndex: 'cost',
     key: 'cost',
     sorter: true,
+    align: 'center',
     sortOrder: sorter.sorterName === 'cost' ? sorter.sorterKey : null,
     width: 120,
     render: val => TableItem.renderHttpCost(val),
@@ -43,12 +47,14 @@ export const httpTableColumns = (sorter: {
     title: '请求方法',
     dataIndex: 'method',
     key: 'method',
+    align: 'center',
     width: 80,
   },
   // {
   //   title: '请求头信息',
   //   dataIndex: 'reqHeaders',
   //   key: 'reqHeaders',
+  //   align: 'center',
   //   width: 120,
   //   render: (text) => TableItem.renderText(text, 10, false),
   // },
@@ -57,6 +63,7 @@ export const httpTableColumns = (sorter: {
     dataIndex: 'reqBody',
     key: 'reqBody',
     width: 200,
+    align: 'center',
     render: url => TableItem.renderUrl(url, 23, true),
   },
   {
@@ -64,6 +71,7 @@ export const httpTableColumns = (sorter: {
     dataIndex: '@timestamp',
     key: '@timestamp',
     width: 200,
+    align: 'center',
     render: time => TableItem.renderTime(time),
   },
 ];
