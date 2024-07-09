@@ -105,6 +105,10 @@ export const getPerformance = async (
   params: GetPerformanceReq
 ): BluBiuResponse<GetPerformanceRes> => await http.get('/performance/getPerformance', { params });
 
+// 根据ids查询资源
+export const getResourcesByPerformanceIds = async (data) =>
+  await http.post('/performance/resources', data);
+
 export const getHttpErrorRank = async (params: AnalyseReq): BluBiuResponse<HttpErrorRankRes[]> =>
   await http.get('/httpError/getHttpErrorRank', { params });
 

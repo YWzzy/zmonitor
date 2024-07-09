@@ -1,11 +1,13 @@
-import React from 'react';
-import { Drawer, Table, TableColumnsType, Tag } from 'antd';
-import { Col, Row } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Drawer, Table, Tag, Col, Row } from 'antd';
+import type { TableColumnsType } from 'antd';
 import styles from './index.module.less';
 import { getStatusColor } from '@/src/utils/getStatusColor';
 import { parseUrl } from '@/src/utils';
+import { getResourcesByPerformanceIds } from '@/src/api';
+import { ShowTime } from '@/src/components';
 
-interface Detail {
+interface DetailProps {
   data: (PerfamceReportMsg & PublicMsg) | null;
   open: boolean;
   onClose: () => void;
@@ -33,9 +35,9 @@ const mapping = [
   },
   {
     name: '用户信息',
-    key: 'userId',
+    key: 'markUserId',
     render: (item: PerfamceReportMsg & PublicMsg) =>
-      [item?.userId, item?.userId].filter(item => item).join('、'),
+      [item?.markUserId, item?.userId].filter(item => item).join('、'),
   },
   {
     name: 'browser',
@@ -60,7 +62,7 @@ const mapping = [
   },
   {
     name: '性能指标',
-    key: 'ip',
+    key: 'performance',
     render: (record: PerfamceReportMsg & PublicMsg) => {
       const map = [
         {
@@ -105,58 +107,7 @@ const mapping = [
   {
     name: '加载资源',
     key: 'rescources',
-    render: (item: PerfamceReportMsg & PublicMsg) => {
-      const columns: TableColumnsType<ResourceStatus> = [
-        {
-          title: '资源Url',
-          width: 100,
-          dataIndex: 'resource',
-          key: 'resource',
-          fixed: 'left',
-        },
-        {
-          title: '资源大小',
-          dataIndex: 'size',
-          key: 'size',
-          width: 80,
-          render: value => (
-            <span>
-              {value.toFixed(0)}
-              <small>kb</small>
-            </span>
-          ),
-        },
-        {
-          title: '加载耗时',
-          dataIndex: 'duration',
-          key: 'duration',
-          width: 50,
-          render: value => (
-            <span>
-              {value.toFixed(0)}
-              <small>ms</small>
-            </span>
-          ),
-        },
-        {
-          title: '资源类型',
-          dataIndex: 'type',
-          key: 'type',
-          width: 60,
-        },
-      ];
-
-      return (
-        <Table
-          scroll={{
-            x: 600,
-          }}
-          columns={columns}
-          dataSource={item.rescources}
-          pagination={null}
-        />
-      );
-    },
+    render: (item: PerfamceReportMsg & PublicMsg) => <ResourceTable performanceIds={item.ids} />,
   },
 ];
 
@@ -165,13 +116,110 @@ const ShowPerformance: React.FC<ShowPerformanceIn> = ({ performanceKey, value, t
 
   return (
     <Tag color={color} style={{ marginBottom: 10 }}>
-      {title}:{value && value.toFixed(0)}
+      {title}:{value && value.toFixed(2)}
       <small>ms</small>
     </Tag>
   );
 };
 
-export const Detail: React.FC<Detail> = ({ data, open, onClose }) => (
+const ResourceTable: React.FC<{ performanceIds: string[] }> = ({ performanceIds }) => {
+  const [loading, setLoading] = useState(false);
+  const [resourcesData, setResourcesData] = useState([]);
+
+  useEffect(() => {
+    const fetchResourcesData = async () => {
+      setLoading(true);
+      try {
+        const { data } = await getResourcesByPerformanceIds({ ids: performanceIds });
+        console.log('====================================');
+        console.log(data);
+        console.log('====================================');
+        setResourcesData(data);
+      } catch (error) {
+        console.error('Failed to fetch resources data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResourcesData();
+  }, [performanceIds]);
+
+  const columns: TableColumnsType<ResourceStatus> = [
+    {
+      title: '资源Url',
+      width: 100,
+      dataIndex: 'name',
+      key: 'name',
+      align: 'center',
+      fixed: 'left',
+    },
+    {
+      title: '资源大小',
+      dataIndex: 'transferSize',
+      key: 'transferSize',
+      align: 'center',
+      width: 80,
+      render: value => (
+        <span>
+          {value ? value.toFixed(2) : '-'}
+          <small>kb</small>
+        </span>
+      ),
+    },
+    {
+      title: '加载耗时',
+      dataIndex: 'duration',
+      key: 'duration',
+      width: 50,
+      align: 'center',
+      render: (val: number) => <ShowTime name="requestTime" value={val} />,
+    },
+    {
+      title: '发起类型',
+      dataIndex: 'initiatorType',
+      key: 'initiatorType',
+      width: 60,
+      align: 'center',
+    },
+    {
+      title: '传输类型',
+      dataIndex: 'deliveryType',
+      key: 'deliveryType',
+      width: 60,
+      align: 'center',
+    },
+    {
+      title: '响应状态码',
+      dataIndex: 'responseStatus',
+      key: 'responseStatus',
+      width: 60,
+      align: 'center',
+    },
+    {
+      title: '发生时间',
+      dataIndex: 'createTime',
+      key: 'createTime',
+      width: 80,
+      align: 'center',
+      render: value => new Date(value).toLocaleString(),
+    },
+  ];
+
+  return (
+    <Table
+      loading={loading}
+      scroll={{
+        x: 1300,
+      }}
+      columns={columns}
+      dataSource={resourcesData}
+      pagination={null}
+    />
+  );
+};
+
+export const Detail: React.FC<DetailProps> = ({ data, open, onClose }) => (
   <Drawer open={open} onClose={onClose} width={800} destroyOnClose title="详情信息">
     {data
       ? mapping.map(item => (

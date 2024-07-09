@@ -26,6 +26,44 @@ export class PerformanceController {
     return this.performanceService.create(createPerformanceDto);
   }
 
+  @Post("resources")
+  @ApiOperation({
+    summary: "Post resources by performance ids",
+    description: "根据 performance ids 获取资源数据",
+  })
+  async getResourcesByPerformanceIds(
+    @Body("ids") ids: number[],
+    @Res() res: Response
+  ): Promise<void> {
+    const data = await this.performanceService.getResourcesByPerformanceIds(
+      ids
+    );
+    res.status(HttpStatus.OK).json({ data, message: "success", code: 200 });
+  }
+
+  @Post("paginatedResources")
+  @ApiOperation({
+    summary: "Post paginated resources by performance ids",
+    description: "根据 performance ids 获取分页的资源数据",
+  })
+  async getPaginatedResourcesByPerformanceIds(
+    @Body("ids") ids: string,
+    @Query("page") page = 1,
+    @Query("pageSize") pageSize = 10,
+    @Res() res: Response
+  ): Promise<void> {
+    const idArray = ids.split(",").map((id) => parseInt(id, 10));
+    const { data, total } =
+      await this.performanceService.getPaginatedResourcesByPerformanceIds(
+        idArray,
+        page,
+        pageSize
+      );
+    res
+      .status(HttpStatus.OK)
+      .json({ data, total, currentPage: page, pageSize });
+  }
+
   @Get("allPerformance")
   async getAllPerformance(
     @Query("appId") appId: string,

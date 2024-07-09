@@ -44,6 +44,7 @@ interface PerfamceReportMsg {
   rescources: ResourceStatus[];
   /** 一次性能数据的唯一id */
   uuid: string;
+  ids: string[];
 }
 
 interface ResourceStatus {

@@ -39,6 +39,30 @@ export class PerformanceService {
     }
   }
 
+  // 根据性能日志 id 获取资源列表
+  async getResourcesByPerformanceIds(ids: number[]): Promise<Resource[]> {
+    return this.resourceRepository
+      .createQueryBuilder("resource")
+      .where("resource.performanceId IN (:...ids)", { ids })
+      .getMany();
+  }
+
+  // 根据性能日志 id 获取分页资源列表
+  async getPaginatedResourcesByPerformanceIds(
+    ids: number[],
+    page: number,
+    pageSize: number
+  ): Promise<{ data: Resource[]; total: number }> {
+    const [data, total] = await this.resourceRepository
+      .createQueryBuilder("resource")
+      .where("resource.performanceId IN (:...ids)", { ids })
+      .skip((page - 1) * pageSize)
+      .take(pageSize)
+      .getManyAndCount();
+
+    return { data, total };
+  }
+
   async getAvgPerformanceByType(
     appId: string,
     type: string,
@@ -163,49 +187,6 @@ export class PerformanceService {
       sorterKey,
     } = query;
 
-    const qb = this.performanceRepository
-      .createQueryBuilder("pm")
-      .select([
-        "pm.uuid",
-        "pm.type",
-        "pm.appId",
-        "pm.pageUrl",
-        "pm.time",
-        "pm.type",
-        "pm.createTime",
-        "pm.name",
-        "pm.performanceValue",
-        // Add other fields needed for grouping or sorting
-      ])
-      .where("pm.appId = :appId", { appId });
-
-    if (pageUrl) {
-      qb.andWhere("pm.pageUrl LIKE :pageUrl", {
-        pageUrl: `%${pageUrl}%`,
-      });
-    }
-
-    if (beginTime && endTime) {
-      qb.andWhere("pm.createTime BETWEEN :beginTime AND :endTime", {
-        beginTime: new Date(beginTime),
-        endTime: new Date(endTime),
-      });
-    }
-
-    if (whiteTime) {
-      const whiteTimeRanges = {
-        1: [0, 1000],
-        2: [1001, 2000],
-        3: [2001, 3000],
-        4: [3001, 3000000],
-      };
-      const [whiteTimeStart, whiteTimeEnd] = whiteTimeRanges[whiteTime];
-      qb.andWhere("pm.whiteTime BETWEEN :whiteTimeStart AND :whiteTimeEnd", {
-        whiteTimeStart,
-        whiteTimeEnd,
-      });
-    }
-
     // 查询不重复的 uuid 数量
     const distinctUuidCountQuery = this.performanceRepository
       .createQueryBuilder("pm")
@@ -293,15 +274,12 @@ export class PerformanceService {
     const distinctUuidsData = await distinctUuids.getRawMany();
     const { count: total } = await distinctUuids.getRawOne();
 
-    console.log("====================================");
-    console.log(distinctUuidsData);
-    console.log("====================================");
-
     // 根据获取的 uuid 查询数据
     const uuids = distinctUuidsData.map((item) => item.uuid);
     const results = this.performanceRepository
       .createQueryBuilder("pm")
       .select([
+        "pm.id",
         "pm.uuid",
         "pm.type",
         "pm.appId",
@@ -359,8 +337,13 @@ export class PerformanceService {
           pageUrl: curr.pageUrl,
           createTime: curr.createTime.toISOString(),
           performanceData: {}, // 初始化 performanceData 字段
+          ids: [], // 初始化 ids 数组
         };
       }
+
+      // 将当前记录的 id 添加到 ids 数组中
+      acc[curr.uuid].ids.push(curr.id);
+
       // 将 name 和 performanceValue 添加到 performanceData 中
       acc[curr.uuid][curr.name] = curr.performanceValue ?? null;
 
