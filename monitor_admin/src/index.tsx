@@ -11,7 +11,10 @@ import recordscreen from '@zmonitor/recordscreen';
 
 zMonitor.init({
   dsn: 'http://localhost:8083/monitor/reportData',
-  apikey: '7845254399804114',
+  appId: '7845254399804114',
+  // silentWhiteScreen: false,
+  // skeletonProject: true,
+  // repeatCodeError: true,
   userId: '88888888',
 });
 

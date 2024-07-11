@@ -14,15 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "@nestjs/mapped-types": "*",
-    "@zmonitor/common": "1.0.0",
-    "@zmonitor/types": "1.0.0",
-    "@zmonitor/utils": "1.0.0",
-    "core-js": "^3.19.1",
-    "error-stack-parser": "^2.1.4",
-    "path-to-regexp": "^6.2.0",
-    "tslib": "^2.4.1",
-    "ua-parser-js": "^1.0.32",
-    "web-vitals": "^3.1.0"
+    "core-js": "^3.19.1"
   },
   "devDependencies": {
     "@types/ua-parser-js": "^0.7.39",

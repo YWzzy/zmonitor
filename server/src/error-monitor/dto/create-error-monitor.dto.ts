@@ -26,6 +26,14 @@ export class CreateErrorMonitorDto {
   appId: string;
   uuid: string;
   pageUrl: string;
+  url: string;
+  requestData: {
+    [key: string]: any;
+  };
+  response: {
+    [key: string]: any;
+  };
+  elapsedTime?: number;
   deviceInfo: {
     browserVersion: string;
     browser: string;

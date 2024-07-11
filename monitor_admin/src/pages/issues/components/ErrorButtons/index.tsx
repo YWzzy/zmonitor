@@ -80,6 +80,12 @@ export const ErrorButtons: React.FC<ErrorButtonsProps> = ({ getTableData }) => {
       });
   };
 
+  const fetchSuccess = () => {
+      fetch('https://jsonplaceholder.typicode.com/', {
+        method: 'GET'
+      });
+  }
+
   const resourceError = () => {
     const script = document.createElement('script');
     script.type = 'text/javascript';
@@ -117,6 +123,11 @@ export const ErrorButtons: React.FC<ErrorButtonsProps> = ({ getTableData }) => {
         <Form.Item>
           <Button type="primary" onClick={fetchError}>
             fetch请求报错
+          </Button>
+        </Form.Item>
+                <Form.Item>
+          <Button type="primary" onClick={fetchSuccess}>
+            fetch请求成功
           </Button>
         </Form.Item>
         <Form.Item>

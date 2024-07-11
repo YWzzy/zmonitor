@@ -185,6 +185,7 @@ export class ErrorMonitorService {
       .select("DATE_FORMAT(FROM_UNIXTIME(time / 1000), '%Y-%m-%d') AS label")
       .addSelect("COUNT(*) AS value")
       .where("appId = :appId", { appId })
+      .andWhere("status = 'error'")
       .andWhere("time BETWEEN :beginTime AND :endTime", {
         beginTime: new Date(beginTime).getTime(),
         endTime: new Date(endTime).getTime(),

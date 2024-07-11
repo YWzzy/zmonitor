@@ -56,6 +56,31 @@ export class ErrorMonitor {
   @Column({ default: "", comment: "页面URL" })
   pageUrl: string;
 
+  @Column({ default: "", comment: "请求URL" })
+  url: string;
+
+  @Column("json", { nullable: true, comment: "请求数据" })
+  requestData: {
+    query: string;
+    body: string;
+    params: string;
+    headers: string;
+    httpType: string;
+    method: string;
+    data: any;
+  };
+
+  @Column("json", { nullable: true, comment: "请求响应数据" })
+  response: {
+    Status: number;
+    statusText: string;
+    headers: string;
+    data: any;
+  };
+
+  @Column({ default: 0, comment: "请求消耗时长" })
+  elapsedTime: number;
+
   @Column("json", { nullable: true, comment: "设备信息" })
   deviceInfo: {
     browserVersion: string;
