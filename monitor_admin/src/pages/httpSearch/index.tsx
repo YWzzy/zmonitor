@@ -31,12 +31,12 @@ const HttpSearch = () => {
   const [total, setTotal] = useState(0);
 
   const toSearch = async () => {
-    const { pageUrl, date, requestType } = form.getFieldsValue();
+    const { url, date, requestType } = form.getFieldsValue();
     const query = {
       from: 1,
       size: defaultSize,
       appId: active,
-      pageUrl,
+      url,
       beginTime: date ? date[0].format('YYYY-MM-DD 00:00:00') : undefined,
       endTime: date ? date[1].format('YYYY-MM-DD 23:59:59') : undefined,
       requestType,
@@ -74,12 +74,12 @@ const HttpSearch = () => {
   };
 
   const onTableChange = (pagination, __, sorter: any) => {
-    const { pageUrl, date, requestType } = form.getFieldsValue();
+    const { url, date, requestType } = form.getFieldsValue();
     const query = {
       from: pagination.current,
       size: pagination.pageSize,
       appId: active,
-      pageUrl,
+      url,
       beginTime: date ? date[0].format('YYYY-MM-DD 00:00:00') : undefined,
       endTime: date ? date[1].format('YYYY-MM-DD 23:59:59') : undefined,
       requestType,
@@ -128,7 +128,7 @@ const HttpSearch = () => {
   return (
     <Card title="请求查询">
       <Form form={form} style={{ paddingBottom: 20 }} name="horizontal_login" layout="inline">
-        <Form.Item name="pageUrl" label="接口地址">
+        <Form.Item name="url" label="接口地址">
           <Input placeholder="请输入接口地址" />
         </Form.Item>
         <Form.Item name="date" label="日期" initialValue={[dayjs(), dayjs()]}>

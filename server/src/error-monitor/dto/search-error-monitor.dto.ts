@@ -42,6 +42,10 @@ export class SearchErrorMonitorDto {
 
   @IsString()
   @IsOptional()
+  url: string;
+
+  @IsString()
+  @IsOptional()
   status: string;
 
   @IsInt()
