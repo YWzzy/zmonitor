@@ -64,9 +64,22 @@ type RequestReportMsg = {
   method: string;
   reqHeaders: string;
   reqBody: string;
-  status: number;
-  requestType: 'done' | 'error' | 'ok';
+  status: 'done' | 'error' | 'ok';
   cost: number;
+  sdkVersion: string;
+  createTime: string;
+  requestData: {
+    data: any;
+    headers: { [key: string]: string } | undefined;
+    params: { [key: string]: string } | undefined;
+    method: string;
+    httpType: string;
+  };
+  response: {
+    Status: number;
+    data: any;
+  };
+  elapsedTime: number;
 };
 
 type JsErrorReportMsg = {

@@ -9,12 +9,12 @@ export const httpTableColumns = (sorter: {
 }): TableColumnsType<RequestReportMsg & PublicMsg> => [
   {
     title: '接口地址',
-    dataIndex: 'pageUrl',
-    key: 'pageUrl',
+    dataIndex: 'url',
+    key: 'url',
     width: 220,
     align: 'left',
     fixed: 'left',
-    render: pageUrl => TableItem.renderUrl(pageUrl, 30, true),
+    render: url => TableItem.renderUrl(url, 30, true),
   },
   {
     title: '请求类型',
@@ -30,18 +30,18 @@ export const httpTableColumns = (sorter: {
     width: 100,
     align: 'center',
     render: (status, record) => (
-      <Tag color={record.requestType === 'ok' ? '#1f8800' : '#c33300'}>{status}</Tag>
+      <Tag color={record['status'] === 'ok' ? '#1f8800' : '#c33300'}>{status}</Tag>
     ),
   },
   {
     title: '请求耗时',
-    dataIndex: 'cost',
-    key: 'cost',
+    dataIndex: 'elapsedTime',
+    key: 'elapsedTime',
     sorter: true,
     align: 'center',
-    sortOrder: sorter.sorterName === 'cost' ? sorter.sorterKey : null,
+    sortOrder: sorter.sorterName === 'elapsedTime' ? sorter.sorterKey : null,
     width: 120,
-    render: val => TableItem.renderHttpCost(val),
+    render: elapsedTime => TableItem.renderHttpCost(elapsedTime),
   },
   {
     title: '请求方法',
@@ -49,22 +49,43 @@ export const httpTableColumns = (sorter: {
     key: 'method',
     align: 'center',
     width: 80,
+    render: (method, record) => 
+      ( 
+        <span>{record['requestData']?.method}</span>
+      ),
   },
-  // {
-  //   title: '请求头信息',
-  //   dataIndex: 'reqHeaders',
-  //   key: 'reqHeaders',
-  //   align: 'center',
-  //   width: 120,
-  //   render: (text) => TableItem.renderText(text, 10, false),
-  // },
+  {
+    title: '请求头信息',
+    dataIndex: 'reqHeaders',
+    key: 'reqHeaders',
+    align: 'center',
+    width: 120,
+    render: (reqHeaders,record) => 
+    (
+      TableItem.renderObject(record?.requestData?.headers, 50, false)
+    )
+  },
   {
     title: '请求体',
     dataIndex: 'reqBody',
     key: 'reqBody',
     width: 200,
     align: 'center',
-    render: url => TableItem.renderUrl(url, 23, true),
+    render: (reqBody, record) => 
+      (
+        TableItem.renderObject(record['requestData']?.data, 50, true)
+      )
+  },
+  {
+    title: '请求params',
+    dataIndex: 'params',
+    key: 'params',
+    width: 200,
+    align: 'center',
+    render: (params, record) => 
+      (
+        TableItem.renderObject(record['requestData']?.params, 50, true)
+      )
   },
   {
     title: '时间',

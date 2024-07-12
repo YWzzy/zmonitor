@@ -82,7 +82,12 @@ export const ErrorButtons: React.FC<ErrorButtonsProps> = ({ getTableData }) => {
 
   const fetchSuccess = () => {
       fetch('https://jsonplaceholder.typicode.com/', {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer YourAuthToken',
+          'X-Custom-Header': 'Value'
+        }
       });
   }
 

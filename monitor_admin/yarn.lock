@@ -1872,79 +1872,59 @@
   resolved "https://registry.npmjs.org/@xstate/fsm/-/fsm-1.6.5.tgz"
   integrity sha512-b5o1I6aLNeYlU/3CPlj/Z91ybk1gUsKT+5NAJI+2W4UjvS5KLG28K9v5UvNoFVjHV8PajVZ00RH3vnjyQO7ZAw==
 
-"@zmonitor/common@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@zmonitor/common/-/common-2.0.0.tgz#f9f633a5d72f827bde01de0f5c1adc1325b033e9"
-  integrity sha512-WT5jEfkjEBz/x/HU+ye9tYxyEOC9pfAYoaa+I1jzLUFSowbT4vmXJPUWzivaAwA6ihtruAJJ6rNbJL+epnOHRA==
+"@zmonitor/common@5.1.0", "@zmonitor/common@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@zmonitor/common/-/common-5.1.0.tgz#696e9cee5afcc426ac4b5d7b82912f63ccb3e0ae"
+  integrity sha512-Pq92YzqUndZTq4Yc7MCyDlRKtvf90SafXvz+AJgxst0EK49k5NbkbrIAsPnK6XsYdpBhR37TDLnyRYW3y/4HBg==
 
-"@zmonitor/core@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@zmonitor/core/-/core-2.0.0.tgz#b38e04fdcf0c7ee0dcc505a18cdf055e92209618"
-  integrity sha512-DgmNDpbZuH0AcW638Bm7mgzLu0ZpivCAwqJiNFwSf2ohe6WTHHKQ2CwMkJh4hOfxraAMVkGt0+03xvssqXvl8Q==
+"@zmonitor/core@5.2.0", "@zmonitor/core@^5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@zmonitor/core/-/core-5.2.0.tgz#f30bffcb13e4cd9699ec5046bdbdc0b4dc6b0c95"
+  integrity sha512-T9reLDQEL6lg34Jd4C4HnFkvMHgfzXe5pc4h+s4GgLU19E7GBPxFj3FE7RgKj3BLFlOI7dro8hlf3zNiwKa8vw==
   dependencies:
-    "@zmonitor/common" "2.0.0"
-    "@zmonitor/types" "2.0.0"
-    "@zmonitor/utils" "2.0.0"
+    "@zmonitor/common" "5.1.0"
+    "@zmonitor/types" "5.1.0"
+    "@zmonitor/utils" "5.1.0"
 
-"@zmonitor/core@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@zmonitor/core/-/core-3.0.0.tgz#001185d8a2043366c6843b647d3703199da54960"
-  integrity sha512-RPMEZEvI/VupG4FuNwUIAuEpm7B5WCD3DhecF865ooDt77kX5wjHTM+kjxP4mDeotf1XUNDqQ2QqbXHAkIrOGQ==
+"@zmonitor/performance@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@zmonitor/performance/-/performance-5.1.0.tgz#af3f977fe27c7cc3b4723212bf038a4be426b80a"
+  integrity sha512-t6GMJw8jf/P5Ql2dXLREMg7Nbb4TDvwiRyojFBKRZy7JFYY9L55Qu1uRL8hhzrAq9uVuaRfdG3ljcFW0UwJa2Q==
   dependencies:
-    "@zmonitor/common" "2.0.0"
-    "@zmonitor/types" "2.0.0"
-    "@zmonitor/utils" "2.0.1"
-
-"@zmonitor/performance@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@zmonitor/performance/-/performance-2.0.0.tgz#8b54a77e2e4ecc8d71044d665d3f8b857e04fe2a"
-  integrity sha512-Zmp4pw+e285S66+AsYsxXOm9DaSUfV+oQQzPD4vqecebya4SpoWusTbtdmooRSwuk93xQfKzoZWEbIt4MTaxpQ==
-  dependencies:
-    "@zmonitor/common" "2.0.0"
-    "@zmonitor/types" "2.0.0"
-    "@zmonitor/utils" "2.0.0"
+    "@zmonitor/common" "5.1.0"
+    "@zmonitor/types" "5.1.0"
+    "@zmonitor/utils" "5.1.0"
     web-vitals "^3.1.0"
 
-"@zmonitor/recordscreen@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@zmonitor/recordscreen/-/recordscreen-2.0.0.tgz#a42c3bc6050740163054e2e9e4e81fe127dd2117"
-  integrity sha512-6kimEXEFZ2IVu//iMmF5yW3GFaC/W9pFl7tpEgO27yKXbYqxQc3oJh1OWTOCGyOETVe5q3OIyYxeQDjGKuuJVg==
+"@zmonitor/recordscreen@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@zmonitor/recordscreen/-/recordscreen-5.1.0.tgz#c7468879ebbd79af3c6af47644df8191f8b63c93"
+  integrity sha512-5X2nlixEKMyrij5rczSreHHrl7+MK4YqqrywlXo5yAO51iDQqqnokHUTA1j1AtaA4JJuIi42W/sEvxb+E0P27g==
   dependencies:
     "@types/pako" "^2.0.0"
-    "@zmonitor/common" "2.0.0"
-    "@zmonitor/types" "2.0.0"
-    "@zmonitor/utils" "2.0.0"
+    "@zmonitor/common" "5.1.0"
+    "@zmonitor/types" "5.1.0"
+    "@zmonitor/utils" "5.1.0"
     js-base64 "3.7.3"
     pako "2.1.0"
     rrweb "1.1.3"
 
-"@zmonitor/types@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@zmonitor/types/-/types-2.0.0.tgz#6714facb28f02706b72d986a74f8aaf824b6401e"
-  integrity sha512-iVIQ6v+6jnxSTGT9bpM8cgXibDj/87FPeGMNe71aN9arsrFOrWPKxWhoG1zIpWNkd6UvjzdX8qguCC5mkLV8zw==
+"@zmonitor/types@5.1.0", "@zmonitor/types@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@zmonitor/types/-/types-5.1.0.tgz#b0c832c7f0e47af1de4bac6d753c9be2042eb59f"
+  integrity sha512-KgU3fsGCXryOUruuAs5VAWHGqf2Pr/bRcuqDLyi8pKSCXX5XUyvjop2Q28hczPV0ZS0wdmrcu7LCHkeYF9yARg==
   dependencies:
-    "@zmonitor/common" "2.0.0"
+    "@zmonitor/common" "5.1.0"
 
-"@zmonitor/utils@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@zmonitor/utils/-/utils-2.0.0.tgz#729e8d4886e2323d249c82d1daf907b9b4bdf326"
-  integrity sha512-dRYrULtY5R+nhBQJRE4Z2XoA2nbaofCTuMluWm5HeAwLYG/HsVfDBf/cy98i3vNWqWUHyUlhRmlHSwHOTajY9w==
+"@zmonitor/utils@5.1.0", "@zmonitor/utils@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@zmonitor/utils/-/utils-5.1.0.tgz#8c9e8eab651696775e70c7018a4b6174094e3cf9"
+  integrity sha512-Urm2yPSMmPmGWSdc3lp+SqffKbyLAggzK27oqzo+iZY0DZuH7U3tl3s5aGQqhC/rqyOwoMLBJU+Nme7MW3/lKw==
   dependencies:
     "@types/ua-parser-js" "^0.7.36"
-    "@zmonitor/common" "2.0.0"
-    "@zmonitor/core" "2.0.0"
-    "@zmonitor/types" "2.0.0"
-    ua-parser-js "1.0.32"
-
-"@zmonitor/utils@2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@zmonitor/utils/-/utils-2.0.1.tgz#71efce11bf44edda96fde51aaf70167e5814b9ae"
-  integrity sha512-n3V7gusIz6K34SE8HeGThZuiPEp4frIePp6mWsBmhdtZwJG13AVlK7t1lzc0fazoDoAfFwsRwbjrdqoprEcbrw==
-  dependencies:
-    "@types/ua-parser-js" "^0.7.36"
-    "@zmonitor/common" "2.0.0"
-    "@zmonitor/core" "3.0.0"
-    "@zmonitor/types" "2.0.0"
+    "@zmonitor/common" "5.1.0"
+    "@zmonitor/core" "5.2.0"
+    "@zmonitor/types" "5.1.0"
     ua-parser-js "1.0.32"
 
 acorn-jsx@^5.3.2:
