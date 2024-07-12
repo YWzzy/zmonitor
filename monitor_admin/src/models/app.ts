@@ -2,13 +2,14 @@ import { createModel } from '@rematch/core';
 import type { RootModel } from '.';
 import { getAppList } from '@/src/api';
 
-const userModel = createModel<RootModel>()({
+const appModel = createModel<RootModel>()({
   state: {
-    apps: [] as AppInfo[],
-    isLoading: true,
-    showAddModal: false,
-    active: '',
+    apps: [] as AppInfo[],  // 存储应用程序列表
+    isLoading: true,        // 指示是否正在加载数据
+    showAddModal: false,    // 控制是否显示添加应用的模态框
+    active: '',             // 当前活跃的应用程序 ID
   },
+  // 同步操作
   reducers: {
     updateAppModel(state, newState) {
       return {
@@ -29,7 +30,9 @@ const userModel = createModel<RootModel>()({
       };
     },
   },
+  // 异步操作
   effects: dispatch => ({
+    // 获取应用列表
     async getAppList() {
       dispatch.app.updateAppModel({
         isLoading: true,
@@ -48,7 +51,7 @@ const userModel = createModel<RootModel>()({
         });
       }
     },
-    // 首次进入应用
+    // 首次进入应用时调用，异步获取应用程序列表
     async getAppListOnce() {
       dispatch.app.updateAppModel({
         isLoading: true,
@@ -63,4 +66,4 @@ const userModel = createModel<RootModel>()({
   }),
 });
 
-export default userModel;
+export default appModel;
