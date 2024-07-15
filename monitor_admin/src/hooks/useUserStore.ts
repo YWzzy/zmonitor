@@ -12,6 +12,7 @@ export const useUserStore = () => {
     key: 'user',
     selector: (state: RootState) => state.user,
     updateAction: (data) => ({ type: 'user/updateUserModel', payload: data }),
+    cacheDuration: 3600000 * 24, // 1 小时 * 24
   });
 
   return {

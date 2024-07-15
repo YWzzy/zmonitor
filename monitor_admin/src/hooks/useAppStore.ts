@@ -12,6 +12,7 @@ export const useAppStore = () => {
     key: 'app',
     selector: (state: RootState) => state.app,
     updateAction: (data) => ({ type: 'app/updateAppModel', payload: data }),
+    cacheDuration: 3600000 * 24, // 1 小时 * 24
   });
 
   return {

@@ -37,18 +37,30 @@ const appModel = createModel<RootModel>()({
       dispatch.app.updateAppModel({
         isLoading: true,
       });
-      const { code, data } = await getAppList(userKey);
-      if (data.length === 1) {
+      const cachedAppData = localStorage.getItem('app');
+      const parsedData = JSON.parse(cachedAppData || '{}');
+      if(parsedData && parsedData.apps.length > 0) {
+        const parsedData = JSON.parse(cachedAppData);
         dispatch.app.updateAppModel({
           isLoading: false,
-          apps: code === 200 ? data : [],
-          active: data[0].appId,
+          apps: parsedData.apps,
+          active: parsedData.active,
         });
+        return;
       } else {
-        dispatch.app.updateAppModel({
-          isLoading: false,
-          apps: code === 200 ? data : [],
-        });
+        const { code, data } = await getAppList(userKey);
+        if (data.length === 1) {
+          dispatch.app.updateAppModel({
+            isLoading: false,
+            apps: code === 200 ? data : [],
+            active: data[0].appId,
+          });
+        } else {
+          dispatch.app.updateAppModel({
+            isLoading: false,
+            apps: code === 200 ? data : [],
+          });
+        }
       }
     },
     // 首次进入应用时调用，异步获取应用程序列表
@@ -56,12 +68,23 @@ const appModel = createModel<RootModel>()({
       dispatch.app.updateAppModel({
         isLoading: true,
       });
-      const { code, data } = await getAppList(userKey);
-      dispatch.app.updateAppModel({
-        isLoading: false,
-        apps: code === 200 ? data : [],
-        active: data.length > 0 ? data[0].appId : '',
-      });
+      const cachedAppData = localStorage.getItem('app');
+      const parsedData = JSON.parse(cachedAppData || '{}');
+      if(parsedData && parsedData.apps.length > 0) {
+        dispatch.app.updateAppModel({
+          isLoading: false,
+          apps: parsedData.apps,
+          active: parsedData.active,
+        });
+        return;
+      } else {
+        const { code, data } = await getAppList(userKey);
+        dispatch.app.updateAppModel({
+          isLoading: false,
+          apps: code === 200 ? data : [],
+          active: data.length > 0 ? data[0].appId : '',
+        });
+      }
     },
   }),
 });
