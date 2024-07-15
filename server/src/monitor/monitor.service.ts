@@ -29,6 +29,11 @@ export class MonitorService {
   // 存储录屏数据
   async saveRecordScreen(data: any): Promise<void> {
     try {
+      // 获取应用录屏配置
+      const application = await this.applicationRepository.findOne({
+        where: { appId: data.appId },
+      });
+      if (application && !application.enableRecording) return; // 如果应用未开启录屏功能，则直接返回
       const extractedFiles = await this.fileUploadService.saveRecordingFile(
         data.events,
         data.recordScreenId,
@@ -59,7 +64,6 @@ export class MonitorService {
       } else if (type === "recordScreen") {
         this.saveRecordScreen(data);
       } else if (type === "whiteScreen") {
-        // this.whiteScreenList.push(data);
         const createErrorMonitorDto: CreateErrorMonitorDto = data;
         await this.errorMonitorService.create(createErrorMonitorDto);
       } else {
@@ -295,7 +299,6 @@ export class MonitorService {
     try {
       const length = Object.keys(req.body).length;
       if (length) {
-        // this.recordScreenList.push(req.body);
         this.saveRecordScreen(req.body);
       } else {
         const data = await coBody.json(req);
