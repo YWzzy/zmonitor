@@ -10,6 +10,7 @@ const appModel = createModel<RootModel>()({
     showConfigModal: false, // 控制是否显示配置应用的模态框
     active: '',             // 当前活跃的应用程序 ID
     curConfAppId: '',       // 当前配置的应用程序 ID
+    needFetch: false,       // 是否需要重新获取应用程序列表
   },
   // 同步操作
   reducers: {
@@ -31,6 +32,12 @@ const appModel = createModel<RootModel>()({
         curConfAppId,
       };
     },
+    updateNeedFetch(state, needFetch) {
+      return {
+        ...state,
+        needFetch,
+      };
+    },
     updateAddModalStatus(state, show) {
       return {
         ...state,
@@ -45,7 +52,7 @@ const appModel = createModel<RootModel>()({
     },
   },
   // 异步操作
-  effects: dispatch => ({
+  effects: (dispatch) => ({
     // 获取应用列表
     async getAppList(userKey: string) {
       dispatch.app.updateAppModel({
@@ -53,12 +60,14 @@ const appModel = createModel<RootModel>()({
       });
       const cachedAppData = localStorage.getItem('app');
       const parsedData = JSON.parse(cachedAppData || '{}');
-      if(parsedData && parsedData.apps.length > 0) {
+      const needFetch = parsedData?.needFetch;
+      if(parsedData && parsedData.apps.length > 0 && !needFetch) {
         const parsedData = JSON.parse(cachedAppData);
         dispatch.app.updateAppModel({
           isLoading: false,
           apps: parsedData.apps,
           active: parsedData.active,
+          needFetch: false,
         });
         return;
       } else {
@@ -68,6 +77,7 @@ const appModel = createModel<RootModel>()({
             isLoading: false,
             apps: code === 200 ? data : [],
             active: data[0].appId,
+            needFetch: false,
           });
         } else {
           dispatch.app.updateAppModel({
@@ -84,7 +94,8 @@ const appModel = createModel<RootModel>()({
       });
       const cachedAppData = localStorage.getItem('app');
       const parsedData = JSON.parse(cachedAppData || '{}');
-      if(parsedData && parsedData.apps.length > 0) {
+      const needFetch = parsedData?.needFetch;
+      if(parsedData && parsedData.apps.length > 0  && !needFetch) {
         dispatch.app.updateAppModel({
           isLoading: false,
           apps: parsedData.apps,
@@ -107,9 +118,6 @@ const appModel = createModel<RootModel>()({
     },
     // 更新应用程序状态
     async getConfigApp(appId: string) {
-            console.log('====================================');
-      console.log("getConfigApp",appId);
-      console.log('====================================');
       const {data, code} = await getConfigApp(appId);
       if(code === 200) {
         return data;

@@ -28,6 +28,7 @@ export const AppItem: React.FC<AppItemIn> = ({ appInfo }) => {
       id: appInfo.id,
       appStatus: appInfo.appStatus === 1 ? 0 : 1,
     });
+    await appDispatch.updateNeedFetch(true);
     await appDispatch.getAppList(userInfo.account);
     message.success(appInfo.appStatus === 1 ? '已停用' : '已启用');
   };
