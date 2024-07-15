@@ -68,7 +68,7 @@ export class UserController {
     }
 
     const token = jwt.sign({ userId: user.id }, "secretKey", {
-      expiresIn: "1d",
+      expiresIn: "7d",
     });
     req.session.token = token;
     return { message: "登录成功", token };

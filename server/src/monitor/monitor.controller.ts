@@ -35,11 +35,12 @@ export class MonitorController {
   })
   // @Version("2")
   getMap(
+    @Query("appId") appId: string,
     @Query("fileName") fileName: string,
     @Query("env") env: string,
     @Res() res: Response
   ): void {
-    this.monitorService.getMap(fileName, env, res);
+    this.monitorService.getMap(appId, fileName, env, res);
   }
 
   @Get("getErrorList")

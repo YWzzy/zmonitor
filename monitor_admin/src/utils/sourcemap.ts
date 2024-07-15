@@ -25,7 +25,7 @@ export default class SourceMapUtils {
     return res && Array.isArray(res) ? res[1] : null;
   }
 
-  static async loadSourceMap(fileName: string): Promise<string | null> {
+  static async loadSourceMap(appId: string,fileName: string): Promise<string | null> {
     const file = fileName;
     // const env = process.env.NODE_ENV;
     const env = 'production';
@@ -55,15 +55,17 @@ export default class SourceMapUtils {
   }
 
   static async findCodeBySourceMap({
+    appId,
     fileName,
     line,
     column,
   }: {
+    appId: string;
     fileName: string;
     line: number;
     column: number;
   }): Promise<any> {
-    const sourceData: any = await this.loadSourceMap(fileName);
+    const sourceData: any = await this.loadSourceMap(appId, fileName);
 
     if (!sourceData) return;
 

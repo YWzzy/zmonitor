@@ -12,11 +12,14 @@ import { FileUploadService } from "../file-upload/file-upload.service";
 import { PerformanceService } from "../performance/performance.service";
 import { CreatePerformanceDto } from "src/performance/dto/create-performance.dto";
 import { SearchErrorMonitorDto } from "src/error-monitor/dto/search-error-monitor.dto";
+import { Application } from "src/application/entities/application.entity";
 
 @Injectable()
 export class MonitorService {
   constructor(
     @InjectRepository(Monitor) private readonly monitor: Repository<Monitor>,
+    @InjectRepository(Application)
+    private readonly applicationRepository: Repository<Application>,
     private readonly errorMonitorService: ErrorMonitorService,
     private readonly recordingService: RecordingService,
     private readonly fileUploadService: FileUploadService,
@@ -71,8 +74,15 @@ export class MonitorService {
     }
   }
 
-  // 获取js.map源码文件
-  async getMap(fileName: string, env: string, res: any): Promise<void> {
+  // 从数据库中获取应用的 packageUrl 路径
+  async getAppPackagePath(
+    appId: string,
+    fileName: string,
+    env: string
+  ): Promise<string> {
+    const application = await this.applicationRepository.findOne({
+      where: { appId },
+    });
     let mapPath: string;
     let originalFileName;
     const regex = /\/([^\/]+)$/; // 匹配最后一个斜杠后的内容作为文件名
@@ -89,14 +99,35 @@ export class MonitorService {
         originalFileName ? originalFileName : fileName
       );
     } else {
-      mapPath = path.join(
-        __dirname,
-        "..",
-        "client/js",
-        `${originalFileName ? originalFileName : fileName}.map`
-      );
+      if (application && application.packageUrl) {
+        mapPath = path.join(
+          __dirname,
+          "..",
+          application.packageUrl,
+          "/js",
+          `${originalFileName ? originalFileName : fileName}.map`
+        );
+        return mapPath; // 返回应用程序的录屏存储路径
+      } else {
+        mapPath = path.join(
+          __dirname,
+          "..",
+          "publicClient/js",
+          `${originalFileName ? originalFileName : fileName}.map`
+        );
+        return mapPath; // 默认使用公共目录
+      }
     }
-    // console.log("源码路径 mapPath:", mapPath);
+  }
+
+  // 获取js.map源码文件
+  async getMap(
+    appId: string,
+    fileName: string,
+    env: string,
+    res: any
+  ): Promise<void> {
+    const mapPath = await this.getAppPackagePath(appId, fileName, "production");
 
     try {
       const data = await fs.promises.readFile(mapPath);

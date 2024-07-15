@@ -13,10 +13,11 @@ import { ErrorMonitorModule } from "../error-monitor/error-monitor.module";
 import { FileUploadModule } from "../file-upload/file-upload.module";
 import { RecordingModule } from "../recording/recording.module";
 import { PerformanceModule } from "../performance/performance.module";
+import { Application } from "src/application/entities/application.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Monitor]),
+    TypeOrmModule.forFeature([Monitor, Application]),
     ErrorMonitorModule,
     FileUploadModule,
     RecordingModule,
