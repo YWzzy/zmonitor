@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { CopyOutlined } from '@ant-design/icons';
 import { Button, Tooltip, message } from 'antd';
 import cls from 'classnames';
@@ -7,7 +7,7 @@ import styles from './index.module.less';
 import { PeropleCounter, Loading, NewUserLine } from '@/src/components';
 import { updateAppStatus } from '@/src/api';
 import { copyTextToClipboard } from '@/src/utils';
-import { useAppStore, useAppInfo } from '@/src/hooks';
+import { useAppStore, useAppInfo, useUserStore } from '@/src/hooks';
 
 interface AppItemIn {
   appInfo: AppInfo;
@@ -16,6 +16,7 @@ export const AppItem: React.FC<AppItemIn> = ({ appInfo }) => {
   const { appDispatch } = useAppStore();
 
   const { appStatus, loading } = useAppInfo(appInfo.appId);
+  const { userInfo } = useUserStore();
 
   const navigate = useNavigate();
 
@@ -27,7 +28,7 @@ export const AppItem: React.FC<AppItemIn> = ({ appInfo }) => {
       id: appInfo.id,
       appStatus: appInfo.appStatus === 1 ? 0 : 1,
     });
-    await appDispatch.getAppList();
+    await appDispatch.getAppList(userInfo.account);
     message.success(appInfo.appStatus === 1 ? '已停用' : '已启用');
   };
 
@@ -48,6 +49,14 @@ export const AppItem: React.FC<AppItemIn> = ({ appInfo }) => {
                 }}
               />
             </Tooltip>
+            <span
+              className={cls(styles.insert, styles.config)}
+              onClick={() => {
+                appDispatch.updateConfigApp(appInfo.appId)
+              }}
+            >
+              配置
+            </span>
             <span
               className={styles.insert}
               onClick={() => {

@@ -46,7 +46,7 @@ export class ApplicationController {
   @ApiOperation({ summary: "根据应用ID获取应用信息" })
   @ApiOkResponse({ description: "成功获取应用信息", type: Application })
   @ApiNotFoundResponse({ description: "未找到对应的应用" })
-  @Get(":id")
+  @Get("getAppByAppId")
   findOne(@Param("appId") appId: string) {
     return this.applicationService.findOne(appId);
   }

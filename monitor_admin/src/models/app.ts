@@ -1,13 +1,15 @@
 import { createModel } from '@rematch/core';
 import type { RootModel } from '.';
-import { getAppList } from '@/src/api';
+import { getAppList, getConfigApp } from '@/src/api';
 
 const appModel = createModel<RootModel>()({
   state: {
     apps: [] as AppInfo[],  // 存储应用程序列表
     isLoading: true,        // 指示是否正在加载数据
     showAddModal: false,    // 控制是否显示添加应用的模态框
+    showConfigModal: false, // 控制是否显示配置应用的模态框
     active: '',             // 当前活跃的应用程序 ID
+    curConfAppId: '',       // 当前配置的应用程序 ID
   },
   // 同步操作
   reducers: {
@@ -23,10 +25,22 @@ const appModel = createModel<RootModel>()({
         active,
       };
     },
+    updateCurConfAppId(state, curConfAppId) {
+      return {
+        ...state,
+        curConfAppId,
+      };
+    },
     updateAddModalStatus(state, show) {
       return {
         ...state,
         showAddModal: show,
+      };
+    },
+    updateConfigModalStatus(state, show) {
+      return {
+        ...state,
+        showConfigModal: show,
       };
     },
   },
@@ -86,6 +100,20 @@ const appModel = createModel<RootModel>()({
         });
       }
     },
+    // 更新配置的应用
+    async updateConfigApp(appId: string) {
+      dispatch.app.updateCurConfAppId(appId);
+      dispatch.app.updateConfigModalStatus(true);
+    },
+    // 更新应用程序状态
+    async getConfigApp(appId: string) {
+      const {data, code} = await getConfigApp(appId);
+      if(code === 200) {
+        return data;
+      } else {
+        return {};
+      }
+    }
   }),
 });
 

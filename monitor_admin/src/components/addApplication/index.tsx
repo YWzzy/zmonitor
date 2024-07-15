@@ -41,7 +41,7 @@ export const AddApplication: React.FC<AddApplicationIn> = ({ open, onClose }) =>
         </Form.Item>
         <Form.Item
           name="appType"
-          label="应用类型"
+          label="应用名称"
           initialValue={AppType.WEB}
           rules={[{ required: true }]}
         >

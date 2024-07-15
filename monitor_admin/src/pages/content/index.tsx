@@ -14,6 +14,7 @@ import logoPng from '@/src/images/logo.png';
 import { checkAppStatus, AddApplication } from '@/src/components';
 import { munuRouters, hasAppRouters } from '@/src/router';
 import { useAppStore } from '@/src/hooks';
+import { ConfigApplication } from '@/src/components/configApplication';
 const { Sider } = Layout;
 
 function Home() {
@@ -39,7 +40,7 @@ function Home() {
 
   const [openMenuKey, setKey] = useState(pathname);
 
-  const { apps, active, showAddModal, appDispatch } = useAppStore();
+  const { apps, active, showAddModal, showConfigModal, appDispatch, curConfAppId } = useAppStore();
 
   const menus = React.useMemo(() => {
     const menus = apps.length < 0 ? munuRouters : [...munuRouters, ...hasAppRouters];
@@ -161,6 +162,13 @@ function Home() {
         open={showAddModal}
         onClose={() => {
           appDispatch.updateAddModalStatus(false);
+        }}
+      />
+      <ConfigApplication
+        open={showConfigModal}
+        appId={curConfAppId}
+        onClose={() => {
+          appDispatch.updateConfigModalStatus(false);
         }}
       />
     </div>

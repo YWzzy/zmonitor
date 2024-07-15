@@ -30,6 +30,24 @@ interface UpdateAppInfo {
   appStatus: number;
 }
 
+interface UpdateAppInfo {
+  appId: string;
+  id: number;
+  appStatus: number;
+}
+
+interface AppConfig {
+  id: number;
+  appId: string; // 应用ID
+  appName: string; // 应用名称
+  appStatus: number; // 应用开关
+  deployServer: string; // 应用部署服务器地址
+  packageUrl: string; // 应用包地址
+  recordingStorage: string; // 录屏文件存放地址
+  enableRecording: boolean; // 是否开启录屏
+  reportErrorsOnly: boolean; // 是否只异常上报
+}
+
 interface AppInfo {
   id: number;
   appId: string;

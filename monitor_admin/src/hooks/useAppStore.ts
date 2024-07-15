@@ -5,7 +5,7 @@ import { useCache } from './useCache';
 export const useAppStore = () => {
   const dispatch = useDispatch<Dispatch>();
 
-  const { apps, isLoading, active, showAddModal } = useSelector((state: RootState) => state.app);
+  const { apps, isLoading, active, showAddModal, showConfigModal, curConfAppId } = useSelector((state: RootState) => state.app);
 
   // 使用缓存 hook
   useCache({
@@ -20,6 +20,8 @@ export const useAppStore = () => {
     isLoading,
     active,
     showAddModal,
+    showConfigModal,
+    curConfAppId,
     appDispatch: dispatch.app,
   };
 };

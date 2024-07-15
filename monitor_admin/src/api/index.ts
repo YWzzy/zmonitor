@@ -82,6 +82,16 @@ export const getAppList = async (params): CustomResponse<AppInfo[]> => {
 export const createApp = async (params: CreateAppIn): CustomResponse<any> =>
   await http.post('/applications/createApp', params);
 
+export const getConfigApp = async (params): CustomResponse<Options[]> => {
+  const data = {
+    appId : params
+  }
+  return  await http.get('/applications/getAppByAppId', { params: data });
+}
+
+export const updateAppConfig = async (data: AppConfig): CustomResponse<any> =>
+  await http.post('/applications/updateAppConfig', data);
+
 export const updateAppStatus = async (params: UpdateAppInfo): CustomResponse<any> =>
   await http.post('/applications/updateAppStatus', params);
 
