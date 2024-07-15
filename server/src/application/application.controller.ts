@@ -47,7 +47,7 @@ export class ApplicationController {
   @ApiOkResponse({ description: "成功获取应用信息", type: Application })
   @ApiNotFoundResponse({ description: "未找到对应的应用" })
   @Get("getAppByAppId")
-  findOne(@Param("appId") appId: string) {
+  findOne(@Query("appId") appId: string) {
     return this.applicationService.findOne(appId);
   }
 
@@ -58,7 +58,6 @@ export class ApplicationController {
   update(@Body() updateApplicationDto: UpdateApplicationDto) {
     return this.applicationService.update(updateApplicationDto);
   }
-  
 
   @ApiOperation({ summary: "删除应用" })
   @ApiOkResponse({ description: "成功删除应用" })

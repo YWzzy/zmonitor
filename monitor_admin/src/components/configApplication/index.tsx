@@ -23,6 +23,7 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
   useEffect(() => {
     const fetchAppConfig = async () => {
       const config = await appDispatch.getConfigApp(appId);
+      console.log("setAppConfig",config);
       setAppConfig(config);
       form.setFieldsValue(config);
     };

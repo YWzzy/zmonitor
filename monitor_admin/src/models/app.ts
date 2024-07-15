@@ -107,6 +107,9 @@ const appModel = createModel<RootModel>()({
     },
     // 更新应用程序状态
     async getConfigApp(appId: string) {
+            console.log('====================================');
+      console.log("getConfigApp",appId);
+      console.log('====================================');
       const {data, code} = await getConfigApp(appId);
       if(code === 200) {
         return data;
