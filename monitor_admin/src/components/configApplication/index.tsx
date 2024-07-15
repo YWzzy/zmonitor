@@ -39,12 +39,17 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
       onOk={async () => {
         await form.validateFields();
         setLoading(true);
-        const formData = form.getFieldsValue();
-        await updateAppConfig(formData);
-        await appDispatch.getAppList(userInfo.account);
-        setLoading(false);
-        message.success('应用配置成功更新！');
-        onClose();
+        try {
+            const formData = form.getFieldsValue();
+            await updateAppConfig(formData);
+            await appDispatch.getAppList(userInfo.account);
+            setLoading(false);
+            message.success('应用配置成功更新！');
+            onClose();
+        } catch (error) {
+            setLoading(false);
+            message.error('应用配置更新失败！');
+        }
       }}
       onCancel={onClose}
       okButtonProps={{
@@ -55,6 +60,9 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
       <Form form={form} initialValues={appConfig}>
         <Form.Item name="appName" label="应用名称" rules={[{ required: true }]}>
           <Input />
+        </Form.Item>
+        <Form.Item name="appId" label="appId">
+          <Input disabled />
         </Form.Item>
         <Form.Item name="deployServer" label="应用部署服务器地址" rules={[{ required: true }]}>
           <Input />

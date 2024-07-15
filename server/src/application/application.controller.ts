@@ -58,6 +58,7 @@ export class ApplicationController {
   update(@Body() updateApplicationDto: UpdateApplicationDto) {
     return this.applicationService.update(updateApplicationDto);
   }
+  
 
   @ApiOperation({ summary: "删除应用" })
   @ApiOkResponse({ description: "成功删除应用" })

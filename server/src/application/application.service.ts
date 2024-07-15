@@ -76,9 +76,9 @@ export class ApplicationService {
     updateApplicationDto: UpdateApplicationDto
   ): Promise<Application> {
     try {
-      const id = updateApplicationDto.id;
+      const appId = updateApplicationDto.appId;
       const application = await this.applicationRepository.findOne({
-        where: { id: id },
+        where: { appId: appId },
       });
       if (!application) {
         throw new Error("Application not found");
@@ -93,6 +93,22 @@ export class ApplicationService {
 
       if (updateApplicationDto.appSecret) {
         application.appSecret = updateApplicationDto.appSecret;
+      }
+
+      if (updateApplicationDto.deployServer) {
+        application.deployServer = updateApplicationDto.deployServer;
+      }
+      if (updateApplicationDto.packageUrl) {
+        application.packageUrl = updateApplicationDto.packageUrl;
+      }
+      if (updateApplicationDto.recordingStorage) {
+        application.recordingStorage = updateApplicationDto.recordingStorage;
+      }
+      if (updateApplicationDto.enableRecording) {
+        application.enableRecording = updateApplicationDto.enableRecording;
+      }
+      if (updateApplicationDto.reportErrorsOnly) {
+        application.reportErrorsOnly = updateApplicationDto.reportErrorsOnly;
       }
 
       // 更新应用状态

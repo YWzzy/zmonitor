@@ -57,6 +57,41 @@ export class Application {
   })
   userKey: string;
 
+  @Column({
+    type: "varchar",
+    length: 255,
+    comment: "应用部署服务器地址",
+  })
+  deployServer: string;
+
+  @Column({
+    type: "varchar",
+    length: 255,
+    comment: "应用包地址",
+  })
+  packageUrl: string;
+
+  @Column({
+    type: "varchar",
+    length: 255,
+    comment: "录屏文件存放地址",
+  })
+  recordingStorage: string;
+
+  @Column({
+    type: "boolean",
+    default: false,
+    comment: "是否开启录屏",
+  })
+  enableRecording: boolean;
+
+  @Column({
+    type: "boolean",
+    default: false,
+    comment: "是否只异常上报",
+  })
+  reportErrorsOnly: boolean;
+
   @CreateDateColumn({
     type: "timestamp",
     comment: "创建时间",

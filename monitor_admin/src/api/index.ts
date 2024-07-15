@@ -90,7 +90,7 @@ export const getConfigApp = async (params): CustomResponse<Options[]> => {
 }
 
 export const updateAppConfig = async (data: AppConfig): CustomResponse<any> =>
-  await http.post('/applications/updateAppConfig', data);
+  await http.post('/applications/updateAppStatus', data);
 
 export const updateAppStatus = async (params: UpdateAppInfo): CustomResponse<any> =>
   await http.post('/applications/updateAppStatus', params);
