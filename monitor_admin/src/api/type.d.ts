@@ -2,6 +2,8 @@
 interface LoginRegsiterIn {
   account: string;
   password: string;
+  name?: string;
+  code?: string;
 }
 
 interface UserInfo {

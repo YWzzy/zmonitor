@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 import { Input, message as Message, Modal } from 'antd';
 import { useNavigate } from 'react-router';
-import { useDispatch } from 'react-redux';
+// import { useDispatch } from 'react-redux';
 import css from './index.module.less';
 import { login, register } from '@/src/api/index';
 enum ActionType {
   Login = 0,
   Regist,
 }
+
 const LoginPage = () => {
+
   const navigate = useNavigate();
   const [type, setType] = useState(ActionType.Login);
   const [show, setShow] = useState(false);
   const [form, setForm] = useState({
     user: '',
+    name: '',
     pwd: '',
   });
 
@@ -29,6 +32,7 @@ const LoginPage = () => {
     setType(type);
     setForm({
       user: '',
+      name: '',
       pwd: '',
     });
   };
@@ -58,6 +62,7 @@ const LoginPage = () => {
         await register({
           account: form.user,
           password: form.pwd,
+          name: form.name
         });
         Modal.confirm({
           content: '立即登录？',
@@ -102,8 +107,21 @@ const LoginPage = () => {
         >
           <div className={css['login-body']}>
             <div className={css.title}>
-              {type === ActionType.Login ? '登录BLUBIU系统' : '注册BLUBIU账号'}
+              {type === ActionType.Login ? '登录监控系统' : '注册监控账号'}
             </div>
+            {
+              type === ActionType.Login ? null : (
+                <Input
+                  style={{ marginTop: '20px', height: 40 }}
+                  placeholder="请输入用户名称"
+                  value={form.name}
+                  onChange={e => {
+                    formChange(e.target.value, 'name');
+                  }}
+                  prefix={<span className={css['site-form-item-icon']}>用户名：</span>}
+                />
+              )
+            }
             <Input
               style={{ margin: '20px 0', height: 40 }}
               placeholder="请输入账号"

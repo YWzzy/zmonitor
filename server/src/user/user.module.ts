@@ -21,7 +21,7 @@ export class UserModule implements NestModule {
     consumer
       .apply(Logger)
       // .forRoutes("user");
-      .forRoutes({ path: "user/code", method: RequestMethod.ALL });
-    // .forRoutes(UserController);
+      // .forRoutes({ path: "user/code", method: RequestMethod.ALL });
+    .forRoutes(UserController);
   }
 }

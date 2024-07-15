@@ -23,7 +23,7 @@ export const http = axios.create({
 });
 
 http.interceptors.response.use(({ data, status }) => {
-  const statusCode = data['code'] || status;
+  const statusCode = status;
   if (statusCode !== 200) {
     message.error('网络异常');
     return data;
@@ -51,14 +51,14 @@ http.interceptors.response.use(({ data, status }) => {
 });
 
 export const login = async (params: LoginRegsiterIn): BluBiuResponse<any> =>
-  await http.post('/login', params);
+  await http.post('/user/login', params);
 
-export const loginOut = async (): BluBiuResponse<any> => await http.post('/loginOut');
+export const loginOut = async (): BluBiuResponse<any> => await http.post('/user/loginOut');
 
 export const register = async (params: LoginRegsiterIn): BluBiuResponse<any> =>
-  await http.post('/register', params);
+  await http.post('/user/register', params);
 
-export const getUserInfo = async (): BluBiuResponse<UserInfo> => await http.get('/getUserInfo');
+export const getUserInfo = async (): BluBiuResponse<UserInfo> => await http.get('/user/getUserInfo');
 
 export const getAppList = async (): BluBiuResponse<AppInfo[]> =>
   await http.get('/applications/getAppList');

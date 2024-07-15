@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Menu, Modal, Select, Button } from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-// import cls from 'classnames';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -168,4 +167,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default checkAppStatus(Home);

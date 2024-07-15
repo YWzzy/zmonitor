@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Like, Repository } from "typeorm";
+import { FindOneOptions, Like, Repository } from "typeorm";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { User } from "./entities/user.entity";
@@ -8,21 +8,33 @@ import { User } from "./entities/user.entity";
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User) private readonly user: Repository<User>
+    @InjectRepository(User) private readonly userRepository: Repository<User>
   ) {}
   create(createUserDto: CreateUserDto) {
     const data = new User();
     data.name = createUserDto.name;
     data.desc = createUserDto.desc;
-    return this.user.save(data);
+    return this.userRepository.save(data);
   }
 
-  // findAll() {
-  //   return `This action returns all user`;
-  // }
+  async findUserByAccount(account: string): Promise<User | undefined> {
+    return this.userRepository.findOne({ where: { account } });
+  }
+
+  async findUserById(id: number): Promise<User | undefined> {
+    const options: FindOneOptions<User> = {
+      where: { id },
+    };
+    return this.userRepository.findOne(options);
+  }
+
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const newUser = this.userRepository.create(createUserDto);
+    return this.userRepository.save(newUser);
+  }
 
   async findAll(query: { keyWord: string; page: number; pageSize: number }) {
-    const data = await this.user.find({
+    const data = await this.userRepository.find({
       where: {
         name: Like(`%${query.keyWord}%`),
       },
@@ -32,7 +44,7 @@ export class UserService {
       // skip: (query.page - 1) * query.pageSize,
       // take: query.pageSize,
     });
-    const total = await this.user.count({
+    const total = await this.userRepository.count({
       where: {
         name: Like(`%${query.keyWord}%`),
       },
@@ -44,10 +56,10 @@ export class UserService {
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {
-    return this.user.update(id, updateUserDto);
+    return this.userRepository.update(id, updateUserDto);
   }
 
   remove(id: string) {
-    return this.user.delete(id);
+    return this.userRepository.delete(id);
   }
 }
