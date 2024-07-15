@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Form, Radio, Input, message } from 'antd';
 import { createApp } from '@/src/api';
 import { AppTypes, AppType } from '@/src/constants';
-import { useAppStore } from '@/src/hooks';
+import { useAppStore, useUserStore } from '@/src/hooks';
 
 interface AddApplicationIn {
   open: boolean;
@@ -12,6 +12,7 @@ export const AddApplication: React.FC<AddApplicationIn> = ({ open, onClose }) =>
   const [form] = Form.useForm();
 
   const { appDispatch } = useAppStore();
+  const { userInfo } = useUserStore();
 
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +24,7 @@ export const AddApplication: React.FC<AddApplicationIn> = ({ open, onClose }) =>
         await form.validateFields();
         setLoading(true);
         await createApp(form.getFieldsValue());
-        await appDispatch.getAppList();
+        await appDispatch.getAppList(userInfo.account);
         setLoading(false);
         message.success('应用成功创建！');
         onClose();

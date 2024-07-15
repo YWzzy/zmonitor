@@ -16,6 +16,7 @@ import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { ApiTags, ApiOperation, ApiBody } from "@nestjs/swagger";
 import { CustomHttpException } from "src/common/exception";
+import { Auth } from "src/decorator/Auth";
 
 @Controller("user")
 @ApiTags("用户权限")
@@ -99,6 +100,7 @@ export class UserController {
     summary: "获取用户信息",
     description: "根据 Token 获取当前登录用户信息",
   })
+  @Auth()
   async getUserInfo(@Req() req) {
     const token = req.session.token;
     if (!token) {
@@ -122,6 +124,7 @@ export class UserController {
     summary: "用户登出",
     description: "用户登出接口，清除登录状态",
   })
+  @Auth()
   async loginOut(@Req() req) {
     req.session.token = null;
     return { code: 200, message: "登出成功" };

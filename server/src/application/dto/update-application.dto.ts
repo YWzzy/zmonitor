@@ -15,6 +15,10 @@ export class UpdateApplicationDto {
 
   @IsString()
   @IsOptional()
+  userKey: string;
+
+  @IsString()
+  @IsOptional()
   appId: string;
 
   @IsString()

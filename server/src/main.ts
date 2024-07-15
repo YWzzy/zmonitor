@@ -65,7 +65,7 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new ResponseInterceptor());
 
-  // app.useGlobalFilters(new HttpFilter());
+  app.useGlobalFilters(new HttpFilter());
   app.useStaticAssets(join(__dirname, "images"));
   // 全局路由
   // app.useGlobalGuards(new RoleGuard());

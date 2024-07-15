@@ -60,6 +60,12 @@ export class ApplicationService {
     return this.applicationRepository.find();
   }
 
+  async findByUserKey(userKey: string): Promise<Application[]> {
+    return this.applicationRepository.find({
+      where: { userKey: userKey },
+    });
+  }
+
   async findOne(appId: string): Promise<Application> {
     return this.applicationRepository.findOne({
       where: { appId: appId },

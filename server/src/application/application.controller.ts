@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -19,6 +20,7 @@ import { ApplicationService } from "./application.service";
 import { CreateApplicationDto } from "./dto/create-application.dto";
 import { UpdateApplicationDto } from "./dto/update-application.dto";
 import { Application } from "./entities/application.entity";
+import { Auth } from "src/decorator/Auth";
 
 @ApiTags("监控应用")
 @Controller("applications")
@@ -36,8 +38,9 @@ export class ApplicationController {
   @ApiOperation({ summary: "获取所有应用列表" })
   @ApiOkResponse({ description: "成功获取所有应用列表", type: [Application] })
   @Get("getAppList")
-  findAll() {
-    return this.applicationService.findAll();
+  @Auth()
+  findByUserKey(@Query("userKey") userKey: string) {
+    return this.applicationService.findByUserKey(userKey);
   }
 
   @ApiOperation({ summary: "根据应用ID获取应用信息" })

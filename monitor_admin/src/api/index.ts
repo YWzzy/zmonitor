@@ -25,7 +25,7 @@ export const http = axios.create({
 http.interceptors.response.use(
   (response) => {
     const { data, status } = response;
-    if (status !== 200 && status !== 304) {
+    if (status !== 200 && status !== 304 && status !== 201) {
       message.error('网络异常');
       return data;
     }
@@ -72,8 +72,12 @@ export const register = async (params: LoginRegsiterIn): CustomResponse<any> =>
 
 export const getUserInfo = async (): CustomResponse<UserInfo> => await http.get('/user/getUserInfo');
 
-export const getAppList = async (): CustomResponse<AppInfo[]> =>
-  await http.get('/applications/getAppList');
+export const getAppList = async (params): CustomResponse<AppInfo[]> => {
+  const data = {
+    userKey: params,
+  }
+  return await http.get('/applications/getAppList', {params: data});
+}
 
 export const createApp = async (params: CreateAppIn): CustomResponse<any> =>
   await http.post('/applications/createApp', params);

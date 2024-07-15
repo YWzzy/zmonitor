@@ -50,6 +50,13 @@ export class Application {
   })
   appDesc: string;
 
+  @Column({
+    type: "varchar",
+    length: 128,
+    comment: "创建人ID",
+  })
+  userKey: string;
+
   @CreateDateColumn({
     type: "timestamp",
     comment: "创建时间",

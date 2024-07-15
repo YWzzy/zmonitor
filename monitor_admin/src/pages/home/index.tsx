@@ -3,12 +3,13 @@ import { Empty, Button } from 'antd';
 import { PlusCircleFilled } from '@ant-design/icons';
 import { AppItem } from './components/appItem';
 import styles from './index.module.less';
-import { useAppStore } from '@/src/hooks';
+import { useAppStore, useUserStore } from '@/src/hooks';
 const Home = () => {
   const { apps, appDispatch } = useAppStore();
+  const { userInfo } = useUserStore();
 
   useEffect(() => {
-    appDispatch.getAppList();
+    appDispatch.getAppList(userInfo.account);
   }, []);
 
   return (

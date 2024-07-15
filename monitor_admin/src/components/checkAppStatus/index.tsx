@@ -1,30 +1,29 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+// import { useDispatch } from 'react-redux';
 import { Navigate, useLocation } from 'react-router-dom';
-import { RootState, Dispatch } from '@/src/models/store';
+// import { Dispatch } from '@/src/models/store';
 import { Loading } from '@/src/components/loading';
-import { useAppStore } from '@/src/hooks';
+import { useAppStore, useUserStore } from '@/src/hooks';
 
 export const checkAppStatus = (Page: React.FunctionComponent) => () => {
-  const dispatch = useDispatch<Dispatch>();
+  // const dispatch = useDispatch<Dispatch>();
 
   const location = useLocation();
 
   const { appDispatch, apps, isLoading } = useAppStore();
-
-  const { userInfo } = useSelector((state: RootState) => state.user);
-
-  React.useEffect(() => {
-    dispatch.user.getUserInfo();
-  }, []);
+  const { userInfo, userDispatch } = useUserStore();
 
   React.useEffect(() => {
-    if (userInfo.id) {
-      appDispatch.getAppListOnce();
+    userDispatch.getUserInfo();
+  }, [userDispatch]);
+
+  React.useEffect(() => {
+    if (userInfo.account) {
+      appDispatch.getAppListOnce(userInfo.account);
     }
-  }, [userInfo.id]);
+  }, [userInfo.id, appDispatch]);
 
-  if (!userInfo?.id) {
+  if (!userInfo.id) {
     return <Loading />;
   }
 

@@ -9,6 +9,11 @@ import {
 
 export class CreateApplicationDto {
   @IsString()
+  @IsNotEmpty({ message: "创建人不能为空" })
+  @Length(1, 128, { message: "创建人长度必须在1到128个字符之间" })
+  userKey: string;
+
+  @IsString()
   @IsOptional()
   appId: string;
 
