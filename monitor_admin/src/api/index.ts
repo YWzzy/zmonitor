@@ -13,7 +13,7 @@ enum CustomResponseCode {
   ACCOUNTEXIST = 1004, // 该账号已被注
   NOLOGIN = 1005, // 登录已过期
   NOTFOUNDACCOUNT = 1006, // 没有找到用户信息
-  BUSSNIESS = 400, // 业务异常400
+  BUSSNIESS = 800, // 业务异常800
 }
 
 export const http = axios.create({
@@ -22,36 +22,45 @@ export const http = axios.create({
   withCredentials: true,
 });
 
-http.interceptors.response.use(({ data, status }) => {
-  const statusCode = status;
-  console.log('====================================');
-  console.log(statusCode);
-  console.log('====================================');
-  if (statusCode !== 200) {
-    message.error('网络异常');
-    return data;
-  }
-  const res = data as BluBiuRes<any>;
-  if (!data['code'] && (status == 200 || status == 304)) {
-    return res;
-  }
+http.interceptors.response.use(
+  (response) => {
+    const { data, status } = response;
+    if (status !== 200 && status !== 304) {
+      message.error('网络异常');
+      return data;
+    }
+    const res = data as BluBiuRes<any>;
+    if (!data['code'] && (status == 200 || status == 304)) {
+      return res;
+    }
 
-  if (res.code === CustomResponseCode.NOLOGIN || res.code === CustomResponseCode.NOTFOUNDACCOUNT) {
-    if (!isShowNoLogin) {
-      window.location.href = '/login';
+    if (res.code !== CustomResponseCode.SUCCESS) {
       message.error(res.message);
-      isShowNoLogin = true;
-      throw Error(res.message);
+      throw new Error(res.message);
+    }
+
+    return res;
+  },
+  (error) => {
+    const { response } = error;
+    if (response) {
+      response?.data?.message ? message.error(`请求错误: ${response.status} - ${response.statusText} - ${response?.data?.message}`) : message.error(`请求错误: ${response.status} - ${response.statusText}`);
+      const res = response.data as BluBiuRes<any>;
+      if (res.code === CustomResponseCode.NOLOGIN || res.code === CustomResponseCode.NOTFOUNDACCOUNT) {
+        if (!isShowNoLogin) {
+          window.location.href = '/login';
+          message.error(res.message);
+          isShowNoLogin = true;
+          throw new Error(res.message);
+        }
+      }
+      return Promise.reject(res);
+    } else {
+      message.error('网络异常');
+      return Promise.reject(error);
     }
   }
-
-  if (res.code !== CustomResponseCode.SUCCESS) {
-    message.error(res.message);
-    throw Error(res.message);
-  }
-
-  return res;
-});
+);
 
 export const login = async (params: LoginRegsiterIn): CustomResponse<any> =>
   await http.post('/user/login', params);
