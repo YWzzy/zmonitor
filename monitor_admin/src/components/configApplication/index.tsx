@@ -86,9 +86,6 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
         <Form.Item name="reportErrorsOnly" label="是否只异常上报" valuePropName="checked">
           <Switch />
         </Form.Item>
-        <Form.Item name="appStatus" label="应用开关" valuePropName="checked">
-          <Switch />
-        </Form.Item>
       </Form>
     </Modal>
   );

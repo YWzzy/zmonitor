@@ -28,7 +28,8 @@ export class MonitorService {
     try {
       const extractedFiles = await this.fileUploadService.saveRecordingFile(
         data.events,
-        data.recordScreenId
+        data.recordScreenId,
+        data.appId
       );
       // console.log("====================================");
       // console.log("File uploaded successfully", extractedFiles);

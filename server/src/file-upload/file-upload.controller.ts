@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from "@nestjs/common";
@@ -19,8 +20,11 @@ export class FileUploadController {
 
   @Post()
   @UseInterceptors(FileInterceptor("file"))
-  async uploadFile(@UploadedFile() file) {
-    const extractedFiles = await this.fileUploadService.handleFileUpload(file);
+  async uploadFile(@UploadedFile() file, @Query("appId") appId: string) {
+    const extractedFiles = await this.fileUploadService.handleFileUpload(
+      file,
+      appId
+    );
 
     const savedRecordings = await Promise.all(
       extractedFiles.map(async (filePath) => {
