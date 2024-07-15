@@ -6,7 +6,7 @@ import * as cors from "cors";
 import { Request, Response, NextFunction } from "express";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { join } from "path";
-import { ResponseInter } from "./common/response";
+import { ResponseInterceptor } from "./common/response";
 import { HttpFilter } from "./common/filter";
 import { RoleGuard } from "./guard/role.guard";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
@@ -63,7 +63,7 @@ async function bootstrap() {
   // 全局注册中间件
   // app.use(CorsMiddleware);
 
-  app.useGlobalInterceptors(new ResponseInter());
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   // app.useGlobalFilters(new HttpFilter());
   app.useStaticAssets(join(__dirname, "images"));
