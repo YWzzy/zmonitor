@@ -111,7 +111,7 @@ export class UserController {
       if (!user) {
         throw new CustomHttpException(1006, "用户不存在");
       }
-      return { code: 200, data: user };
+      return user;
     } catch (error) {
       throw new CustomHttpException(1005, "Token无效");
     }

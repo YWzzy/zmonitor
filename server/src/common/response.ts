@@ -51,14 +51,20 @@ export class ResponseInterceptor<T = any> implements NestInterceptor {
       }),
       catchError((error) => {
         if (error instanceof CustomHttpException) {
+          console.log("====================================");
+          console.log(error);
+          console.log("====================================");
           return throwError(
             () =>
-              new BadRequestException({
-                data: null,
-                code: error.getCustomCode(),
-                success: false,
-                message: error.getCustomMessage(),
-              })
+              new HttpException(
+                {
+                  data: null,
+                  code: error.getCustomCode(),
+                  success: false,
+                  message: error.getCustomMessage(),
+                },
+                error.getStatus()
+              )
           );
         } else if (error instanceof HttpException) {
           const status = error.getStatus();

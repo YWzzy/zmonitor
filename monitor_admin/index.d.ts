@@ -11,7 +11,7 @@ type BluBiuRes<T> = {
   total?: number;
 };
 
-type BluBiuResponse<T> = Promise<BluBiuRes<T>>;
+type CustomResponse<T> = Promise<BluBiuRes<T>>;
 
 type PerformanceInKey =
   | 'dnsTime'
