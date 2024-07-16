@@ -53,11 +53,6 @@ import { ConfigurationService } from "./config/config.service"; // 导入 Config
         password: "123456",
         database: "monitor",
         // prod
-        // host: "172.17.0.9",
-        // port: 3306,
-        // username: "root",
-        // password: "maiwo@2023",
-        // database: "monitor",
 
         entities: [__dirname + "/**/*.entity{.ts,.js}"],
         synchronize: true,
