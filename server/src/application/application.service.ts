@@ -48,6 +48,7 @@ export class ApplicationService {
     newApplication.appName = createApplicationDto.appName;
     newApplication.appSecret = createApplicationDto.appSecret;
     newApplication.appType = createApplicationDto.appType;
+    newApplication.userKey = createApplicationDto.userKey;
     newApplication.appStatus = 1; // 默认打开
     newApplication.appDesc = createApplicationDto.appDesc;
     newApplication.createTime = new Date();

@@ -21,13 +21,19 @@ export const AddApplication: React.FC<AddApplicationIn> = ({ open, onClose }) =>
       open={open}
       destroyOnClose
       onOk={async () => {
-        await form.validateFields();
-        setLoading(true);
-        await createApp(form.getFieldsValue());
-        await appDispatch.getAppList(userInfo.account);
-        setLoading(false);
-        message.success('应用成功创建！');
-        onClose();
+        try {
+          await form.validateFields();
+          setLoading(true);
+          const params = {...form.getFieldsValue(), userKey: userInfo.account};
+          await createApp(params);
+          await appDispatch.getAppList(userInfo.account);
+          setLoading(false);
+          message.success('应用成功创建！');
+          onClose();
+        } catch (error) {
+          setLoading(false);
+          message.error('应用创建失败！');
+        }
       }}
       onCancel={onClose}
       okButtonProps={{

@@ -10,11 +10,11 @@ import performance from '@zmonitor/performance';
 import recordscreen from '@zmonitor/recordscreen';
 
 zMonitor.init({
-  dsn: 'http://localhost:8083/monitor/reportData',
+  dsn: 'http://222.71.83.59:9001/api/monitor/reportData',
   appId: '7845254399804114',
-  // silentWhiteScreen: false,
-  // skeletonProject: true,
-  // repeatCodeError: true,
+  silentWhiteScreen: true,
+  skeletonProject: true,
+  repeatCodeError: true,
   userId: '88888888',
 });
 
