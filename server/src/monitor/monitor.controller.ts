@@ -17,6 +17,7 @@ import { MonitorService } from "./monitor.service";
 // import { CreateMonitorDto } from "./dto/create-monitor.dto";
 // import { UpdateMonitorDto } from "./dto/update-monitor.dto";
 import { ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { Response } from "express";
 
 @Controller("monitor")
 @ApiTags("系统监控")

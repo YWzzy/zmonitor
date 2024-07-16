@@ -1,40 +1,27 @@
 import { Module, Global, DynamicModule } from "@nestjs/common";
+import {
+  ConfigModule as NestConfigModule,
+  ConfigService,
+} from "@nestjs/config";
+import * as path from "path";
 
 interface Options {
   path: string;
 }
 
 @Global()
-@Module({
-  //   providers: [
-  //     {
-  //       provide: 'Config',
-  //       useValue: { baseUrl: '/dev' },
-  //     },
-  //   ],
-  //   exports: [
-  //     {
-  //       provide: 'Config',
-  //       useValue: { baseUrl: '/dev'},
-  //     },
-  //   ],
-})
+@Module({})
 export class ConfigModule {
   static forRoot(options: Options): DynamicModule {
     return {
       module: ConfigModule,
-      providers: [
-        {
-          provide: "Config",
-          useValue: { baseUrl: "/dev/" + options.path },
-        },
+      imports: [
+        NestConfigModule.forRoot({
+          isGlobal: true,
+          envFilePath: path.resolve(process.cwd(), "src/config/", options.path),
+        }),
       ],
-      exports: [
-        {
-          provide: "Config",
-          useValue: { baseUrl: "/dev/" + options.path },
-        },
-      ],
+      exports: [NestConfigModule],
     };
   }
 }
