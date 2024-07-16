@@ -53,6 +53,7 @@ export class Application {
   @Column({
     type: "varchar",
     length: 128,
+    default: "",
     comment: "创建人ID",
   })
   userKey: string;
@@ -60,6 +61,7 @@ export class Application {
   @Column({
     type: "varchar",
     length: 255,
+    default: "",
     comment: "应用部署服务器地址",
   })
   deployServer: string;
@@ -67,6 +69,7 @@ export class Application {
   @Column({
     type: "varchar",
     length: 255,
+    default: "",
     comment: "应用包地址",
   })
   packageUrl: string;
@@ -74,6 +77,7 @@ export class Application {
   @Column({
     type: "varchar",
     length: 255,
+    default: "",
     comment: "录屏文件存放地址",
   })
   recordingStorage: string;

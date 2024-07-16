@@ -50,9 +50,6 @@ export class ResponseInterceptor<T = any> implements NestInterceptor {
         };
       }),
       catchError((error) => {
-        console.log("====================================");
-        console.log(error);
-        console.log("====================================");
         if (error instanceof CustomHttpException) {
           return throwError(
             () =>

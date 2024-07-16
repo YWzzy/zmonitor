@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { Application } from "./entities/application.entity";
 import { CreateApplicationDto } from "./dto/create-application.dto";
 import { UpdateApplicationDto } from "./dto/update-application.dto";
+import { CustomHttpException } from "src/common/exception";
 
 @Injectable()
 export class ApplicationService {
@@ -34,6 +35,12 @@ export class ApplicationService {
   async create(
     createApplicationDto: CreateApplicationDto
   ): Promise<Application> {
+    const application = await this.applicationRepository.findOne({
+      where: { appName: createApplicationDto.appName },
+    });
+    if (application) {
+      throw new CustomHttpException(500, "Application name already exists");
+    }
     // 如果createApplicationDto中没有appSecret，则生成一个uuid
     if (!createApplicationDto.appSecret) {
       createApplicationDto.appSecret = require("uuid").v4();
