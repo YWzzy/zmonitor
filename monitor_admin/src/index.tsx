@@ -9,11 +9,11 @@ import zMonitor from '@zmonitor/core';
 import performance from '@zmonitor/performance';
 import recordscreen from '@zmonitor/recordscreen';
 
-const dsn = process.env.REACT_APP_ZMONITOR_DSN;
+const dsn = import.meta.env.VITE_ZMONITOR_DSN;
 
 zMonitor.init({
   dsn,
-  appId: process.env.APPID,
+  appId: import.meta.env.VITE_APPID,
   silentWhiteScreen: true,
   skeletonProject: true,
   repeatCodeError: true,

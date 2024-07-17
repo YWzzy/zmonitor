@@ -46,19 +46,6 @@ import { ConfigurationService } from "./config/config.service"; // 导入 Config
         username: configService.get<string>("DB_USERNAME"),
         password: configService.get<string>("DB_PASSWORD"),
         database: configService.get<string>("DB_DATABASE"),
-        // dev
-        // host: "localhost",
-        // port: 3306,
-        // username: "root",
-        // password: "123456",
-        // database: "monitor",
-        // prod
-        // host: "172.17.0.9",
-        // port: 3306,
-        // username: "root",
-        // password: "maiwo@2023",
-        // database: "monitor",
-
         entities: [__dirname + "/**/*.entity{.ts,.js}"],
         synchronize: true,
         retryDelay: 500,
