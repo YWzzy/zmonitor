@@ -17,6 +17,7 @@ import { CreateErrorMonitorDto } from "./dto/create-error-monitor.dto";
 import { UpdateErrorMonitorDto } from "./dto/update-error-monitor.dto";
 import { SearchErrorMonitorDto } from "./dto/search-error-monitor.dto";
 import { ApiOperation, ApiQuery, ApiTags, ApiBody } from "@nestjs/swagger";
+import { Auth } from "src/decorator/Auth";
 
 @Controller("error-monitor")
 @ApiTags("错误日志")
@@ -28,6 +29,7 @@ export class ErrorMonitorController {
     summary: "存储错误日志",
     description: "存储错误日志",
   })
+  @Auth()
   create(@Body() createErrorMonitorDto: CreateErrorMonitorDto) {
     return this.errorMonitorService.create(createErrorMonitorDto);
   }
@@ -37,6 +39,7 @@ export class ErrorMonitorController {
     summary: "查找所有错误日志",
     description: "查找所有错误日志",
   })
+  @Auth()
   findAll() {
     return this.errorMonitorService.findAll();
   }
@@ -73,6 +76,7 @@ export class ErrorMonitorController {
       },
     },
   })
+  @Auth()
   findListPage(@Body() searchErrorMonitorDto: SearchErrorMonitorDto) {
     return this.errorMonitorService.findListPage(searchErrorMonitorDto);
   }
@@ -82,6 +86,7 @@ export class ErrorMonitorController {
     summary: "获取指定时间区间内的JavaScript错误数据",
     description: "获取指定时间区间内的JavaScript错误数据",
   })
+  @Auth()
   @ApiQuery({ name: "appId", type: String, description: "应用ID" })
   @ApiQuery({ name: "beginTime", type: String, description: "开始时间" })
   @ApiQuery({ name: "endTime", type: String, description: "结束时间" })
@@ -116,6 +121,7 @@ export class ErrorMonitorController {
     summary: "通过id查找错误日志",
     description: "通过id查找错误日志",
   })
+  @Auth()
   findOne(@Param("id") id: number) {
     return this.errorMonitorService.findOne(+id);
   }
@@ -125,6 +131,7 @@ export class ErrorMonitorController {
     summary: "更新错误日志",
     description: "更新错误日志",
   })
+  @Auth()
   update(
     @Param("id") id: string,
     @Body() updateErrorMonitorDto: UpdateErrorMonitorDto
@@ -137,6 +144,7 @@ export class ErrorMonitorController {
     summary: "屏蔽错误日志",
     description: "屏蔽错误日志",
   })
+  @Auth()
   async shieldError(@Body("id") id: number) {
     console.log("shieldError", id);
     return this.errorMonitorService.shieldError(id);
@@ -147,6 +155,7 @@ export class ErrorMonitorController {
     summary: "删除错误日志",
     description: "删除错误日志",
   })
+  @Auth()
   remove(@Param("id") id: string) {
     return this.errorMonitorService.remove(+id);
   }

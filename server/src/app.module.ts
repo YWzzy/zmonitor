@@ -1,11 +1,11 @@
 import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { LoggerMiddleware } from "./logger.middleware";
 import { MulterModule } from "@nestjs/platform-express";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { UserModule } from "./user/user.module";
-import { ConfigModule } from "./config/config.module";
+// import { ConfigModule } from "./config/config.module";
 import { UploadModule } from "./upload/upload.module";
 import { SpiderModule } from "./spider/spider.module";
 import { GuardModule } from "./guard/guard.module";
@@ -24,6 +24,20 @@ import { ApplicationModule } from "./application/application.module";
 import { AnalyseModule } from "./analyse/analyse.module";
 import { ReportPerformanceEsModule } from "./report-performance-es/report-performance-es.module";
 import { ConfigurationService } from "./config/config.service"; // 导入 ConfigurationService
+import * as dotenv from "dotenv";
+import * as fs from "fs";
+import * as path from "path";
+
+const envFilePath =
+  process.env.NODE_ENV === "production"
+    ? path.resolve(__dirname, "../src/config/production.env")
+    : path.resolve(__dirname, "../src/config/development.env");
+if (fs.existsSync(envFilePath)) {
+  dotenv.config({ path: envFilePath });
+} else {
+  console.error(".env.production file not found");
+  process.exit(1);
+}
 
 @Module({
   imports: [
@@ -31,29 +45,47 @@ import { ConfigurationService } from "./config/config.service"; // 导入 Config
     //   path: "zzzyyy",
     // }), // 加载配置模块，并设置配置文件路径为 "zzzyyy"
 
+    // ConfigModule.forRoot({
+    //   path:
+    //     process.env.NODE_ENV === "development"
+    //       ? "development.env"
+    //       : "production.env",
+    // }),
     ConfigModule.forRoot({
-      path:
-        process.env.NODE_ENV === "development"
-          ? "development.env"
-          : "production.env",
+      ignoreEnvFile: true, // 忽略默认的 .env 文件
     }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: () => ({
         type: "mysql",
-        host: configService.get<string>("DB_HOST"),
-        port: configService.get<number>("DB_PORT"),
-        username: configService.get<string>("DB_USERNAME"),
-        password: configService.get<string>("DB_PASSWORD"),
-        database: configService.get<string>("DB_DATABASE"),
+        host: process.env.DB_HOST,
+        port: +process.env.DB_PORT,
+        username: process.env.DB_USERNAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_DATABASE,
         entities: [__dirname + "/**/*.entity{.ts,.js}"],
         synchronize: true,
         retryDelay: 500,
         retryAttempts: 10,
         autoLoadEntities: true,
       }),
-      inject: [ConfigService],
     }),
+    // TypeOrmModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: (configService: ConfigService) => ({
+    //     type: "mysql",
+    //     host: configService.get<string>("DB_HOST"),
+    //     port: configService.get<number>("DB_PORT"),
+    //     username: configService.get<string>("DB_USERNAME"),
+    //     password: configService.get<string>("DB_PASSWORD"),
+    //     database: configService.get<string>("DB_DATABASE"),
+    //     entities: [__dirname + "/**/*.entity{.ts,.js}"],
+    //     synchronize: true,
+    //     retryDelay: 500,
+    //     retryAttempts: 10,
+    //     autoLoadEntities: true,
+    //   }),
+    //   inject: [ConfigService],
+    // }),
     MulterModule.registerAsync({
       imports: [FileUploadModule],
       useFactory: (fileUploadService: FileUploadService) =>

@@ -125,7 +125,6 @@ export class MonitorController {
     summary: "上报数据",
     description: "上报数据",
   })
-  @Auth()
   reportData(@Req() req: any, @Res() res: any): void {
     this.monitorService.reportData(req, res);
   }

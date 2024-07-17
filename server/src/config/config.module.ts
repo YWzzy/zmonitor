@@ -13,6 +13,12 @@ interface Options {
 @Module({})
 export class ConfigModule {
   static forRoot(options: Options): DynamicModule {
+    console.log("====================================");
+    console.log(
+      "ConfigModule.forRoot",
+      path.resolve(process.cwd(), "src/config/", options.path)
+    );
+    console.log("====================================");
     return {
       module: ConfigModule,
       imports: [

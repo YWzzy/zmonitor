@@ -12,6 +12,8 @@ import { RoleGuard } from "./guard/role.guard";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { CorsMiddleware } from "./middleware/cors.middleware";
 import { ConfigService } from "@nestjs/config";
+import * as dotenv from "dotenv";
+import * as path from "path";
 
 var bodyParser = require("body-parser");
 
@@ -26,8 +28,16 @@ function MiddlewareAll(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+// 加载环境变量
+const envFilePath =
+  process.env.NODE_ENV === "production"
+    ? path.resolve(__dirname, "./src/config/production.env")
+    : path.resolve(__dirname, "./src/config/development.env");
+dotenv.config({ path: envFilePath });
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
   const options = new DocumentBuilder()
     .addBearerAuth()
     .setTitle("z-monitor-server")

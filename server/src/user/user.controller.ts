@@ -16,16 +16,20 @@ import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { ApiTags, ApiOperation, ApiBody } from "@nestjs/swagger";
 import { CustomHttpException } from "src/common/exception";
-import { ConfigService } from "@nestjs/config";
 import { Auth } from "src/decorator/Auth";
+import * as dotenv from "dotenv";
+import * as path from "path";
+
+const envFilePath =
+  process.env.NODE_ENV === "production"
+    ? path.resolve(__dirname, "../src/config/production.env")
+    : path.resolve(__dirname, "../src/config/development.env");
+dotenv.config({ path: envFilePath });
 
 @Controller("user")
 @ApiTags("用户权限")
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly configService: ConfigService
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   @Get("code")
   @ApiOperation({
@@ -71,7 +75,7 @@ export class UserController {
       throw new CustomHttpException(1003, "密码错误");
     }
 
-    const secretKey = this.configService.get<string>("SECRET_KEY");
+    const secretKey = process.env.SECRET_KEY;
     const token = jwt.sign({ userId: user.id }, secretKey, {
       expiresIn: "7d",
     });
@@ -110,7 +114,7 @@ export class UserController {
   async getUserInfo(@Req() req) {
     const token = req.session.token;
     try {
-      const secretKey = this.configService.get<string>("SECRET_KEY");
+      const secretKey = process.env.SECRET_KEY;
       const decoded = jwt.verify(token, secretKey);
       const user = await this.userService.findUserById(decoded.userId);
       if (!user) {
