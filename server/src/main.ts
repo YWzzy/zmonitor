@@ -11,6 +11,7 @@ import { HttpFilter } from "./common/filter";
 import { RoleGuard } from "./guard/role.guard";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { CorsMiddleware } from "./middleware/cors.middleware";
+import { ConfigService } from "@nestjs/config";
 
 var bodyParser = require("body-parser");
 
@@ -35,6 +36,20 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup("/api-docs", app, document);
+
+  const configService = app.get(ConfigService);
+  const secretKey = configService.get<string>("SECRET_KEY");
+  console.log("secretKey", secretKey);
+
+  // 配置 session 中间件
+  app.use(
+    session({
+      secret: secretKey, // 你自己的 secret key
+      resave: false,
+      saveUninitialized: false,
+      cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }, // 设置 cookie 过期时间为 7 天
+    })
+  );
 
   app.enableCors({
     origin: "*",

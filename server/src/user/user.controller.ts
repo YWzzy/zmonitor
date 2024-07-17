@@ -16,12 +16,16 @@ import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { ApiTags, ApiOperation, ApiBody } from "@nestjs/swagger";
 import { CustomHttpException } from "src/common/exception";
+import { ConfigService } from "@nestjs/config";
 import { Auth } from "src/decorator/Auth";
 
 @Controller("user")
 @ApiTags("用户权限")
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly configService: ConfigService
+  ) {}
 
   @Get("code")
   @ApiOperation({
@@ -67,10 +71,12 @@ export class UserController {
       throw new CustomHttpException(1003, "密码错误");
     }
 
-    const token = jwt.sign({ userId: user.id }, "secretKey", {
+    const secretKey = this.configService.get<string>("SECRET_KEY");
+    const token = jwt.sign({ userId: user.id }, secretKey, {
       expiresIn: "7d",
     });
     req.session.token = token;
+    req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000; // 确保 session cookie 也有 7 天的过期时间
     return { message: "登录成功", token };
   }
 
@@ -103,12 +109,9 @@ export class UserController {
   @Auth()
   async getUserInfo(@Req() req) {
     const token = req.session.token;
-    if (!token) {
-      throw new CustomHttpException(1005, "未登录");
-    }
-
     try {
-      const decoded = jwt.verify(token, "secretKey");
+      const secretKey = this.configService.get<string>("SECRET_KEY");
+      const decoded = jwt.verify(token, secretKey);
       const user = await this.userService.findUserById(decoded.userId);
       if (!user) {
         throw new CustomHttpException(1006, "用户不存在");

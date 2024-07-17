@@ -18,6 +18,7 @@ import { MonitorService } from "./monitor.service";
 // import { UpdateMonitorDto } from "./dto/update-monitor.dto";
 import { ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
+import { Auth } from "src/decorator/Auth";
 
 @Controller("monitor")
 @ApiTags("系统监控")
@@ -35,6 +36,7 @@ export class MonitorController {
     description: "获取服务器上的map文件",
   })
   // @Version("2")
+  @Auth()
   getMap(
     @Query("appId") appId: string,
     @Query("fileName") fileName: string,
@@ -49,6 +51,7 @@ export class MonitorController {
     summary: "获取错误日志列表",
     description: "获取错误日志列表",
   })
+  @Auth()
   getErrorList(@Res() res: Response): void {
     this.monitorService.getErrorList(res);
   }
@@ -58,6 +61,7 @@ export class MonitorController {
     summary: "获取错误日志列表分页",
     description: "获取错误日志列表分页",
   })
+  @Auth()
   async getErrorListPage(
     @Query("appId") appId: string,
     @Query("beginTime") beginTime: string,
@@ -81,6 +85,7 @@ export class MonitorController {
     summary: "获取错误日志列表分页",
     description: "获取错误日志列表分页",
   })
+  @Auth()
   async getHttpErrorListPage(
     @Query("appId") appId: string,
     @Query("beginTime") beginTime: string,
@@ -110,6 +115,7 @@ export class MonitorController {
     summary: "根据id获取录屏",
     description: "根据id获取录屏",
   })
+  @Auth()
   getRecordScreenId(@Query("id") id: string, @Res() res: Response): void {
     this.monitorService.getRecordScreenById(id, res);
   }
@@ -119,6 +125,7 @@ export class MonitorController {
     summary: "上报数据",
     description: "上报数据",
   })
+  @Auth()
   reportData(@Req() req: any, @Res() res: any): void {
     this.monitorService.reportData(req, res);
   }

@@ -31,6 +31,7 @@ export class ApplicationController {
   @ApiCreatedResponse({ description: "应用创建成功", type: Application })
   @ApiBadRequestResponse({ description: "请求参数错误" })
   @Post("createApp")
+  @Auth()
   create(@Body() createApplicationDto: CreateApplicationDto) {
     return this.applicationService.create(createApplicationDto);
   }
@@ -47,6 +48,7 @@ export class ApplicationController {
   @ApiOkResponse({ description: "成功获取应用信息", type: Application })
   @ApiNotFoundResponse({ description: "未找到对应的应用" })
   @Get("getAppByAppId")
+  @Auth()
   findOne(@Query("appId") appId: string) {
     return this.applicationService.findOne(appId);
   }
@@ -55,6 +57,7 @@ export class ApplicationController {
   @ApiOkResponse({ description: "成功更新应用信息", type: Application })
   @ApiNotFoundResponse({ description: "未找到对应的应用" })
   @Post("updateAppStatus")
+  @Auth()
   update(@Body() updateApplicationDto: UpdateApplicationDto) {
     return this.applicationService.update(updateApplicationDto);
   }
@@ -63,6 +66,7 @@ export class ApplicationController {
   @ApiOkResponse({ description: "成功删除应用" })
   @ApiNotFoundResponse({ description: "未找到对应的应用" })
   @Delete(":appId")
+  @Auth()
   remove(@Param("appId") appId: string) {
     return this.applicationService.remove(appId);
   }

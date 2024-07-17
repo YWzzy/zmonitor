@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build_check": "tsc -b && vite build",
-    "build": "vite build",
+    "dev": "cross-env NODE_ENV=development vite",
+    "build_check": "tsc -b && cross-env NODE_ENV=production vite build",
+    "build": "cross-env NODE_ENV=production vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "update_sdk": "yarn upgrade @zmonitor/core@latest @zmonitor/common@latest @zmonitor/types@latest @zmonitor/performance@latest @zmonitor/recordscreen@latest @zmonitor/utils@latest"

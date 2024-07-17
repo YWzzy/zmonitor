@@ -9,9 +9,11 @@ import zMonitor from '@zmonitor/core';
 import performance from '@zmonitor/performance';
 import recordscreen from '@zmonitor/recordscreen';
 
+const dsn = process.env.REACT_APP_ZMONITOR_DSN;
+
 zMonitor.init({
-  dsn: 'http://222.71.83.59:9001/api/monitor/reportData',
-  appId: '7845254399804114',
+  dsn,
+  appId: process.env.APPID,
   silentWhiteScreen: true,
   skeletonProject: true,
   repeatCodeError: true,
