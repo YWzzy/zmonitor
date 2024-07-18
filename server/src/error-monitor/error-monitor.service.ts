@@ -186,6 +186,7 @@ export class ErrorMonitorService {
       .addSelect("COUNT(*) AS value")
       .where("appId = :appId", { appId })
       .andWhere("status = 'error'")
+      .andWhere("type != 'whiteScreen'")
       .andWhere("time BETWEEN :beginTime AND :endTime", {
         beginTime: new Date(beginTime).getTime(),
         endTime: new Date(endTime).getTime(),
