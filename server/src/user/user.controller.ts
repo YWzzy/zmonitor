@@ -89,6 +89,7 @@ export class UserController {
     summary: "用户注册",
     description: "用户注册接口，创建新用户",
   })
+  @Auth() // 暂关闭注册功能
   @ApiBody({ type: CreateUserDto, description: "注册信息，包括账号和密码" })
   async register(@Body() createUserDto: CreateUserDto) {
     const { account, password } = createUserDto;
