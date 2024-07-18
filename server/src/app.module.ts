@@ -30,12 +30,12 @@ import * as path from "path";
 
 const envFilePath =
   process.env.NODE_ENV === "production"
-    ? path.resolve(__dirname, "../src/config/production.env")
+    ? path.resolve(__dirname, "../production.env")
     : path.resolve(__dirname, "../src/config/development.env");
 if (fs.existsSync(envFilePath)) {
   dotenv.config({ path: envFilePath });
 } else {
-  console.error(".env.production file not found");
+  console.error("production.env file not found:", envFilePath);
   process.exit(1);
 }
 

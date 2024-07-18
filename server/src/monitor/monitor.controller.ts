@@ -36,7 +36,7 @@ export class MonitorController {
     description: "获取服务器上的map文件",
   })
   // @Version("2")
-  @Auth()
+  // @Auth()
   getMap(
     @Query("appId") appId: string,
     @Query("fileName") fileName: string,

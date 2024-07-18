@@ -25,7 +25,7 @@ zMonitor.use(recordscreen, { recordScreentime: 20 });
 
 // new Monitor({
 //   appId: 'wgnfezuv1706513953473',
-//   api: 'http://localhost:8083/report',
+//   api: 'http://localhost:9001/report',
 //   cacheMax: 1,
 //   webVitalsTimeouts: 10000,
 // });
@@ -44,7 +44,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 // const params = {
 //   a: 1,
 // };
-// xhr.open('post', 'http://localhost:8083/api/desktop/updateAppStatus', true);
+// xhr.open('post', 'http://localhost:9001/api/desktop/updateAppStatus', true);
 // xhr.send(JSON.stringify(params));
 
 root.render(

@@ -49,6 +49,10 @@ export class UpdateApplicationDto {
   recordingStorage: string;
 
   @IsBoolean()
+  @IsOptional({ message: "是否是sourceMap包" })
+  isSourceMap: boolean;
+
+  @IsBoolean()
   @IsOptional({ message: "是否开启录屏不能为空" })
   enableRecording: boolean;
 

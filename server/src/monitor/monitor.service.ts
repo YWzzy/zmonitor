@@ -96,32 +96,35 @@ export class MonitorService {
     } else {
       originalFileName = fileName; // 如果未匹配到，返回null或其他默认值
     }
-    if (env === "development") {
+
+    // if (env === "development") {
+    //   mapPath = path.join(
+    //     __dirname,
+    //     "../../",
+    //     originalFileName ? originalFileName : fileName
+    //   );
+    //   return mapPath;
+    // } else {
+    if (application && application.packageUrl) {
+      mapPath = path.join(
+        application.packageUrl,
+        `${originalFileName ? originalFileName : fileName}${
+          application.isSourceMap ? ".map" : ""
+        }`
+      );
+      return mapPath; // 返回应用程序的录屏存储路径
+    } else {
       mapPath = path.join(
         __dirname,
         "..",
-        originalFileName ? originalFileName : fileName
+        "publicClient/js",
+        `${originalFileName ? originalFileName : fileName}${
+          application.isSourceMap ? ".map" : ""
+        }`
       );
-    } else {
-      if (application && application.packageUrl) {
-        mapPath = path.join(
-          __dirname,
-          "..",
-          application.packageUrl,
-          "/js",
-          `${originalFileName ? originalFileName : fileName}.map`
-        );
-        return mapPath; // 返回应用程序的录屏存储路径
-      } else {
-        mapPath = path.join(
-          __dirname,
-          "..",
-          "publicClient/js",
-          `${originalFileName ? originalFileName : fileName}.map`
-        );
-        return mapPath; // 默认使用公共目录
-      }
+      return mapPath; // 默认使用公共目录
     }
+    // }
   }
 
   // 获取js.map源码文件
@@ -131,7 +134,10 @@ export class MonitorService {
     env: string,
     res: any
   ): Promise<void> {
-    const mapPath = await this.getAppPackagePath(appId, fileName, "production");
+    const mapPath = await this.getAppPackagePath(appId, fileName, env);
+    console.log("====================================");
+    console.log(mapPath);
+    console.log("====================================");
 
     try {
       const data = await fs.promises.readFile(mapPath);

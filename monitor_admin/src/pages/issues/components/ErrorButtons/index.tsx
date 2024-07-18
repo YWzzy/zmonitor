@@ -10,7 +10,7 @@ export const ErrorButtons: React.FC<ErrorButtonsProps> = ({ getTableData }) => {
   const codeErr = () => {
     getTableData();
     const a = undefined;
-    if (a?.length) {
+    if (a.length) {
       console.log('1');
     } else {
       message.error('JS Error triggered');
@@ -20,11 +20,8 @@ export const ErrorButtons: React.FC<ErrorButtonsProps> = ({ getTableData }) => {
   const asyncError = () => {
     getTableData();
     setTimeout(() => {
-      try {
-        JSON.parse('');
-      } catch (e) {
-        message.error('Async Error triggered');
-      }
+      message.error('Async Error triggered err');
+      JSON.parse('');
     });
   };
 

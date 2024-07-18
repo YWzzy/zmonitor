@@ -85,6 +85,13 @@ export class Application {
   @Column({
     type: "boolean",
     default: false,
+    comment: "是否是sourceMap包",
+  })
+  isSourceMap: boolean;
+
+  @Column({
+    type: "boolean",
+    default: false,
     comment: "是否开启录屏",
   })
   enableRecording: boolean;

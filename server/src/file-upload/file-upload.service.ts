@@ -47,6 +47,7 @@ export class FileUploadService {
       const appPath = path.join(
         __dirname,
         "..",
+        "..",
         this.uploadPath,
         application.recordingStorage,
         today
@@ -55,6 +56,7 @@ export class FileUploadService {
     } else {
       const publicPath = path.join(
         __dirname,
+        "..",
         "..",
         this.uploadPath,
         this.publicPath,
