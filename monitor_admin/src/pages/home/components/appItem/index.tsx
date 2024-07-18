@@ -60,8 +60,8 @@ export const AppItem: React.FC<AppItemIn> = ({ appInfo }) => {
             </span>
             <span
               className={styles.insert}
-              onClick={() => {
-                appDispatch.updateActive(appInfo.appId);
+              onClick={async () => {
+                await appDispatch.updateActive(appInfo.appId);
                 navigate('/jsError');
               }}
             >

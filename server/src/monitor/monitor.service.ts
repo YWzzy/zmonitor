@@ -189,6 +189,7 @@ export class MonitorService {
         endTime,
         pageNo: pageNumber,
         pageSize: pageSizeNumber,
+        types: ["error", "unhandledrejection", "promiseunhandledrejection"],
       } as SearchErrorMonitorDto);
 
       res.status(HttpStatus.OK).send({
