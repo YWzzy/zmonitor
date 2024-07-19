@@ -18,6 +18,7 @@ import { UpdateErrorMonitorDto } from "./dto/update-error-monitor.dto";
 import { SearchErrorMonitorDto } from "./dto/search-error-monitor.dto";
 import { ApiOperation, ApiQuery, ApiTags, ApiBody } from "@nestjs/swagger";
 import { Auth } from "src/decorator/Auth";
+import { CustomHttpException } from "src/common/exception";
 
 @Controller("error-monitor")
 @ApiTags("错误日志")
@@ -114,6 +115,49 @@ export class ErrorMonitorController {
     );
 
     return res.status(HttpStatus.OK).json({ data });
+  }
+
+  @Get("getHttpErrorRank")
+  @ApiOperation({
+    summary: "获取HTTP错误排名",
+    description: "获取指定时间范围内按url和method聚合的HTTP错误排名",
+  })
+  @Auth()
+  @ApiQuery({ name: "appId", type: String, description: "应用ID" })
+  @ApiQuery({ name: "beginTime", type: String, description: "开始时间" })
+  @ApiQuery({ name: "endTime", type: String, description: "结束时间" })
+  async getHttpErrorRank(
+    @Query("appId") appId: string,
+    @Query("beginTime") beginTime: string,
+    @Query("endTime") endTime: string,
+    @Res() res: Response
+  ) {
+    try {
+      if (!appId || !beginTime || !endTime) {
+        throw new BadRequestException("Missing required query parameters.");
+      }
+
+      // 验证日期格式
+      if (isNaN(Date.parse(beginTime)) || isNaN(Date.parse(endTime))) {
+        throw new BadRequestException(
+          "Invalid date format for beginTime or endTime."
+        );
+      }
+
+      const data = await this.errorMonitorService.getHttpErrorRank(
+        appId,
+        beginTime,
+        endTime,
+      );
+
+      return res.status(HttpStatus.OK).json({
+        code: 200,
+        data,
+        message: "Issues list retrieved successfully.",
+      });
+    } catch (error) {
+      throw new CustomHttpException(500, error.message);
+    }
   }
 
   @Get(":id")

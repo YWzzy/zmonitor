@@ -3,7 +3,7 @@ import React, { Suspense, lazy, ComponentType } from 'react';
 import { RouteObject } from 'react-router-dom';
 import {
   AppstoreOutlined,
-  BarChartOutlined,
+  // BarChartOutlined,
   OrderedListOutlined,
   FileSearchOutlined,
   RadarChartOutlined,
@@ -31,18 +31,18 @@ export const munuRouters = [
 ];
 
 export const hasAppRouters = [
-  {
-    path: '/issues',
-    name: '错误日志',
-    icon: BarChartOutlined,
-    element: lazyLoad(() => import('../pages/issues')),
-  },
-  {
-    path: '/visitorStats',
-    name: '流量分析',
-    icon: BarChartOutlined,
-    element: lazyLoad(() => import('../pages/visitorStats')),
-  },
+  // {
+  //   path: '/issues',
+  //   name: '错误日志',
+  //   icon: BarChartOutlined,
+  //   element: lazyLoad(() => import('../pages/issues')),
+  // },
+  // {
+  //   path: '/visitorStats',
+  //   name: '流量分析',
+  //   icon: BarChartOutlined,
+  //   element: lazyLoad(() => import('../pages/visitorStats')),
+  // },
   {
     path: '/performance',
     name: '性能分析',

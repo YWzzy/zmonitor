@@ -178,6 +178,35 @@ export class ErrorMonitorService {
     }
   }
 
+  async getHttpErrorRank(appId: string, beginTime: string, endTime: string) {
+    const queryBuilder = this.errorMonitorRepository
+      .createQueryBuilder("error")
+      .select([
+        "error.url",
+        "JSON_UNQUOTE(JSON_EXTRACT(error.requestData, '$.method')) AS method",
+        "COUNT(*) AS errorCount",
+      ])
+      .where("error.appId = :appId", { appId })
+      .andWhere("error.createTime BETWEEN :beginTime AND :endTime", {
+        beginTime,
+        endTime,
+      })
+      .andWhere("error.type IN (:...types)", { types: ["xhr", "fetch"] })
+      .andWhere("error.status = :status", { status: "error" })
+      .groupBy("error.url, method")
+      .orderBy("errorCount", "DESC");
+
+    const result = await queryBuilder.getRawMany();
+
+    const data = result.map((item) => ({
+      url: item.error_url,
+      method: item.method,
+      errorCount: item.errorCount,
+      key: `${item.error_url}-${item.method}-${item.errorCount}`,
+    }));
+    return data;
+  }
+
   // 获取时间区间内的异常数量
   async getJsErrorRange(appId: string, beginTime: string, endTime: string) {
     const data = await this.errorMonitorRepository

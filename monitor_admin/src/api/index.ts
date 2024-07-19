@@ -136,13 +136,15 @@ export const getResourcesByPerformanceIds = async data =>
   await http.post('/performance/resources', data);
 
 export const getHttpErrorRank = async (params: AnalyseReq): CustomResponse<HttpErrorRankRes[]> =>
-  await http.get('/httpError/getHttpErrorRank', { params });
+  await http.get('/error-monitor/getHttpErrorRank', { params });
+  // await http.get('/httpError/getHttpErrorRank', { params });
 
 export const getHttpDoneRank = async (params: AnalyseReq): CustomResponse<HttpErrorRankRes[]> =>
   await http.get('/httpError/getHttpDoneRank', { params });
 
 export const getHttpErrorRang = async (params: AnalyseReq): CustomResponse<Options[]> =>
-  await http.get('/httpError/getHttpErrorRang', { params });
+  await http.get('/error-monitor/getJsErrorRange', { params });
+  // await http.get('/httpError/getHttpErrorRang', { params });
 
 export const getHttpList = async (params: GetHttpListReq): CustomResponse<GetHttpListRes> =>
   await http.get('/httpError/getHttpList', { params });

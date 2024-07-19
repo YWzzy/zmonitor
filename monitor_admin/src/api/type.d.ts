@@ -106,7 +106,7 @@ interface TrafficTimesRes {
 
 interface PerformanceInPage {
   key: string;
-  doc_count: number;
+  errorCount: number;
 }
 
 type PerformanceInValue = Record<
@@ -142,7 +142,7 @@ interface Pagination<T> {
 type GetPerformanceRes = Pagination<PerfamceReportMsg & PublicMsg>;
 
 interface HttpErrorRankRes {
-  doc_count: number;
+  errorCount: number;
   avg_cost: {
     value: number;
   };

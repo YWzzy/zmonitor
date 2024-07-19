@@ -86,7 +86,7 @@ export const HttpSlow = () => {
       endTime: dayjs().format('YYYY-MM-DD 23:59:59'),
     });
     const result = data.map(item => ({
-      count: item.doc_count,
+      count: item.errorCount,
       cost: item.avg_cost.value,
       ...item.key,
     }));
