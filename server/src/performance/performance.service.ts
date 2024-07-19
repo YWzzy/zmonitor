@@ -132,47 +132,34 @@ export class PerformanceService {
     };
   }
 
-  async getAppAvgPerformance(appId: string): Promise<any> {
-    const avgResult = await this.performanceRepository
-      .createQueryBuilder("performance_monitor")
-      .select([
-        "AVG(performance_monitor.dnsTime) as dnsTime",
-        "AVG(performance_monitor.tcpTime) as tcpTime",
-        "AVG(performance_monitor.whiteTime) as whiteTime",
-        "AVG(performance_monitor.fcp) as fcp",
-        "AVG(performance_monitor.ttfb) as ttfb",
-        "AVG(performance_monitor.lcp) as lcp",
-        "AVG(performance_monitor.fid) as fid",
-      ])
-      .where("performance_monitor.appId = :appId", { appId })
-      .getRawOne();
-    return avgResult;
-  }
-
+  // 获取页面平均性能
   async getPageAvgPerformance(
     appId: string,
-    beginTime: Date,
-    endTime: Date
-  ): Promise<any> {
-    const avgResult = await this.performanceRepository
-      .createQueryBuilder("performance_monitor")
-      .select([
-        "performance.pageUrl as pageUrl",
-        "AVG(performance.dnsTime) as dnsTime",
-        "AVG(performance.tcpTime) as tcpTime",
-        "AVG(performance.whiteTime) as whiteTime",
-        "AVG(performance.fcp) as fcp",
-        "AVG(performance.ttfb) as ttfb",
-        "AVG(performance.lcp) as lcp",
-        "AVG(performance.fid) as fid",
-      ])
-      .where(
-        "performance.appId = :appId AND performance.createTime BETWEEN :beginTime AND :endTime",
-        { appId, beginTime, endTime }
-      )
-      .groupBy("performance_monitor.pageUrl")
-      .getRawMany();
-    return avgResult;
+    beginTime: string,
+    endTime: string
+  ) {
+    const avgQuery = this.getPublicAvgQuery();
+
+    const rawQuery = `
+      SELECT 
+        pageUrl,
+        ${avgQuery}
+      FROM 
+        performance_monitor
+      WHERE 
+        appId = ? 
+        AND time BETWEEN ? AND ?
+      GROUP BY 
+        pageUrl;
+    `;
+
+    const result = await this.performanceRepository.query(rawQuery, [
+      appId,
+      new Date(beginTime).getTime(),
+      new Date(endTime).getTime(),
+    ]);
+
+    return result;
   }
 
   async getPerformance(query: any): Promise<any> {
@@ -329,35 +316,72 @@ export class PerformanceService {
     };
   }
 
-  async getPageOpenRate(appId: string, whiteRange?: number[]): Promise<number> {
-    const qb = this.performanceRepository
-      .createQueryBuilder("performance_monitor")
-      .where("performance_monitor.appId = :appId", { appId });
+  // async getPageOpenRate(appId: string, whiteRange?: number[]): Promise<number> {
+  //   const qb = this.performanceRepository
+  //     .createQueryBuilder("performance_monitor")
+  //     .where("performance_monitor.appId = :appId", { appId });
 
+  //   if (whiteRange) {
+  //     qb.andWhere("performance_monitor.whiteTime BETWEEN :start AND :end", {
+  //       start: whiteRange[0],
+  //       end: whiteRange[1],
+  //     });
+  //   }
+
+  //   const count = await qb.getCount();
+  //   return count;
+  // }
+
+  private getPublicAvgQuery() {
+    const keys = [
+      "dnsTime",
+      "tcpTime",
+      "whiteTime",
+      "FCP",
+      "TTFB",
+      "LCP",
+      "FID",
+    ];
+
+    const query = keys
+      .map(
+        (key) =>
+          `AVG(CASE WHEN name = '${key}' THEN performanceValue ELSE NULL END) AS ${key}`
+      )
+      .join(", ");
+
+    console.log("====================================");
+    console.log(query);
+    console.log("====================================");
+
+    return query;
+  }
+
+  async getAppAvgPerformance(appId: string) {
+    const query = `
+      SELECT ${this.getPublicAvgQuery()}
+      FROM performance_monitor
+      WHERE appId = ? AND type = 'performance'
+    `;
+
+    const data = await this.performanceRepository.query(query, [appId]);
+    return data[0];
+  }
+
+  async getPageOpenRate(appId: string, whiteRange?: number[]) {
+    let query = `
+      SELECT COUNT(*) AS count
+      FROM performance_monitor
+      WHERE appId = ? AND type = 'performance' AND name = 'whiteTime'
+    `;
+
+    const params: (string | number)[] = [appId];
     if (whiteRange) {
-      qb.andWhere("performance_monitor.whiteTime BETWEEN :start AND :end", {
-        start: whiteRange[0],
-        end: whiteRange[1],
-      });
+      query += ` AND name = 'whiteTime' AND performanceValue BETWEEN ? AND ?`;
+      params.push(whiteRange[0], whiteRange[1]);
     }
 
-    const count = await qb.getCount();
-    return count;
-  }
-
-  findAll() {
-    return `This action returns all performance`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} performance`;
-  }
-
-  update(id: number, updatePerformanceDto: UpdatePerformanceDto) {
-    return `This action updates a #${id} performance`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} performance`;
+    const result = await this.performanceRepository.query(query, params);
+    return result[0].count;
   }
 }

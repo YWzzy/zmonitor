@@ -84,28 +84,6 @@ export class PerformanceController {
     res.status(200).json(data);
   }
 
-  @Get("getAppAvgPerformance")
-  @ApiOperation({
-    summary: "Get average performance of the application",
-    description: "获取应用的平均性能",
-  })
-  async getAppAvgPerformance(
-    @Query("appId") appId: string,
-    @Res() res: Response
-  ): Promise<void> {
-    const data = await this.performanceService.getAppAvgPerformance(appId);
-    const [all, fast, slow] = await Promise.all([
-      this.performanceService.getPageOpenRate(appId),
-      this.performanceService.getPageOpenRate(appId, [0, 1000]),
-      this.performanceService.getPageOpenRate(appId, [5000, 100000]),
-    ]);
-    res.status(HttpStatus.OK).json({
-      ...data,
-      fastRote: { value: fast / all },
-      slowRote: { value: slow / all },
-    });
-  }
-
   @Get("getPageAvgPerformance")
   @ApiOperation({
     summary: "Get average performance of the pages",
@@ -117,12 +95,21 @@ export class PerformanceController {
     @Query("endTime") endTime: string,
     @Res() res: Response
   ): Promise<void> {
-    const data = await this.performanceService.getPageAvgPerformance(
-      appId,
-      new Date(beginTime),
-      new Date(endTime)
-    );
-    res.status(HttpStatus.OK).json(data);
+    try {
+      const data = await this.performanceService.getPageAvgPerformance(
+        appId,
+        beginTime,
+        endTime
+      );
+      const result = {
+        data: data,
+        message: "success",
+        code: 200,
+      };
+      res.status(HttpStatus.OK).json(result);
+    } catch (err) {
+      throw new CustomHttpException(500, err.message);
+    }
   }
 
   @Get("getPerformance")
@@ -139,26 +126,28 @@ export class PerformanceController {
     }
   }
 
-  @Get()
-  findAll() {
-    return this.performanceService.findAll();
-  }
+  @Get("getAppAvgPerformance")
+  @ApiOperation({
+    summary: "Get app avg performance data",
+    description: "获取应用日均性能数据",
+  })
+  async getAppAvgPerformance(@Query("appId") appId: string) {
+    try {
+      const data = await this.performanceService.getAppAvgPerformance(appId);
 
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.performanceService.findOne(+id);
-  }
+      const [all, fast, slow] = await Promise.all([
+        this.performanceService.getPageOpenRate(appId),
+        this.performanceService.getPageOpenRate(appId, [0, 1000]),
+        this.performanceService.getPageOpenRate(appId, [5000, 100000]),
+      ]);
 
-  @Patch(":id")
-  update(
-    @Param("id") id: string,
-    @Body() updatePerformanceDto: UpdatePerformanceDto
-  ) {
-    return this.performanceService.update(+id, updatePerformanceDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.performanceService.remove(+id);
+      return {
+        ...data,
+        fastRate: { value: fast / all },
+        slowRate: { value: slow / all },
+      };
+    } catch (err) {
+      throw new CustomHttpException(500, err.message);
+    }
   }
 }
