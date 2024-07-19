@@ -5,6 +5,7 @@ import { Performance } from "./entities/performance.entity";
 import { Resource } from "./entities/resource.entity";
 import { CreatePerformanceDto } from "./dto/create-performance.dto";
 import { UpdatePerformanceDto } from "./dto/update-performance.dto";
+import { CustomHttpException } from "src/common/exception";
 
 interface PerformanceList {
   list: any[];
@@ -193,41 +194,8 @@ export class PerformanceService {
       .select("COUNT(DISTINCT pm.uuid)", "count")
       .where("pm.appId = :appId", { appId });
 
-    if (pageUrl) {
-      distinctUuidCountQuery.andWhere("pm.pageUrl LIKE :pageUrl", {
-        pageUrl: `%${pageUrl}%`,
-      });
-    }
-
-    if (beginTime && endTime) {
-      distinctUuidCountQuery.andWhere(
-        "pm.createTime BETWEEN :beginTime AND :endTime",
-        {
-          beginTime: new Date(beginTime),
-          endTime: new Date(endTime),
-        }
-      );
-    }
-
-    if (whiteTime) {
-      const whiteTimeRanges = {
-        1: [0, 1000],
-        2: [1001, 2000],
-        3: [2001, 3000],
-        4: [3001, 3000000],
-      };
-      const [whiteTimeStart, whiteTimeEnd] = whiteTimeRanges[whiteTime];
-      distinctUuidCountQuery.andWhere(
-        "pm.whiteTime BETWEEN :whiteTimeStart AND :whiteTimeEnd",
-        {
-          whiteTimeStart,
-          whiteTimeEnd,
-        }
-      );
-    }
-
     // 获取总数
-    // const { count: total } = await distinctUuidCountQuery.getRawOne();
+    const { count: total } = await distinctUuidCountQuery.getRawOne();
 
     // 查询分页后的唯一 uuid
     const offset = (from - 1) * size;
@@ -261,8 +229,9 @@ export class PerformanceService {
         4: [3001, 3000000],
       };
       const [whiteTimeStart, whiteTimeEnd] = whiteTimeRanges[whiteTime];
+      distinctUuids.andWhere("pm.name = 'whiteTime'");
       distinctUuids.andWhere(
-        "pm.whiteTime BETWEEN :whiteTimeStart AND :whiteTimeEnd",
+        "pm.performanceValue BETWEEN :whiteTimeStart AND :whiteTimeEnd",
         {
           whiteTimeStart,
           whiteTimeEnd,
@@ -272,10 +241,22 @@ export class PerformanceService {
 
     // 获取总数
     const distinctUuidsData = await distinctUuids.getRawMany();
-    const { count: total } = await distinctUuids.getRawOne();
+    // const total = await distinctUuids.getCount();
 
     // 根据获取的 uuid 查询数据
     const uuids = distinctUuidsData.map((item) => item.uuid);
+
+    if (uuids.length === 0)
+      return {
+        message: "success",
+        data: {
+          data: [],
+          total,
+        },
+        total,
+        currentPage: from,
+        pageSize: size,
+      };
     const results = this.performanceRepository
       .createQueryBuilder("pm")
       .select([
@@ -292,36 +273,6 @@ export class PerformanceService {
       ])
       .where("pm.appId = :appId", { appId })
       .andWhere("pm.uuid IN (:...uuids)", { uuids });
-
-    if (pageUrl) {
-      results.andWhere("pm.pageUrl LIKE :pageUrl", {
-        pageUrl: `%${pageUrl}%`,
-      });
-    }
-
-    if (beginTime && endTime) {
-      results.andWhere("pm.createTime BETWEEN :beginTime AND :endTime", {
-        beginTime: new Date(beginTime),
-        endTime: new Date(endTime),
-      });
-    }
-
-    if (whiteTime) {
-      const whiteTimeRanges = {
-        1: [0, 1000],
-        2: [1001, 2000],
-        3: [2001, 3000],
-        4: [3001, 3000000],
-      };
-      const [whiteTimeStart, whiteTimeEnd] = whiteTimeRanges[whiteTime];
-      results.andWhere(
-        "pm.whiteTime BETWEEN :whiteTimeStart AND :whiteTimeEnd",
-        {
-          whiteTimeStart,
-          whiteTimeEnd,
-        }
-      );
-    }
 
     const fetchedResults = await results.getMany();
 
@@ -366,13 +317,10 @@ export class PerformanceService {
       });
     }
 
-    // 分页
-    const paginatedData = formattedData.slice((from - 1) * size, from * size);
-
     return {
       message: "success",
       data: {
-        data: paginatedData,
+        data: formattedData,
         total,
       },
       total,

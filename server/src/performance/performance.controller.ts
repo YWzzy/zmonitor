@@ -15,6 +15,7 @@ import { Response } from "express";
 import { PerformanceService } from "./performance.service";
 import { CreatePerformanceDto } from "./dto/create-performance.dto";
 import { UpdatePerformanceDto } from "./dto/update-performance.dto";
+import { CustomHttpException } from "src/common/exception";
 
 @Controller("performance")
 @ApiTags("性能日志")
@@ -130,8 +131,12 @@ export class PerformanceController {
     description: "获取性能数据",
   })
   async getPerformance(@Query() query, @Res() res: Response): Promise<void> {
-    const data = await this.performanceService.getPerformance(query);
-    res.status(HttpStatus.OK).json(data);
+    try {
+      const data = await this.performanceService.getPerformance(query);
+      res.status(HttpStatus.OK).json(data);
+    } catch (err) {
+      throw new CustomHttpException(500, err.message);
+    }
   }
 
   @Get()
