@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { Tooltip } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
@@ -8,7 +9,7 @@ import { RootState } from '@/src/models/store';
 import { getAppAvgPerformance } from '@/src/api';
 interface AvgItemIn {
   name: string;
-  key: 'whiteTime' | 'FCP' | 'LCP' | 'FID' | 'TTFB' | 'fastRote' | 'slowRote';
+  key: 'whiteTime' | 'FCP' | 'LCP' | 'FID' | 'TTFB' | 'fastRate' | 'slowRate';
   value: number;
   tip?: string;
 }
@@ -21,8 +22,8 @@ export const AvgAppData = () => {
     LCP: 0,
     FID: 0,
     TTFB: 0,
-    fastRote: 0,
-    slowRote: 0,
+    fastRate: 0,
+    slowRate: 0,
   });
 
   const getDataValue = (data: object): any => {
@@ -48,14 +49,14 @@ export const AvgAppData = () => {
   const avgData: AvgItemIn[] = [
     {
       name: '秒开率',
-      key: 'fastRote',
-      value: data.fastRote || 0,
+      key: 'fastRate',
+      value: data.fastRate || 0,
       tip: '1s内打开页面百分比',
     },
     {
       name: '慢开率',
-      key: 'slowRote',
-      value: data.slowRote || 0,
+      key: 'slowRate',
+      value: data.slowRate || 0,
       tip: '5s以上打开页面百分比',
     },
     {
@@ -102,7 +103,7 @@ export const AvgAppData = () => {
               )}
             </div>
             <div className={styles.value}>
-              {item.key === 'fastRote' || item.key === 'slowRote' ? (
+              {item.key === 'fastRate' || item.key === 'slowRate' ? (
                 `${(item.value * 100).toFixed(0)}%`
               ) : (
                 <ShowTime name={item.key} value={item.value} />

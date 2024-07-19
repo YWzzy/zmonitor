@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { DatePicker, Table, Input } from 'antd';
 import type { TableColumnsType } from 'antd';
@@ -25,7 +26,7 @@ export const AvgPageData = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const [searchUrl, setUrl] = useState('');
+  const [pageUrl, setUrl] = useState('');
 
   const [date, setDate] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([dayjs().add(-7, 'day'), dayjs()]);
 
@@ -34,7 +35,7 @@ export const AvgPageData = () => {
     const keys = Object.keys(data);
     for (const key of keys) {
       const item = data[key];
-      if (item?.value || item.value === 0 || item.value === null) {
+      if (item?.value || item?.value === 0 || item?.value === null) {
         obj[key] = item.value;
       } else {
         obj[key] = item;
@@ -50,7 +51,11 @@ export const AvgPageData = () => {
       beginTime: date[0].format('YYYY-MM-DD 00:00:00'),
       endTime: date[1].format('YYYY-MM-DD 23:59:59'),
     });
-    const res = data.map(item => getDataValue(item));
+      const res = data.map((item: any) => {
+        item = getDataValue(item)
+        item.key = item.pageUrl;
+        return item;
+      })
     setData(res);
     setLoading(false);
   };
@@ -66,7 +71,7 @@ export const AvgPageData = () => {
       title: (
         <Input
           placeholder="请输入网页链接"
-          value={searchUrl}
+          value={pageUrl}
           onChange={e => {
             setUrl(e.target.value);
           }}
@@ -76,7 +81,7 @@ export const AvgPageData = () => {
       key: 'key',
       width: 200,
       fixed: 'left',
-      render: val => <HighlightText searchTerm={searchUrl} text={val} />,
+      render: val => <HighlightText searchTerm={pageUrl} text={val} />,
     },
     {
       title: '白屏时间',
@@ -137,8 +142,8 @@ export const AvgPageData = () => {
   ];
 
   const tableData = React.useMemo(
-    () => data.filter(item => item.key.indexOf(searchUrl) !== -1),
-    [data, searchUrl]
+    () => data.filter(item => item.key.indexOf(pageUrl) !== -1),
+    [data, pageUrl]
   );
   return (
     <Card
