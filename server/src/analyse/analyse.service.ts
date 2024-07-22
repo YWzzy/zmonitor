@@ -72,15 +72,27 @@ export class AnalyseService {
     }
   }
 
+  /**
+   * 获取指定应用程序的网页访问排行榜数据
+   * @param appId - 应用程序ID
+   * @param type - 排行榜类型
+   * @param top - 获取前N名的数据
+   * @return {Promise<any[]>} - 指定排行榜类型的前N名数据
+   */
   async getWebVisitTop(
     appId: string,
     type: string,
     top: number
   ): Promise<any[]> {
-    return this.analyseRepository.find({
-      where: { appId, type },
-      take: top,
-    });
+    return this.analyseRepository
+      .createQueryBuilder("webVisit")
+      .select("webVisit.label", "label")
+      .addSelect("webVisit.value", "value")
+      .where("webVisit.appId = :appId", { appId })
+      .andWhere("webVisit.type = :type", { type })
+      .orderBy("webVisit.value", "DESC")
+      .limit(top)
+      .getRawMany();
   }
 
   async getNewUsers(appId: string, date: string): Promise<number> {

@@ -43,6 +43,16 @@ export class CreateErrorMonitorDto {
     device: string;
     device_type: string;
   };
+  analyseData: {
+    browserVersion: string;
+    browser: string;
+    osVersion: string;
+    os: string;
+    ua: string;
+    device: string;
+    device_type: string;
+    ip: string;
+  };
   @IsBoolean()
   isDeleted: boolean;
   @IsArray()

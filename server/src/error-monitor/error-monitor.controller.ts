@@ -19,6 +19,7 @@ import { SearchErrorMonitorDto } from "./dto/search-error-monitor.dto";
 import { ApiOperation, ApiQuery, ApiTags, ApiBody } from "@nestjs/swagger";
 import { Auth } from "src/decorator/Auth";
 import { CustomHttpException } from "src/common/exception";
+import { Request } from "express";
 
 @Controller("error-monitor")
 @ApiTags("错误日志")
@@ -31,8 +32,8 @@ export class ErrorMonitorController {
     description: "存储错误日志",
   })
   @Auth()
-  create(@Body() createErrorMonitorDto: CreateErrorMonitorDto) {
-    return this.errorMonitorService.create(createErrorMonitorDto);
+  create(@Body() createErrorMonitorDto: CreateErrorMonitorDto, req: Request) {
+    return this.errorMonitorService.create(req, createErrorMonitorDto);
   }
 
   @Get()

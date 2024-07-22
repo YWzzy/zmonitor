@@ -4,8 +4,10 @@ import {
   CreateDateColumn,
   PrimaryGeneratedColumn,
   OneToMany,
+  OneToOne,
 } from "typeorm";
 import { Breadcrumb } from "./breadcrumb.entity";
+import { Analyse } from "src/analyse/entities/analyse.entity";
 
 @Entity("error_monitor")
 export class ErrorMonitor {
@@ -99,6 +101,11 @@ export class ErrorMonitor {
     cascade: true,
   })
   breadcrumb: Breadcrumb[];
+
+  @OneToOne(() => Analyse, (analyseData) => analyseData.errorMonitor, {
+    cascade: true,
+  })
+  analyseData: Analyse;
 
   @CreateDateColumn({ type: "timestamp", comment: "记录创建时间" })
   createTime: Date;

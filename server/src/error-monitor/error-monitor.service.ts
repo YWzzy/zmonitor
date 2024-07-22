@@ -14,6 +14,8 @@ import { SearchErrorMonitorDto } from "./dto/search-error-monitor.dto";
 import { ErrorMonitor } from "./entities/error-monitor.entity";
 import { Breadcrumb } from "./entities/breadcrumb.entity";
 import dayjs from "dayjs";
+import { getIp } from "src/utils";
+import { Request } from "express";
 
 type ErrorMonitorList = {
   list: ErrorMonitor[];
@@ -31,10 +33,17 @@ export class ErrorMonitorService {
     private readonly breadcrumbRepository: Repository<Breadcrumb>
   ) {}
 
+  // 上报错误日志
   async create(
+    req: Request,
     createErrorMonitorDto: CreateErrorMonitorDto
   ): Promise<ErrorMonitor> {
     try {
+      const analyseData = {
+        ...createErrorMonitorDto.deviceInfo,
+        ip: getIp(req),
+      };
+      createErrorMonitorDto.analyseData = analyseData;
       // 处理 breadcrumb 中的 data 字段
       if (
         createErrorMonitorDto.hasOwnProperty("breadcrumb") &&

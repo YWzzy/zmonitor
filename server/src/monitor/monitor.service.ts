@@ -13,6 +13,7 @@ import { PerformanceService } from "../performance/performance.service";
 import { CreatePerformanceDto } from "src/performance/dto/create-performance.dto";
 import { SearchErrorMonitorDto } from "src/error-monitor/dto/search-error-monitor.dto";
 import { Application } from "src/application/entities/application.entity";
+import { Request } from "express";
 
 @Injectable()
 export class MonitorService {
@@ -53,7 +54,7 @@ export class MonitorService {
   }
 
   // 存储上报信息
-  async saveLogByType(type: string, data: any): Promise<void> {
+  async saveLogByType(type: string, data: any, req: Request): Promise<void> {
     try {
       if (data.apikey) {
         data.appId = data.apikey;
@@ -65,13 +66,13 @@ export class MonitorService {
         this.saveRecordScreen(data);
       } else if (type === "whiteScreen") {
         const createErrorMonitorDto: CreateErrorMonitorDto = data;
-        await this.errorMonitorService.create(createErrorMonitorDto);
+        await this.errorMonitorService.create(req, createErrorMonitorDto);
       } else {
         const createErrorMonitorDto: CreateErrorMonitorDto = data;
         if (data.apikey) {
           createErrorMonitorDto.appId = data.apikey;
         }
-        await this.errorMonitorService.create(createErrorMonitorDto);
+        await this.errorMonitorService.create(req, createErrorMonitorDto);
       }
     } catch (err) {
       console.error(err);
@@ -321,7 +322,7 @@ export class MonitorService {
         const data = await coBody.json(req);
         if (!data) return;
 
-        await this.saveLogByType(data.type, data);
+        await this.saveLogByType(data.type, data, req);
       }
       res.status(HttpStatus.OK).send({
         code: 200,

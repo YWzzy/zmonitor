@@ -1,31 +1,71 @@
-import { IsString, IsInt, IsDateString, IsNotEmpty } from "class-validator";
+import {
+  IsInt,
+  IsString,
+  IsOptional,
+  IsDate,
+  IsNotEmpty,
+  IsIn,
+  IsUUID,
+} from "class-validator";
 
 export class CreateAnalyseDto {
   @IsString()
-  @IsNotEmpty({ message: "应用ID不能为空" })
+  @IsNotEmpty()
   appId: string;
 
   @IsString()
-  @IsNotEmpty({ message: "类型不能为空" })
+  @IsNotEmpty()
   type: string;
 
   @IsInt()
-  @IsNotEmpty({ message: "每日活跃用户数不能为空" })
-  activeUsers: number;
+  @IsOptional()
+  activeUsers?: number;
 
   @IsInt()
-  @IsNotEmpty({ message: "每日新增用户数不能为空" })
-  newUsers: number;
+  @IsOptional()
+  newUsers?: number;
 
   @IsInt()
-  @IsNotEmpty({ message: "每日页面访问量不能为空" })
-  pv: number;
+  @IsOptional()
+  pv?: number;
 
-  @IsInt()
-  @IsNotEmpty({ message: "每日IP数不能为空" })
-  ip: number;
-
-  @IsDateString()
-  @IsNotEmpty({ message: "日期不能为空" })
+  @IsString()
+  @IsNotEmpty()
   date: string;
+
+  @IsString()
+  @IsNotEmpty()
+  browser: string;
+
+  @IsString()
+  @IsNotEmpty()
+  browserVersion: string;
+
+  @IsString()
+  @IsNotEmpty()
+  device: string;
+
+  @IsString()
+  @IsNotEmpty()
+  device_type: string;
+
+  @IsString()
+  @IsNotEmpty()
+  os: string;
+
+  @IsString()
+  @IsNotEmpty()
+  osVersion: string;
+
+  @IsString()
+  @IsNotEmpty()
+  ua: string;
+
+  @IsString()
+  @IsNotEmpty()
+  ip: string;
+
+  @IsUUID()
+  @IsOptional()
+  errorMonitorId?: string;
 }
