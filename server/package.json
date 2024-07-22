@@ -39,7 +39,7 @@
     "co-body": "6.1.0",
     "compressing": "^1.6.2",
     "cors": "^2.8.5",
-    "dayjs": "^1.11.11",
+    "dayjs": "^1.11.12",
     "express-session": "^1.17.3",
     "iconv-lite": "^0.6.3",
     "json2xls": "^1.0.0",

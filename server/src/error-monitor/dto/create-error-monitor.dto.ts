@@ -43,7 +43,7 @@ export class CreateErrorMonitorDto {
     device: string;
     device_type: string;
   };
-  analyseData: {
+  analyse: {
     browserVersion: string;
     browser: string;
     osVersion: string;
@@ -52,6 +52,12 @@ export class CreateErrorMonitorDto {
     device: string;
     device_type: string;
     ip: string;
+    appId: string;
+    activeUsers?: number;
+    pageUrl?: string;
+    newUsers?: number;
+    pv?: number;
+    time?: number;
   };
   @IsBoolean()
   isDeleted: boolean;

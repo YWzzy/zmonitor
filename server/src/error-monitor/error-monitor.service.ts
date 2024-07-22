@@ -13,8 +13,7 @@ import { UpdateErrorMonitorDto } from "./dto/update-error-monitor.dto";
 import { SearchErrorMonitorDto } from "./dto/search-error-monitor.dto";
 import { ErrorMonitor } from "./entities/error-monitor.entity";
 import { Breadcrumb } from "./entities/breadcrumb.entity";
-import dayjs from "dayjs";
-import { getIp } from "src/utils";
+import { getCurrentFormattedDate, getIp } from "src/utils";
 import { Request } from "express";
 
 type ErrorMonitorList = {
@@ -39,11 +38,16 @@ export class ErrorMonitorService {
     createErrorMonitorDto: CreateErrorMonitorDto
   ): Promise<ErrorMonitor> {
     try {
-      const analyseData = {
+      const analyse = {
         ...createErrorMonitorDto.deviceInfo,
+        appId: createErrorMonitorDto.appId,
+        time: createErrorMonitorDto.time,
         ip: getIp(req),
+        pageUrl: createErrorMonitorDto.pageUrl,
+        createTime: getCurrentFormattedDate(),
+        updateTime: getCurrentFormattedDate(),
       };
-      createErrorMonitorDto.analyseData = analyseData;
+      createErrorMonitorDto.analyse = analyse;
       // 处理 breadcrumb 中的 data 字段
       if (
         createErrorMonitorDto.hasOwnProperty("breadcrumb") &&

@@ -24,6 +24,7 @@ import { CreateAnalyseDto } from "./dto/create-analyse.dto";
 import { UpdateAnalyseDto } from "./dto/update-analyse.dto";
 import { Analyse } from "./entities/analyse.entity";
 import dayjs from "dayjs";
+import { CustomHttpException } from "src/common/exception";
 
 @ApiTags("分析")
 @Controller("analyse")
@@ -79,7 +80,11 @@ export class AnalyseController {
     @Query("type") type: string,
     @Query("top") top: number
   ) {
-    return this.analyseService.getWebVisitTop(appId, type, top);
+    try {
+      return this.analyseService.getWebVisitTop(appId, type, top);
+    } catch (error) {
+      throw new CustomHttpException(500, error.message);
+    }
   }
 
   @ApiOperation({ summary: "获取新用户数" })

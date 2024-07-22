@@ -102,10 +102,10 @@ export class ErrorMonitor {
   })
   breadcrumb: Breadcrumb[];
 
-  @OneToOne(() => Analyse, (analyseData) => analyseData.errorMonitor, {
+  @OneToOne(() => Analyse, (analyse) => analyse.errorMonitor, {
     cascade: true,
   })
-  analyseData: Analyse;
+  analyse: Analyse;
 
   @CreateDateColumn({ type: "timestamp", comment: "记录创建时间" })
   createTime: Date;

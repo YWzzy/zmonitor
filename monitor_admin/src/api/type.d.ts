@@ -74,7 +74,7 @@ interface TopReq {
 
 interface Options {
   label: string;
-  value: string | number;
+  count: string | number;
 }
 
 interface TodayTrafficRes {

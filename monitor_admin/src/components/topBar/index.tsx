@@ -16,7 +16,7 @@ export const TopBar: React.FC<TopBarIn> = ({ title, appId, topKey }) => {
       top: 10,
       type: topKey,
     }).then(({ data }) => {
-      const values = data.map(item => Number(item.value));
+      const values = data.map(item => Number(item.count));
       const labels = data.map(item => item.label);
       const maxValue = Math.max(...values);
       setOption({

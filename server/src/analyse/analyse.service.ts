@@ -37,7 +37,7 @@ export class AnalyseService {
     const analyse = await this.analyseRepository.preload({
       id,
       ...updateData,
-      updateTime: new Date(),
+      updateTime: dayjs().format("YYYY-MM-DD HH:mm:ss"),
     });
     if (!analyse) {
       throw new NotFoundException(`Analyse with ID ${id} not found`);
@@ -52,9 +52,8 @@ export class AnalyseService {
 
   private async getUsersCount(appId: string, date: string): Promise<number> {
     const formattedDate = dayjs(date).format("YYYY-MM-DD");
-    this.logger.log(`Formatted Date for getUsersCount: ${formattedDate}`);
     const users = await this.analyseRepository.find({
-      where: { appId, date: formattedDate },
+      where: { appId, createTime: formattedDate },
     });
     return users.length;
   }
@@ -75,7 +74,6 @@ export class AnalyseService {
   /**
    * 获取指定应用程序的网页访问排行榜数据
    * @param appId - 应用程序ID
-   * @param type - 排行榜类型
    * @param top - 获取前N名的数据
    * @return {Promise<any[]>} - 指定排行榜类型的前N名数据
    */
@@ -84,15 +82,52 @@ export class AnalyseService {
     type: string,
     top: number
   ): Promise<any[]> {
-    return this.analyseRepository
-      .createQueryBuilder("webVisit")
-      .select("webVisit.label", "label")
-      .addSelect("webVisit.value", "value")
-      .where("webVisit.appId = :appId", { appId })
-      .andWhere("webVisit.type = :type", { type })
-      .orderBy("webVisit.value", "DESC")
-      .limit(top)
-      .getRawMany();
+    try {
+      if (type === "browser") {
+        return await this.analyseRepository
+          .createQueryBuilder("analyse")
+          .select("analyse.browser", "label")
+          .addSelect("COUNT(analyse.browser)", "count")
+          .where("analyse.appId = :appId", { appId })
+          .groupBy("analyse.browser")
+          .orderBy("count", "DESC")
+          .limit(top)
+          .getRawMany();
+      } else if (type === "osName") {
+        return await this.analyseRepository
+          .createQueryBuilder("analyse")
+          .select("analyse.os", "label")
+          .addSelect("COUNT(analyse.os)", "count")
+          .where("analyse.appId = :appId", { appId })
+          .groupBy("analyse.os")
+          .orderBy("count", "DESC")
+          .limit(top)
+          .getRawMany();
+      } else if (type === "webVisit") {
+        return await this.analyseRepository
+          .createQueryBuilder("analyse")
+          .select("analyse.pageUrl", "label")
+          .addSelect("COUNT(analyse.pageUrl)", "count")
+          .where("analyse.appId = :appId", { appId })
+          .groupBy("analyse.pageUrl")
+          .orderBy("count", "DESC")
+          .limit(top)
+          .getRawMany();
+      } else if (type === "deviceVendor") {
+        return await this.analyseRepository
+          .createQueryBuilder("analyse")
+          .select("analyse.device_type", "label")
+          .addSelect("COUNT(analyse.device_type)", "count")
+          .where("analyse.appId = :appId", { appId })
+          .groupBy("analyse.device_type")
+          .orderBy("count", "DESC")
+          .limit(top)
+          .getRawMany();
+      };
+    } catch (error) {
+      this.logger.error(`Error in getWebVisitTop: ${error.message}`);
+      throw error;
+    }
   }
 
   async getNewUsers(appId: string, date: string): Promise<number> {
@@ -109,7 +144,7 @@ export class AnalyseService {
     return this.analyseRepository.find({
       where: {
         appId,
-        date: Between(formattedBeginTime, formattedEndTime),
+        createTime: Between(formattedBeginTime, formattedEndTime),
       },
     });
   }
@@ -133,16 +168,16 @@ export class AnalyseService {
       this.getNewUsers(appId, lastDay),
     ]);
     const pv = await this.analyseRepository.count({
-      where: { appId, date: today },
+      where: { appId, createTime: today },
     });
     const pv2 = await this.analyseRepository.count({
-      where: { appId, date: lastDay },
+      where: { appId, createTime: lastDay },
     });
     const ip = await this.analyseRepository.count({
-      where: { appId, date: today },
+      where: { appId, createTime: today },
     });
     const ip2 = await this.analyseRepository.count({
-      where: { appId, date: lastDay },
+      where: { appId, createTime: lastDay },
     });
 
     return {

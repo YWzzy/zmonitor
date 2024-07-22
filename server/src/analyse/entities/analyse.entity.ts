@@ -1,12 +1,5 @@
 import { ErrorMonitor } from "src/error-monitor/entities/error-monitor.entity";
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  OneToOne,
-  UpdateDateColumn,
-} from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from "typeorm";
 
 @Entity("analyse")
 export class Analyse {
@@ -25,9 +18,9 @@ export class Analyse {
     type: "varchar",
     length: 255,
     default: "",
-    comment: "类型",
+    comment: "页面路径",
   })
-  type: string;
+  pageUrl: string;
 
   @Column({
     type: "int",
@@ -51,22 +44,27 @@ export class Analyse {
   pv: number;
 
   @Column({
-    type: "date",
-    comment: "日期",
+    type: "bigint",
+    default: 0,
+    comment: "时间戳",
   })
-  date: string;
+  time: number;
 
-  @CreateDateColumn({
-    type: "timestamp",
+  @Column({
+    type: "varchar",
+    length: 19,
+    default: "",
     comment: "创建时间",
   })
-  createTime: Date;
+  createTime: string; // 字符串格式的创建时间
 
-  @UpdateDateColumn({
-    type: "timestamp",
+  @Column({
+    type: "varchar",
+    length: 19,
+    default: "",
     comment: "更新时间",
   })
-  updateTime: Date;
+  updateTime: string; // 字符串格式的更新时间
 
   @Column({
     default: "",
@@ -134,6 +132,6 @@ export class Analyse {
   })
   ip: string; // IP 地址，例如 120.122.2.34
 
-  @OneToOne(() => ErrorMonitor, (errorMonitor) => errorMonitor.analyseData)
+  @OneToOne(() => ErrorMonitor, (errorMonitor) => errorMonitor.analyse)
   errorMonitor: ErrorMonitor;
 }
