@@ -139,6 +139,11 @@ interface Pagination<T> {
   data: PaginationData<T>[];
 }
 
+interface PaginationHttp<T> {
+  total: number;
+  list: PaginationData<T>[];
+}
+
 type GetPerformanceRes = Pagination<PerfamceReportMsg & PublicMsg>;
 
 interface HttpErrorRankRes {
@@ -168,7 +173,7 @@ interface GetHttpListReq {
   sorterKey?: string;
 }
 
-type GetHttpListRes = Pagination<RequestReportMsg & PublicMsg>;
+type GetHttpListRes = PaginationHttp<RequestReportMsg & PublicMsg>;
 
 type JsErrorMsgItem = JsErrorReportMsg & {
   errorCount: number;

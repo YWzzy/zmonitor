@@ -57,11 +57,9 @@ export const HighFrequency = () => {
           onClick={() => {
             showHttpDetail.publish({
               link: record.url,
-              requestType: 'error',
-              beginTime: dayjs()
-                .add(-(day - 1), 'day')
-                .format('YYYY-MM-DD:00:00:00'),
-              endTime: dayjs().format('YYYY-MM-DD 23:59:59'),
+              // requestType: 'error',
+              beginTime: String(dayjs().add(-(day - 1), 'day').startOf('day').valueOf()),
+              endTime: String(dayjs().endOf('day').valueOf())
             });
           }}
         >
@@ -75,10 +73,8 @@ export const HighFrequency = () => {
     setLoading(true);
     const { data } = await getHttpErrorRank({
       appId: active,
-      beginTime: dayjs()
-        .add(-(day - 1), 'day')
-        .format('YYYY-MM-DD:00:00:00'),
-      endTime: dayjs().format('YYYY-MM-DD 23:59:59'),
+      beginTime: String(dayjs().add(-(day - 1), 'day').startOf('day').valueOf()),
+      endTime: String(dayjs().endOf('day').valueOf())
     });
     const result = data.map(item => ({
       count: item.errorCount,

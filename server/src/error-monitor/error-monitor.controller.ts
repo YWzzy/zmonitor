@@ -120,7 +120,7 @@ export class ErrorMonitorController {
         url: link,
         pageNo: from,
         pageSize: size,
-        type: requestType === "done" ? "ok" : "error",
+        // type: requestType === "done" ? "ok" : "error",
         sorterName,
         sorterKey,
       });
@@ -150,13 +150,6 @@ export class ErrorMonitorController {
       throw new BadRequestException("Missing required query parameters.");
     }
 
-    // 验证日期格式
-    if (isNaN(Date.parse(beginTime)) || isNaN(Date.parse(endTime))) {
-      throw new BadRequestException(
-        "Invalid date format for beginTime or endTime."
-      );
-    }
-
     const data = await this.errorMonitorService.getJsErrorRange(
       appId,
       beginTime,
@@ -184,13 +177,6 @@ export class ErrorMonitorController {
     try {
       if (!appId || !beginTime || !endTime) {
         throw new BadRequestException("Missing required query parameters.");
-      }
-
-      // 验证日期格式
-      if (isNaN(Date.parse(beginTime)) || isNaN(Date.parse(endTime))) {
-        throw new BadRequestException(
-          "Invalid date format for beginTime or endTime."
-        );
       }
 
       const data = await this.errorMonitorService.getHttpErrorRank(
@@ -228,13 +214,6 @@ export class ErrorMonitorController {
       if (!appId || !beginTime || !endTime) {
         throw new BadRequestException("Missing required query parameters.");
       }
-
-      // 验证日期格式
-      // if (isNaN(Date.parse(beginTime)) || isNaN(Date.parse(endTime))) {
-      //   throw new BadRequestException(
-      //     "Invalid date format for beginTime or endTime."
-      //   );
-      // }
 
       const data = await this.errorMonitorService.getHttpDoneRank(
         appId,

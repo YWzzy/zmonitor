@@ -34,7 +34,7 @@ export class SearchErrorMonitorDto {
 
   @IsString()
   @IsOptional()
-  type: string;
+  type?: string;
 
   @IsString()
   @IsOptional()

@@ -29,7 +29,7 @@ http.interceptors.response.use(
       message.error('网络异常');
       return data;
     }
-    const res = data as BluBiuRes<any>;
+    const res = data as CustomRes<any>;
     if (!data['code'] && (status == 200 || status == 304)) {
       return res;
     }
@@ -45,7 +45,7 @@ http.interceptors.response.use(
     const { response } = error;
     if (response) {
       response?.data?.message ? message.error(`请求错误: ${response.status} - ${response.statusText} - ${response?.data?.message}`) : message.error(`请求错误: ${response.status} - ${response.statusText}`);
-      const res = response.data as BluBiuRes<any>;
+      const res = response.data as CustomRes<any>;
       if (res.code === CustomResponseCode.NOLOGIN || res.code === CustomResponseCode.NOTFOUNDACCOUNT) {
         if (!isShowNoLogin) {
           window.location.href = '/login';
@@ -141,15 +141,12 @@ export const getHttpErrorRank = async (params: AnalyseReq): CustomResponse<HttpE
 
 export const getHttpDoneRank = async (params: AnalyseReq): CustomResponse<HttpErrorRankRes[]> =>
   await http.get('/error-monitor/getHttpDoneRank', { params });
-  // await http.get('/httpError/getHttpDoneRank', { params });
 
 export const getHttpErrorRang = async (params: AnalyseReq): CustomResponse<Options[]> =>
   await http.get('/error-monitor/getJsErrorRange', { params });
-  // await http.get('/httpError/getHttpErrorRang', { params });
 
 export const getHttpList = async (params: GetHttpListReq): CustomResponse<GetHttpListRes> =>
   await http.get('/error-monitor/getHttpList', { params });
-  // await http.get('/httpError/getHttpList', { params });
 
 //接口查询 - 异常请求数据
 export const getZMonitorHttpList = async (params): CustomResponse<GetHttpListRes> =>

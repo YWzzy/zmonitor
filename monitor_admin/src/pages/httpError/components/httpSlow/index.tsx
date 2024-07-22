@@ -67,7 +67,7 @@ export const HttpSlow = () => {
           onClick={() => {
             showHttpDetail.publish({
               link: record.url,
-              requestType: 'done',
+              // requestType: 'done',
               beginTime: String(dayjs().add(-(day - 1), 'day').startOf('day').valueOf()),
               endTime: String(dayjs().endOf('day').valueOf())
             });

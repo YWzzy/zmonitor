@@ -136,10 +136,6 @@ export class ErrorMonitorService {
         ...searchDto
       } = searchErrorMonitorDto;
 
-      // 转换字符串时间为 Date 对象
-      // const startDate = beginTime ? new Date(beginTime + "Z") : undefined; // 添加 'Z' 表示 UTC 时间
-      // const endDate = endTime ? new Date(endTime + "Z") : undefined; // 添加 'Z' 表示 UTC 时间
-
       const startDate = beginTime ? beginTime : null;
       const endDate = endTime ? endTime : null;
 
@@ -157,13 +153,6 @@ export class ErrorMonitorService {
       const whereConditions: any = { ...searchDto, isDeleted: false };
 
       // 添加时间区间过滤条件
-      // if (startDate && endDate) {
-      //   whereConditions.createTime = Between(startDate, endDate);
-      // } else if (startDate) {
-      //   whereConditions.createTime = MoreThanOrEqual(startDate);
-      // } else if (endDate) {
-      //   whereConditions.createTime = LessThanOrEqual(endDate);
-      // }
       if (startDate && endDate) {
         whereConditions.time = Between(startDate, endDate);
       } else if (startDate) {
@@ -237,7 +226,7 @@ export class ErrorMonitorService {
         "COUNT(*) AS errorCount",
       ])
       .where("error.appId = :appId", { appId })
-      .andWhere("error.createTime BETWEEN :beginTime AND :endTime", {
+      .andWhere("error.time BETWEEN :beginTime AND :endTime", {
         beginTime,
         endTime,
       })

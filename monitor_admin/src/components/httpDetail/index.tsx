@@ -14,7 +14,7 @@ const initQuery = {
   link: '',
   beginTime: '',
   endTime: '',
-  requestType: '',
+  // requestType: '',
 };
 export const HttpDetail = () => {
   const [open, setOpen] = useState(false);
@@ -47,13 +47,13 @@ export const HttpDetail = () => {
   const search = async (searchQuery: GetHttpListReq) => {
     setLoading(true);
     const {
-      data: { total, data },
+      data: { total, list },
     } = await getHttpList(searchQuery);
     setTotal(total);
     setData(
-      data.map(item => ({
-        key: item._id,
-        ...item._source,
+      list.map(item => ({
+        key: item.id,
+        ...item,
       }))
     );
     setLoading(false);

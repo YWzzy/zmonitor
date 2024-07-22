@@ -4,14 +4,14 @@ declare module '*.less';
 declare module '*.scss';
 declare module '*.png';
 
-type BluBiuRes<T> = {
+type CustomRes<T> = {
   code: number;
   message: string;
   data: T;
   total?: number;
 };
 
-type CustomResponse<T> = Promise<BluBiuRes<T>>;
+type CustomResponse<T> = Promise<CustomRes<T>>;
 
 type PerformanceInKey =
   | 'dnsTime'
