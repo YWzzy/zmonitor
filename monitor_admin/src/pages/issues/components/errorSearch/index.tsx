@@ -52,8 +52,8 @@ export const ErrorSearch = forwardRef<ErrorSearchHandle>((props, ref) => {
     const { date } = form.getFieldsValue();
     const query = {
       appId: active,
-      beginTime: date ? date[0].format('YYYY-MM-DD 00:00:00') : undefined,
-      endTime: date ? date[1].format('YYYY-MM-DD 23:59:59') : undefined,
+      beginTime: date ? dayjs(date[0].format('YYYY-MM-DD 00:00:00')).valueOf() : undefined,
+      endTime: date ? dayjs(date[1].format('YYYY-MM-DD 23:59:59')).valueOf() : undefined,
       page,
       pageSize,
     };
@@ -68,10 +68,10 @@ export const ErrorSearch = forwardRef<ErrorSearchHandle>((props, ref) => {
   const search = async searchQuery => {
     setLoading(true);
     const {
-      data: { total, data },
+      data: { total, list },
     } = await getIssueErrorListPage(searchQuery);
 
-    setTableData(data);
+    setTableData(list);
     setPagination({
       ...pagination,
       current: searchQuery.page,

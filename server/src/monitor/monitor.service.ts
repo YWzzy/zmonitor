@@ -197,23 +197,13 @@ export class MonitorService {
           "xhr",
           "resource",
           "script",
-          "console",
-          "vue",
-          "react",
-          "angular",
-          "javascript",
-          "typescript",
-          "css",
-          "html",
-          "nodejs",
-          "network",
         ],
       } as SearchErrorMonitorDto);
 
       res.status(HttpStatus.OK).send({
         code: 200,
         data: {
-          data: list,
+          list,
           total,
         },
         message: "Issues list retrieved successfully.",
@@ -280,7 +270,7 @@ export class MonitorService {
       res.status(HttpStatus.OK).send({
         code: 200,
         data: {
-          data: list,
+          list,
           total,
         },
         message: "Issues list retrieved successfully.",

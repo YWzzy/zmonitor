@@ -37,8 +37,8 @@ const HttpSearch = () => {
       size: defaultSize,
       appId: active,
       url,
-      beginTime: date ? date[0].format('YYYY-MM-DD 00:00:00') : undefined,
-      endTime: date ? date[1].format('YYYY-MM-DD 23:59:59') : undefined,
+      beginTime: date ? dayjs(date[0].format('YYYY-MM-DD 00:00:00')).valueOf() : undefined,
+      endTime: date ? dayjs(date[1].format('YYYY-MM-DD 23:59:59')).valueOf() : undefined,
       requestType,
       sorterName: sorter.sorterKey ? sorter.sorterName : '',
       sorterKey: sorter.sorterKey ? (sorter.sorterKey === 'ascend' ? 'asc' : 'desc') : '',
@@ -68,8 +68,8 @@ const HttpSearch = () => {
       appId: active,
       from: 1,
       size: defaultSize,
-      beginTime: dayjs().format('YYYY-MM-DD 00:00:00'),
-      endTime: dayjs().format('YYYY-MM-DD 23:59:59'),
+      beginTime: dayjs(dayjs().format('YYYY-MM-DD 00:00:00')).valueOf(),
+      endTime: dayjs(dayjs().format('YYYY-MM-DD 23:59:59')).valueOf(),
     });
   };
 
@@ -80,8 +80,8 @@ const HttpSearch = () => {
       size: pagination.pageSize,
       appId: active,
       url,
-      beginTime: date ? date[0].format('YYYY-MM-DD 00:00:00') : undefined,
-      endTime: date ? date[1].format('YYYY-MM-DD 23:59:59') : undefined,
+      beginTime: date ? dayjs(date[0].format('YYYY-MM-DD 00:00:00')).valueOf() : undefined,
+      endTime: date ? dayjs(date[1].format('YYYY-MM-DD 23:59:59')).valueOf() : undefined,
       requestType,
       sorterName: sorter.order ? sorter.field : '',
       sorterKey: sorter.order ? (sorter.order === 'ascend' ? 'asc' : 'desc') : '',
@@ -107,11 +107,11 @@ const HttpSearch = () => {
   const search = async searchQuery => {
     setLoading(true);
     const {
-      data: { total, data },
+      data: { total, list },
     } = await getZMonitorHttpList(searchQuery);
     setTotal(total);
     setData(
-      data.map(item => ({
+      list.map(item => ({
         key: item.id,
         ...item,
       }))

@@ -136,9 +136,6 @@ export class ErrorMonitorService {
         ...searchDto
       } = searchErrorMonitorDto;
 
-      const startDate = beginTime ? beginTime : null;
-      const endDate = endTime ? endTime : null;
-
       // 检查分页参数是否合法
       if (pageSize < 1 || pageNo < 1) {
         throw new Error("Invalid pageNo or pageSize");
@@ -153,12 +150,12 @@ export class ErrorMonitorService {
       const whereConditions: any = { ...searchDto, isDeleted: false };
 
       // 添加时间区间过滤条件
-      if (startDate && endDate) {
-        whereConditions.time = Between(startDate, endDate);
-      } else if (startDate) {
-        whereConditions.time = MoreThanOrEqual(startDate);
-      } else if (endDate) {
-        whereConditions.time = LessThanOrEqual(endDate);
+      if (beginTime && endTime) {
+        whereConditions.time = Between(beginTime, endTime);
+      } else if (beginTime) {
+        whereConditions.time = MoreThanOrEqual(beginTime);
+      } else if (endTime) {
+        whereConditions.time = LessThanOrEqual(endTime);
       }
 
       // 根据url进行模糊查询

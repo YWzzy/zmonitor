@@ -196,7 +196,7 @@ type IssuesListPage = {
   total: number;
 };
 
-type IssuesListPageRes = Pagination<IssuesListPage & PublicMsg>;
+type IssuesListPageRes = PaginationHttp<IssuesListPage & PublicMsg>;
 
 type ErrorMsgItem = {
   appId: string;
