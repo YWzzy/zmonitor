@@ -50,23 +50,34 @@ export class AnalyseService {
     await this.analyseRepository.remove(analyse);
   }
 
+  /**
+   * 获取指定日期范围内不同用户ID的总数
+   * @param appId - 应用程序ID
+   * @param date - 指定日期（格式：YYYY-MM-DD）
+   * @return {Promise<number>} - 不同用户ID的总数
+   */
   private async getUsersCount(appId: string, date: string): Promise<number> {
-    const formattedDate = dayjs(date).format("YYYY-MM-DD");
-    const users = await this.analyseRepository.find({
-      where: { appId, createTime: formattedDate },
-    });
-    return users.length;
+    const formattedBeginTime = dayjs(date).format("YYYY-MM-DD 00:00:00");
+    const formattedEndTime = dayjs(date).format("YYYY-MM-DD 23:59:59");
+
+    const countResult = await this.analyseRepository
+      .createQueryBuilder("analyse")
+      .select("COUNT(DISTINCT analyse.userId)", "count")
+      .where("analyse.appId = :appId", { appId })
+      .andWhere("analyse.createTime BETWEEN :start AND :end", {
+        start: formattedBeginTime,
+        end: formattedEndTime,
+      })
+      .getRawOne();
+
+    return parseInt(countResult.count, 10);
   }
 
   async getDayActiveUsers(appId: string, date: string): Promise<number> {
     try {
-      this.logger.log(
-        `getDayActiveUsers called with appId=${appId}, date=${date}`
-      );
       const activeUsersCount = await this.getUsersCount(appId, date);
       return activeUsersCount;
     } catch (error) {
-      this.logger.error(`Error in getDayActiveUsers: ${error.message}`);
       throw error;
     }
   }
@@ -123,7 +134,7 @@ export class AnalyseService {
           .orderBy("count", "DESC")
           .limit(top)
           .getRawMany();
-      };
+      }
     } catch (error) {
       this.logger.error(`Error in getWebVisitTop: ${error.message}`);
       throw error;
@@ -134,7 +145,21 @@ export class AnalyseService {
     return this.getUsersCount(appId, date);
   }
 
-  async getActiveUsers(
+  async getActiveUsers(appId: string, date: string) {
+    const formattedBeginTime = dayjs(date).format("YYYY-MM-DD 00:00:00");
+    const formattedEndTime = dayjs(date).format("YYYY-MM-DD 23:59:59");
+    console.log("====================================");
+    console.log(formattedBeginTime);
+    console.log("====================================");
+    return this.analyseRepository.find({
+      where: {
+        appId,
+        createTime: Between(formattedBeginTime, formattedEndTime),
+      },
+    });
+  }
+
+  async getActiveUsersBetween(
     appId: string,
     beginTime: string,
     endTime: string
@@ -149,9 +174,19 @@ export class AnalyseService {
     });
   }
 
+  /**
+   * 获取指定应用程序不同用户ID的总数
+   * @param appId - 应用程序ID
+   * @return {Promise<number>} - 不同用户ID的总数
+   */
   async getAllUsers(appId: string): Promise<number> {
-    const allUsers = await this.analyseRepository.find({ where: { appId } });
-    return allUsers.length;
+    const count = await this.analyseRepository
+      .createQueryBuilder("analyse")
+      .select("COUNT(DISTINCT analyse.userId)", "count")
+      .where("analyse.appId = :appId", { appId })
+      .getRawOne();
+
+    return parseInt(count.count, 10);
   }
 
   async getTodayTraffic(appId: string): Promise<any> {

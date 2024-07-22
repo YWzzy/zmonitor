@@ -22,6 +22,9 @@ export class Analyse {
   })
   pageUrl: string;
 
+  @Column({ default: "", comment: "用户ID" })
+  userId: string;
+
   @Column({
     type: "int",
     default: 0,

@@ -52,6 +52,7 @@ export class CreateErrorMonitorDto {
     device: string;
     device_type: string;
     ip: string;
+    userId: string;
     appId: string;
     activeUsers?: number;
     pageUrl?: string;

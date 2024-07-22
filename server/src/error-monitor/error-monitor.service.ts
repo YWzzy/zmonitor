@@ -43,6 +43,7 @@ export class ErrorMonitorService {
         appId: createErrorMonitorDto.appId,
         time: createErrorMonitorDto.time,
         ip: getIp(req),
+        userId: createErrorMonitorDto.userId,
         pageUrl: createErrorMonitorDto.pageUrl,
         createTime: getCurrentFormattedDate(),
         updateTime: getCurrentFormattedDate(),

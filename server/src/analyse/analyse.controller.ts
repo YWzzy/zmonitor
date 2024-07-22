@@ -69,7 +69,11 @@ export class AnalyseController {
     @Query("appId") appId: string,
     @Query("date") dateString: string
   ) {
-    return this.analyseService.getDayActiveUsers(appId, dateString);
+    try {
+      return this.analyseService.getDayActiveUsers(appId, dateString);
+    } catch (error) {
+      throw new CustomHttpException(500, error.message);
+    }
   }
 
   @ApiOperation({ summary: "获取Web访问Top数据" })
@@ -94,15 +98,22 @@ export class AnalyseController {
     return this.analyseService.getNewUsers(appId, date);
   }
 
-  @ApiOperation({ summary: "获取活跃用户数" })
+  @ApiOperation({ summary: "获取当日活跃用户数" })
   @ApiOkResponse({ description: "成功获取活跃用户数" })
   @Get("getActiveUsers")
-  getActiveUsers(
+  getActiveUsers(@Query("appId") appId: string, @Query("date") date: string) {
+    return this.analyseService.getActiveUsers(appId, date);
+  }
+
+  @ApiOperation({ summary: "获取规定时间内活跃用户数" })
+  @ApiOkResponse({ description: "成功获取规定时间内活跃用户数" })
+  @Get("getActiveUsersBetween")
+  getActiveUsersBetween(
     @Query("appId") appId: string,
     @Query("beginTime") beginTime: string,
     @Query("endTime") endTime: string
   ) {
-    return this.analyseService.getActiveUsers(appId, beginTime, endTime);
+    return this.analyseService.getActiveUsersBetween(appId, beginTime, endTime);
   }
 
   @ApiOperation({ summary: "获取所有用户数" })
