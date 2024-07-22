@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { Drawer, Table } from 'antd';
 import { getHttpList } from '@/src/api';

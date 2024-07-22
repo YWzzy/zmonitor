@@ -1,11 +1,3 @@
-/*
- * @Author: yinhan 1738348915@qq.com
- * @Date: 2024-05-24 09:59:26
- * @LastEditors: yinhan 1738348915@qq.com
- * @LastEditTime: 2024-07-05 16:17:45
- * @FilePath: \server\src\error-monitor\dto\search-error-monitor.dto.ts
- * @Description:
- */
 import {
   IsString,
   IsNotEmpty,
@@ -30,6 +22,10 @@ export class SearchErrorMonitorDto {
 
   @IsString()
   @IsOptional()
+  requestType?: string;
+
+  @IsString()
+  @IsOptional()
   sorterKey: string;
 
   @IsString()
@@ -46,15 +42,15 @@ export class SearchErrorMonitorDto {
 
   @IsString()
   @IsOptional()
-  status: string;
+  status?: string;
 
   @IsInt()
   @IsOptional()
-  time: number;
+  time?: number;
 
   @IsString()
   @IsOptional()
-  message: string;
+  message?: string;
 
   @IsString()
   @IsOptional()
@@ -70,15 +66,15 @@ export class SearchErrorMonitorDto {
 
   @IsString()
   @IsOptional()
-  recordScreenId: string;
+  recordScreenId?: string;
 
   @IsString()
   @IsOptional()
-  userId: string;
+  userId?: string;
 
   @IsString()
   @IsOptional()
-  sdkVersion: string;
+  sdkVersion?: string;
 
   @IsString()
   @IsOptional()
@@ -86,15 +82,15 @@ export class SearchErrorMonitorDto {
 
   @IsUUID()
   @IsOptional()
-  uuid: string;
+  uuid?: string;
 
   @IsUrl()
   @IsOptional()
-  pageUrl: string;
+  pageUrl?: string;
 
   @IsBoolean()
   @IsOptional()
-  isDeleted: boolean = false;
+  isDeleted?: boolean = false;
 
   @IsString()
   @IsOptional()
@@ -106,7 +102,7 @@ export class SearchErrorMonitorDto {
 
   @IsDate()
   @IsOptional()
-  createTime: Date;
+  createTime?: Date;
 
   @IsInt()
   @IsOptional()

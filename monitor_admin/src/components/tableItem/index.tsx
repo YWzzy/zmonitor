@@ -6,7 +6,7 @@ import styles from './index.module.less';
 import { getStatusColor } from '@/src/utils/getStatusColor';
 import { copyTextToClipboard } from '@/src/utils';
 const renderHttpCost = (val: number) => (
-  <span style={{ color: getStatusColor(val, 'requestTime') }}>{val ? val.toFixed(0) : '-'}ms</span>
+  <span style={{ color: getStatusColor(val, 'requestTime') }}>{val || val==0 ? Number(val).toFixed(0) : '-'}ms</span>
 );
 
 const renderUrl = (url: string, maxLen: number, copy: boolean) => {

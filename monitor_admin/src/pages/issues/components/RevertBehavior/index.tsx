@@ -10,6 +10,7 @@ interface ActivityItem {
   data: any; // Adjust data type according to your actual structure
   message: string;
   createTime: string;
+  time: string; 
 }
 
 interface RevertBehaviorProps {
@@ -70,7 +71,7 @@ export const RevertBehavior: React.FC<RevertBehaviorProps> = ({ breadcrumbMsg, o
               }}
             >
               <span>{getActivityContent(item)}</span>
-              <span>{dayjs(item.createTime).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>{dayjs(Number(item.time)).format('YYYY-MM-DD HH:mm:ss')}</span>
             </div>
           </Timeline.Item>
         ))}

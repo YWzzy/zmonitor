@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type EventCallback = (...args: any[]) => void;
 
 class EventBus {

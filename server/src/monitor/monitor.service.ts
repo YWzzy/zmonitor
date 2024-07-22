@@ -235,6 +235,7 @@ export class MonitorService {
     url: string,
     from: string,
     size: string,
+    requestType: string,
     sorterKey: string,
     sorterName: string,
     res: any
@@ -255,6 +256,7 @@ export class MonitorService {
         url,
         pageNo: pageNumber,
         pageSize: pageSizeNumber,
+        requestType,
         sorterKey,
         sorterName,
         types: [

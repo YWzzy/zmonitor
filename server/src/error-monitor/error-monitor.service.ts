@@ -4,6 +4,7 @@ import {
   Between,
   In,
   LessThanOrEqual,
+  Like,
   MoreThanOrEqual,
   Repository,
 } from "typeorm";
@@ -12,6 +13,7 @@ import { UpdateErrorMonitorDto } from "./dto/update-error-monitor.dto";
 import { SearchErrorMonitorDto } from "./dto/search-error-monitor.dto";
 import { ErrorMonitor } from "./entities/error-monitor.entity";
 import { Breadcrumb } from "./entities/breadcrumb.entity";
+import dayjs from "dayjs";
 
 type ErrorMonitorList = {
   list: ErrorMonitor[];
@@ -88,6 +90,34 @@ export class ErrorMonitorService {
     }
   }
 
+  async getHttpDoneRank(appId: string, beginTime: string, endTime: string) {
+    const allowedTypes = ["xhr", "fetch", "request"];
+    const results = await this.errorMonitorRepository
+      .createQueryBuilder("request")
+      .select("request.url", "url")
+      .addSelect(
+        "JSON_UNQUOTE(JSON_EXTRACT(request.requestData, '$.method'))",
+        "method"
+      )
+      .addSelect("GROUP_CONCAT(request.requestData SEPARATOR '|')", "key") // 使用 GROUP_CONCAT 聚合 requestData
+      .addSelect("AVG(request.elapsedTime)", "avg_cost")
+      .where("request.type IN (:...types)", { types: allowedTypes })
+      .andWhere("request.appId = :appId", { appId })
+      .addSelect("COUNT(request.id)", "errorCount") // 统计每个 URL 的数量
+      .andWhere("request.status = :requestType", { requestType: "error" })
+      .andWhere("request.time BETWEEN :beginTime AND :endTime", {
+        beginTime,
+        endTime,
+      })
+      .groupBy("request.url")
+      .addGroupBy("JSON_UNQUOTE(JSON_EXTRACT(request.requestData, '$.method'))")
+      .orderBy("avg_cost", "DESC")
+      .limit(50)
+      .getRawMany();
+
+    return results;
+  }
+
   // 分页查询错误日志
   async findListPage(
     searchErrorMonitorDto: SearchErrorMonitorDto
@@ -96,8 +126,10 @@ export class ErrorMonitorService {
       const {
         pageSize,
         pageNo,
+        url,
         beginTime,
         endTime,
+        requestType,
         sorterKey,
         sorterName,
         types,
@@ -105,8 +137,11 @@ export class ErrorMonitorService {
       } = searchErrorMonitorDto;
 
       // 转换字符串时间为 Date 对象
-      const startDate = beginTime ? new Date(beginTime + "Z") : undefined; // 添加 'Z' 表示 UTC 时间
-      const endDate = endTime ? new Date(endTime + "Z") : undefined; // 添加 'Z' 表示 UTC 时间
+      // const startDate = beginTime ? new Date(beginTime + "Z") : undefined; // 添加 'Z' 表示 UTC 时间
+      // const endDate = endTime ? new Date(endTime + "Z") : undefined; // 添加 'Z' 表示 UTC 时间
+
+      const startDate = beginTime ? beginTime : null;
+      const endDate = endTime ? endTime : null;
 
       // 检查分页参数是否合法
       if (pageSize < 1 || pageNo < 1) {
@@ -122,14 +157,29 @@ export class ErrorMonitorService {
       const whereConditions: any = { ...searchDto, isDeleted: false };
 
       // 添加时间区间过滤条件
+      // if (startDate && endDate) {
+      //   whereConditions.createTime = Between(startDate, endDate);
+      // } else if (startDate) {
+      //   whereConditions.createTime = MoreThanOrEqual(startDate);
+      // } else if (endDate) {
+      //   whereConditions.createTime = LessThanOrEqual(endDate);
+      // }
       if (startDate && endDate) {
-        whereConditions.createTime = Between(startDate, endDate);
+        whereConditions.time = Between(startDate, endDate);
       } else if (startDate) {
-        whereConditions.createTime = MoreThanOrEqual(startDate);
+        whereConditions.time = MoreThanOrEqual(startDate);
       } else if (endDate) {
-        whereConditions.createTime = LessThanOrEqual(endDate);
+        whereConditions.time = LessThanOrEqual(endDate);
       }
 
+      // 根据url进行模糊查询
+      if (url) {
+        whereConditions.url = Like(`%${url}%`);
+      }
+
+      if (requestType) {
+        whereConditions.status = requestType === "error" ? "error" : "ok";
+      }
       // type 等于types数组中任意一种
       if (types && types.length > 0) {
         whereConditions.type = In(types);

@@ -93,6 +93,7 @@ export class MonitorController {
     @Query("url") url: string,
     @Query("from") from: string,
     @Query("size") size: string,
+    @Query("requestType") requestType: string,
     @Query("sorterKey") sorterKey: string,
     @Query("sorterName") sorterName: string,
     @Res() res: Response
@@ -104,6 +105,7 @@ export class MonitorController {
       url,
       from,
       size,
+      requestType,
       sorterKey,
       sorterName,
       res

@@ -33,40 +33,43 @@ export const HttpSlow = () => {
       dataIndex: 'url',
       key: 'url',
       width: 200,
+      align: 'center',
       render: val => TableItem.renderUrl(val, 40, false),
     },
     {
       title: '请求方法',
       dataIndex: 'method',
       key: 'method',
+      align: 'center',
       width: 100,
     },
     {
       title: '访问量',
       dataIndex: 'count',
       key: 'count',
-      width: 100,
+      align: 'center',
+      width: 100
     },
     {
       title: '平均响应时间',
       dataIndex: 'cost',
       key: 'cost',
       width: 100,
+      align: 'center',
       render: val => TableItem.renderHttpCost(val),
     },
     {
       title: '操作',
       width: 120,
+      align: 'center',
       render: (_, record) => (
         <a
           onClick={() => {
             showHttpDetail.publish({
               link: record.url,
               requestType: 'done',
-              beginTime: dayjs()
-                .add(-(day - 1), 'day')
-                .format('YYYY-MM-DD:00:00:00'),
-              endTime: dayjs().format('YYYY-MM-DD 23:59:59'),
+              beginTime: String(dayjs().add(-(day - 1), 'day').startOf('day').valueOf()),
+              endTime: String(dayjs().endOf('day').valueOf())
             });
           }}
         >
@@ -80,15 +83,18 @@ export const HttpSlow = () => {
     setLoading(true);
     const { data } = await getHttpDoneRank({
       appId: active,
-      beginTime: dayjs()
+      beginTime: String(dayjs()
         .add(-(day - 1), 'day')
-        .format('YYYY-MM-DD:00:00:00'),
-      endTime: dayjs().format('YYYY-MM-DD 23:59:59'),
+        .startOf('day')
+        .valueOf()),
+      endTime: String(dayjs().endOf('day')
+        .valueOf()),
     });
     const result = data.map(item => ({
       count: item.errorCount,
-      cost: item.avg_cost.value,
-      ...item.key,
+      cost: item.avg_cost,
+      ...item,
+      key: item.url + item.avg_cost
     }));
     setData(result);
     setLoading(false);

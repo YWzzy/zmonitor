@@ -146,6 +146,7 @@ interface HttpErrorRankRes {
   avg_cost: {
     value: number;
   };
+  url: string;
   key: {
     method: string;
     requestType: string;

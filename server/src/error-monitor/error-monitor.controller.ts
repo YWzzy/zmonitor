@@ -82,6 +82,55 @@ export class ErrorMonitorController {
     return this.errorMonitorService.findListPage(searchErrorMonitorDto);
   }
 
+  @Get("getHttpList")
+  @ApiOperation({
+    summary: "获取指定条件下的JavaScript错误数据",
+    description: "获取指定条件下的JavaScript错误数据",
+  })
+  @Auth()
+  @ApiQuery({ name: "appId", type: String, description: "应用ID" })
+  @ApiQuery({ name: "beginTime", type: String, description: "开始时间" })
+  @ApiQuery({ name: "from", type: Number, description: "当前页" })
+  @ApiQuery({ name: "size", type: Number, description: "分页size" })
+  @ApiQuery({ name: "sorterName", type: String, description: "排序字段名称" })
+  @ApiQuery({ name: "sorterKey", type: String, description: "排序key" })
+  @ApiQuery({ name: "requestType", type: String, description: "请求的类型" })
+  @ApiQuery({ name: "link", type: String, description: "请求url" })
+  async getHttpList(
+    @Query("appId") appId: string,
+    @Query("beginTime") beginTime: string,
+    @Query("endTime") endTime: string,
+    @Query("from") from: number,
+    @Query("size") size: number,
+    @Query("sorterName") sorterName: string,
+    @Query("sorterKey") sorterKey: string,
+    @Query("requestType") requestType: string,
+    @Query("link") link: string,
+    @Res() res: Response
+  ) {
+    try {
+      if (!appId || !beginTime || !endTime) {
+        throw new BadRequestException("Missing required query parameters.");
+      }
+
+      const data = await this.errorMonitorService.findListPage({
+        appId,
+        beginTime,
+        endTime,
+        url: link,
+        pageNo: from,
+        pageSize: size,
+        type: requestType === "done" ? "ok" : "error",
+        sorterName,
+        sorterKey,
+      });
+
+      return res.status(HttpStatus.OK).json({ data });
+    } catch (error) {
+      throw new CustomHttpException(500, error.message);
+    }
+  }
+
   @Get("getJsErrorRange")
   @ApiOperation({
     summary: "获取指定时间区间内的JavaScript错误数据",
@@ -147,13 +196,56 @@ export class ErrorMonitorController {
       const data = await this.errorMonitorService.getHttpErrorRank(
         appId,
         beginTime,
-        endTime,
+        endTime
       );
 
       return res.status(HttpStatus.OK).json({
         code: 200,
         data,
         message: "Issues list retrieved successfully.",
+      });
+    } catch (error) {
+      throw new CustomHttpException(500, error.message);
+    }
+  }
+
+  @Get("getHttpDoneRank")
+  @ApiOperation({
+    summary: "获取HTTP完成请求排名",
+    description: "获取指定时间范围内按url和method聚合的HTTP完成请求排名",
+  })
+  @Auth()
+  @ApiQuery({ name: "appId", type: String, description: "应用ID" })
+  @ApiQuery({ name: "beginTime", type: String, description: "开始时间" })
+  @ApiQuery({ name: "endTime", type: String, description: "结束时间" })
+  async getHttpDoneRank(
+    @Query("appId") appId: string,
+    @Query("beginTime") beginTime: string,
+    @Query("endTime") endTime: string,
+    @Res() res: Response
+  ) {
+    try {
+      if (!appId || !beginTime || !endTime) {
+        throw new BadRequestException("Missing required query parameters.");
+      }
+
+      // 验证日期格式
+      // if (isNaN(Date.parse(beginTime)) || isNaN(Date.parse(endTime))) {
+      //   throw new BadRequestException(
+      //     "Invalid date format for beginTime or endTime."
+      //   );
+      // }
+
+      const data = await this.errorMonitorService.getHttpDoneRank(
+        appId,
+        beginTime,
+        endTime
+      );
+
+      return res.status(HttpStatus.OK).json({
+        code: 200,
+        data,
+        message: "HTTP done rank retrieved successfully.",
       });
     } catch (error) {
       throw new CustomHttpException(500, error.message);
