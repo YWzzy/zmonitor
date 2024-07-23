@@ -79,6 +79,11 @@ export const getAppList = async (params): CustomResponse<AppInfo[]> => {
   return await http.get('/applications/getAppList', {params: data});
 }
 
+// 获取应用ip
+export const getAppIp = async (): CustomResponse<any> => {
+  return  await http.get('/applications/getAppIp');
+}
+
 export const createApp = async (params: CreateAppIn): CustomResponse<any> =>
   await http.post('/applications/createApp', params);
 

@@ -21,11 +21,19 @@ import { CreateApplicationDto } from "./dto/create-application.dto";
 import { UpdateApplicationDto } from "./dto/update-application.dto";
 import { Application } from "./entities/application.entity";
 import { Auth } from "src/decorator/Auth";
+import { Request } from "express";
 
 @ApiTags("监控应用")
 @Controller("applications")
 export class ApplicationController {
   constructor(private readonly applicationService: ApplicationService) {}
+
+  @ApiOperation({ summary: "获取ip" })
+  @ApiBadRequestResponse({ description: "获取ip失败" })
+  @Get("getAppIp")
+  getAppIp(req: Request) {
+    return this.applicationService.getAppIp(req);
+  }
 
   @ApiOperation({ summary: "创建新的应用" })
   @ApiCreatedResponse({ description: "应用创建成功", type: Application })

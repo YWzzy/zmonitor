@@ -1,4 +1,5 @@
 import { message } from 'antd';
+import { getAppIp } from '@/src/api';
 
 export function copyTextToClipboard(text) {
   const textarea = document.createElement('textarea');
@@ -26,3 +27,9 @@ export function parseUrlPath(url) {
   a.href = url;
   return a.pathname;
 }
+
+// 获取当前项目的IP地址
+export const getProjectIp = async () => {
+  const ip = await getAppIp();
+  return ip.data? ip.data.ip : 'unkown';
+};

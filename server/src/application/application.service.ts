@@ -5,6 +5,7 @@ import { Application } from "./entities/application.entity";
 import { CreateApplicationDto } from "./dto/create-application.dto";
 import { UpdateApplicationDto } from "./dto/update-application.dto";
 import { CustomHttpException } from "src/common/exception";
+import { Request } from "express";
 
 @Injectable()
 export class ApplicationService {
@@ -30,6 +31,14 @@ export class ApplicationService {
     // 检查数据库中是否已存在该appId，如果存在返回false，否则返回true
     // 这里需要根据具体的数据库操作来实现
     return true; // 假设简单实现，始终返回true
+  }
+
+  getAppIp(req: Request): string {
+    const forwardedFor = req.headers["x-forwarded-for"];
+    const ip = Array.isArray(forwardedFor)
+      ? forwardedFor[0]
+      : forwardedFor || req.socket.remoteAddress;
+    return ip as string;
   }
 
   async create(

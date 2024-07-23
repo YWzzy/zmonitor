@@ -8,20 +8,32 @@ import './index.css';
 import zMonitor from '@zmonitor/core';
 import performance from '@zmonitor/performance';
 import recordscreen from '@zmonitor/recordscreen';
+import { getProjectIp } from './utils';
 
 const dsn = import.meta.env.VITE_ZMONITOR_DSN;
+const projectVersion = import.meta.env.VITE_VERSION;
+const projectEnv = import.meta.env.VITE_ENV;
+getProjectIp().then(ip => {
+  zMonitor.init({
+    dsn,
+    appId: import.meta.env.VITE_APPID,
+    silentWhiteScreen: true,
+    skeletonProject: true,
+    repeatCodeError: true,
+    userId: 'zadmin',
+    getProjectConfig() {
+      return {
+        projectEnv,
+        projectVersion,
+        projectIp: ip,
+        isSourceMap: true,
+      }
+    },
+  });
 
-zMonitor.init({
-  dsn,
-  appId: import.meta.env.VITE_APPID,
-  silentWhiteScreen: true,
-  skeletonProject: true,
-  repeatCodeError: true,
-  userId: '88888888',
-});
-
-zMonitor.use(performance, null);
-zMonitor.use(recordscreen, { recordScreentime: 20 });
+  zMonitor.use(performance, null);
+  zMonitor.use(recordscreen, { recordScreentime: 20 });
+})
 
 // new Monitor({
 //   appId: 'wgnfezuv1706513953473',
