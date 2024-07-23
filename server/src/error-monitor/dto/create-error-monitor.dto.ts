@@ -33,6 +33,10 @@ export class CreateErrorMonitorDto {
   response: {
     [key: string]: any;
   };
+  projectVersion?: string;
+  projectEnv?: string;
+  projectIp?: string;
+  isSourceMap?: boolean;
   elapsedTime?: number;
   deviceInfo: {
     browserVersion: string;
@@ -59,6 +63,10 @@ export class CreateErrorMonitorDto {
     newUsers?: number;
     pv?: number;
     time?: number;
+    projectVersion?: string;
+    projectEnv?: string;
+    projectIp?: string;
+    isSourceMap?: boolean;
   };
   @IsBoolean()
   isDeleted: boolean;

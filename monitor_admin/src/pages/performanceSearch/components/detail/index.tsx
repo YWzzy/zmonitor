@@ -131,9 +131,6 @@ const ResourceTable: React.FC<{ performanceIds: string[] }> = ({ performanceIds 
       setLoading(true);
       try {
         const { data } = await getResourcesByPerformanceIds({ ids: performanceIds });
-        console.log('====================================');
-        console.log(data);
-        console.log('====================================');
         setResourcesData(data);
       } catch (error) {
         console.error('Failed to fetch resources data:', error);

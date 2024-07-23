@@ -45,6 +45,10 @@ export class ErrorMonitorService {
         ip: getIp(req),
         userId: createErrorMonitorDto.userId,
         pageUrl: createErrorMonitorDto.pageUrl,
+        projectVersion: createErrorMonitorDto.projectVersion,
+        projectEnv: createErrorMonitorDto.projectEnv,
+        projectIp: createErrorMonitorDto.projectIp,
+        isSourceMap: createErrorMonitorDto.isSourceMap,
         createTime: getCurrentFormattedDate(),
         updateTime: getCurrentFormattedDate(),
       };

@@ -61,6 +61,37 @@ export class ErrorMonitor {
   @Column({ default: "", comment: "请求URL" })
   url: string;
 
+  @Column({
+    default: "",
+    comment: "项目 IP 地址",
+    length: 45, // 足够存储 IPv6 地址
+    nullable: false,
+  })
+  projectIp: string; // IP 地址，例如 120.122.2.34
+
+  @Column({
+    default: "",
+    comment: "项目环境",
+    length: 45,
+    nullable: false,
+  })
+  projectEnv: string;
+
+  @Column({
+    default: "",
+    comment: "项目版本号",
+    length: 45,
+    nullable: false,
+  })
+  projectVersion: string;
+
+  @Column({
+    default: false,
+    comment: "项目打包是否使用了SourceMap",
+    nullable: false,
+  })
+  isSourceMap: boolean;
+
   @Column("json", { nullable: true, comment: "请求数据" })
   requestData: {
     query: string;

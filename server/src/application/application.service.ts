@@ -89,20 +89,17 @@ export class ApplicationService {
         where: { appId: appId },
       });
       if (!application) {
-        throw new Error("Application not found");
+        throw new CustomHttpException(500, "Application not found");
+      }
+      if (updateApplicationDto.appSecret) {
+        throw new CustomHttpException(500, "Cannot update appSecret");
       }
       if (updateApplicationDto.appType) {
         application.appType = updateApplicationDto.appType;
       }
-
       if (updateApplicationDto.appName) {
         application.appName = updateApplicationDto.appName;
       }
-
-      if (updateApplicationDto.appSecret) {
-        application.appSecret = updateApplicationDto.appSecret;
-      }
-
       if (updateApplicationDto.deployServer) {
         application.deployServer = updateApplicationDto.deployServer;
       }

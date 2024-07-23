@@ -66,11 +66,8 @@ export default class SourceMapUtils {
     line: number;
     column: number;
   }): Promise<any> {
+    try {
     const sourceData: any = await this.loadSourceMap(appId, fileName);
-
-    console.log('====================================');
-    console.log("sourceData", sourceData);
-    console.log('====================================');
 
     if (!sourceData) return;
 
@@ -101,9 +98,6 @@ export default class SourceMapUtils {
         line: Number(line),
         column: Number(column),
       });
-      console.log('====================================');
-      console.log('result', result);
-      console.log('====================================');
 
       if (result.source && result.source.includes('node_modules')) {
         return message.error(`源码解析失败: 因为报错来自三方依赖，报错文件为 ${result.source}`);
@@ -160,5 +154,9 @@ export default class SourceMapUtils {
     console.log('info', info);
 
     return info;
+    } catch (error) {
+      console.error('findCodeBySourceMap error:', error);
+      throw new Error(error);
+    }
   }
 }

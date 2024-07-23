@@ -54,22 +54,6 @@ export class Analyse {
   time: number;
 
   @Column({
-    type: "varchar",
-    length: 19,
-    default: "",
-    comment: "创建时间",
-  })
-  createTime: string; // 字符串格式的创建时间
-
-  @Column({
-    type: "varchar",
-    length: 19,
-    default: "",
-    comment: "更新时间",
-  })
-  updateTime: string; // 字符串格式的更新时间
-
-  @Column({
     default: "",
     comment: "浏览器名称",
     length: 50,
@@ -134,6 +118,53 @@ export class Analyse {
     nullable: false,
   })
   ip: string; // IP 地址，例如 120.122.2.34
+
+  @Column({
+    default: "",
+    comment: "项目 IP 地址",
+    length: 45, // 足够存储 IPv6 地址
+    nullable: false,
+  })
+  projectIp: string; // IP 地址，例如 120.122.2.34
+
+  @Column({
+    default: "",
+    comment: "项目环境",
+    length: 45,
+    nullable: false,
+  })
+  projectEnv: string;
+
+  @Column({
+    default: "",
+    comment: "项目版本号",
+    length: 45,
+    nullable: false,
+  })
+  projectVersion: string;
+
+  @Column({
+    default: false,
+    comment: "项目打包是否使用了SourceMap",
+    nullable: false,
+  })
+  isSourceMap: boolean;
+
+  @Column({
+    type: "varchar",
+    length: 19,
+    default: "",
+    comment: "创建时间",
+  })
+  createTime: string; // 字符串格式的创建时间
+
+  @Column({
+    type: "varchar",
+    length: 19,
+    default: "",
+    comment: "更新时间",
+  })
+  updateTime: string; // 字符串格式的更新时间
 
   @OneToOne(() => ErrorMonitor, (errorMonitor) => errorMonitor.analyse)
   errorMonitor: ErrorMonitor;
