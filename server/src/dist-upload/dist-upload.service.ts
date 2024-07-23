@@ -11,6 +11,7 @@ import * as path from "path";
 import * as dayjs from "dayjs";
 import { DistUploadLog } from "./entities/dist-upload-log.entity";
 import { Application } from "src/application/entities/application.entity";
+import { CustomHttpException } from "src/common/exception";
 
 @Injectable()
 export class DistUploadService {
@@ -32,6 +33,7 @@ export class DistUploadService {
     userId: string
   ): Promise<DistUploadLog> {
     try {
+      const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100M
       const application = await this.applicationRepository.findOne({
         where: { appId },
       });
@@ -53,6 +55,12 @@ export class DistUploadService {
       const logId = require("uuid").v4();
 
       for (const file of files) {
+        if (file.size > MAX_FILE_SIZE) {
+          throw new CustomHttpException(
+            500,
+            `File ${file.originalname} is too large`
+          );
+        }
         const filePath = path.join(directoryPath, file.originalname);
         fs.writeFileSync(filePath, file.buffer);
 
@@ -84,7 +92,8 @@ export class DistUploadService {
 
       return savedDistUploadlog;
     } catch (error) {
-      throw new BadRequestException(
+      throw new CustomHttpException(
+        500,
         `Failed to upload dist package: ${error.message}`
       );
     }

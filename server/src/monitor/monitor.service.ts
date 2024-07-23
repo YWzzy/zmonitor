@@ -14,6 +14,7 @@ import { CreatePerformanceDto } from "src/performance/dto/create-performance.dto
 import { SearchErrorMonitorDto } from "src/error-monitor/dto/search-error-monitor.dto";
 import { Application } from "src/application/entities/application.entity";
 import { Request } from "express";
+import { CustomHttpException } from "src/common/exception";
 
 @Injectable()
 export class MonitorService {
@@ -320,7 +321,11 @@ export class MonitorService {
         this.saveRecordScreen(req.body);
       } else {
         const data = await coBody.json(req);
-        if (!data) return;
+        if (!data || !data.projectEnv) return;
+
+        if(data.projectEnv === "development") {
+          throw new CustomHttpException(500, 'Development environment is not allowed to report data.');
+        }
 
         await this.saveLogByType(data.type, data, req);
       }
