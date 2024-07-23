@@ -188,3 +188,11 @@ export const getNearbyCode = async (formateData: FormData): CustomResponse<Nearb
       'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
+
+// 上传项目包文件
+export const uploadDistFiles = async (data: FormData): CustomResponse<any> =>
+  await http.post('/dist-upload/upload', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
