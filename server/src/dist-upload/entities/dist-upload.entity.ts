@@ -60,6 +60,14 @@ export class DistUpload {
   })
   userId: string;
 
+  @Column({
+    type: "varchar",
+    length: 255,
+    nullable: true,
+    comment: "描述信息",
+  })
+  description: string;
+
   @CreateDateColumn({
     type: "timestamp",
     comment: "创建时间",
@@ -71,12 +79,4 @@ export class DistUpload {
     comment: "更新时间",
   })
   updateTime: Date;
-
-  @Column({
-    type: "varchar",
-    length: 255,
-    nullable: true,
-    comment: "描述信息",
-  })
-  description: string;
 }

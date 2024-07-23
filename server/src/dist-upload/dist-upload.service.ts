@@ -10,6 +10,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as dayjs from "dayjs";
 import { DistUploadLog } from "./entities/dist-upload-log.entity";
+import { Application } from "src/application/entities/application.entity";
 
 @Injectable()
 export class DistUploadService {
@@ -17,7 +18,9 @@ export class DistUploadService {
     @InjectRepository(DistUpload)
     private readonly distUploadRepository: Repository<DistUpload>,
     @InjectRepository(DistUploadLog)
-    private readonly distUploadLogRepository: Repository<DistUploadLog>
+    private readonly distUploadLogRepository: Repository<DistUploadLog>,
+    @InjectRepository(Application)
+    private readonly applicationRepository: Repository<Application>
   ) {}
 
   async uploadDistPackage(
@@ -29,10 +32,13 @@ export class DistUploadService {
     userId: string
   ): Promise<DistUploadLog> {
     try {
+      const application = await this.applicationRepository.findOne({
+        where: { appId },
+      });
       const currentDate = dayjs().format("YYYY-MM-DD");
       const directoryPath = path.join(
-        __dirname,
-        `../../../../dist/${currentDate}/${appId}/${projectEnv}/${projectVersion}/${
+        application.packageUrl,
+        `/distProject/${currentDate}/${appId}/${projectEnv}/${projectVersion}/${
           isSourceMap ? "sourceMap" : "NoSourceMap"
         }`
       );
