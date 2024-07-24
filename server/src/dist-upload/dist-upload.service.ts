@@ -15,6 +15,10 @@ import { Application } from "src/application/entities/application.entity";
 import { CustomHttpException } from "src/common/exception";
 import { Response } from "express";
 
+interface DistFile extends Express.Multer.File {
+  webkitRelativePath: string;
+}
+
 @Injectable()
 export class DistUploadService {
   constructor(
@@ -28,7 +32,7 @@ export class DistUploadService {
 
   async uploadDistPackage(
     appId: string,
-    files: Express.Multer.File[],
+    files: DistFile[],
     projectEnv: string,
     projectVersion: string,
     isSourceMap: boolean,
@@ -73,7 +77,8 @@ export class DistUploadService {
             `File ${file.originalname} is too large`
           );
         }
-        const filePath = path.join(directoryPath, file.originalname);
+        const webkitRelativePath = file.webkitRelativePath;
+        const filePath = path.join(directoryPath, webkitRelativePath);
         fs.writeFileSync(filePath, file.buffer);
 
         const distUpload = new DistUpload();

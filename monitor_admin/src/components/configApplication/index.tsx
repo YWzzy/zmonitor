@@ -24,6 +24,10 @@ interface AppConfig {
   isSourceMap: boolean;
 }
 
+interface UploadOriginFile extends UploadFile {
+  webkitRelativePath: string;
+}
+
 export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose, appId }) => {
   const [form] = Form.useForm();
 
@@ -34,7 +38,7 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
   const [appConfig, setAppConfig] = useState<AppConfig | object>({});
   const [fetching, setFetching] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<UploadOriginFile[]>([]);
 
   const { TextArea } = Input;
 
@@ -65,18 +69,24 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
 
   // 上传dist文件
   const handleUpload = async () => {
+    message.open({
+      content: '文件上传中...',
+      key: 'uploading',
+    });
     const formData = new FormData();
+    const formLocalData = form.getFieldsValue();
+    const isSourceMap = formLocalData['isSourceMap'];
     fileList.forEach(file => {
-      if (appConfig['isSourceMap'] && file.name.endsWith('.map')) {
+      if (isSourceMap && file.name.endsWith('.map')) {
         formData.append('files', file.originFileObj as Blob);
-      } else if (!appConfig['isSourceMap'] && !file.name.endsWith('.map')) {
+      } else if (!isSourceMap && !file.name.endsWith('.map')) {
         formData.append('files', file.originFileObj as Blob);
       }
     });
     formData.append('appId', appConfig['appId']);
-    formData.append('projectEnv', appConfig['projectEnv']);
-    formData.append('projectVersion', appConfig['projectVersion']);
-    formData.append('isSourceMap', appConfig['isSourceMap']);
+    formData.append('projectEnv', formLocalData['projectEnv']);
+    formData.append('projectVersion', formLocalData['projectVersion']);
+    formData.append('isSourceMap', isSourceMap);
     formData.append('userId', import.meta.env.VITE_USERID);
 
     setUploading(true);
@@ -92,14 +102,16 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
   };
 
   const uploadProps = {
-    onRemove: (file: UploadFile) => {
+    onRemove: (file: UploadOriginFile) => {
       const index = fileList.indexOf(file);
       const newFileList = fileList.slice();
       newFileList.splice(index, 1);
       setFileList(newFileList);
     },
-    beforeUpload: (file) => {
-      const isSourceMap = appConfig['isSourceMap'];
+    beforeUpload: (file: UploadOriginFile) => {
+      const formLocalData = form.getFieldsValue();
+      const isSourceMap = formLocalData['isSourceMap'];
+      // const isSourceMap = appConfig['isSourceMap'];
       const allowedNonSourceMapExtensions = ['.js', '.ts', '.cjs', '.css', '.html', '.htm'];
 
       const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
@@ -111,11 +123,12 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
         return false;
       }
 
-      const uploadFile: UploadFile = {
+      const uploadFile: any = {
         uid: file.uid,
         name: file.name,
         status: 'done',
         originFileObj: file,
+        webkitRelativePath: file.webkitRelativePath,
       };
       setFileList(prevList => [...prevList, uploadFile]);
       return false; // 阻止自动上传
@@ -217,6 +230,13 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
           </Col>
           <Col span={12}>
             <Card style={{ height: '500px', overflowY: 'auto' }}>
+              <div style={{ fontSize: '12px' }}>
+                <span>PS：上传的包需要与</span>
+                <span style={{ fontSize: '14px', color: "red" }}>当前项目版本</span>以及
+                <span style={{ fontSize: '14px', color: "red" }}>应用环境</span>还有
+                <span style={{ fontSize: '14px', color: "red" }}>是否使用sourcemap</span>
+                <span>保持一致</span>
+              </div>
               <Form.Item label="上传包文件">
                 {
                   fileList.length !== 0 && !uploading &&

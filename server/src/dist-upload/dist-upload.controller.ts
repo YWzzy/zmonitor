@@ -26,6 +26,10 @@ import { DistUpload } from "./entities/dist-upload.entity";
 import { CustomHttpException } from "src/common/exception";
 import { DistUploadLog } from "./entities/dist-upload-log.entity";
 
+interface DistFile extends Express.Multer.File {
+  webkitRelativePath: string;
+}
+
 @ApiTags("DistUpload")
 @Controller("dist-upload")
 export class DistUploadController {
@@ -50,7 +54,7 @@ export class DistUploadController {
   })
   async uploadDistPackage(
     @Body() body: any,
-    @UploadedFiles() files: Express.Multer.File[]
+    @UploadedFiles() files: DistFile[]
   ): Promise<DistUploadLog> {
     try {
       const { appId, projectEnv, projectVersion, isSourceMap, userId } = body;
