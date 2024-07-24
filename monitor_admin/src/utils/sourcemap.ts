@@ -55,19 +55,43 @@ export default class SourceMapUtils {
     }
   }
 
+  static async loadCodeFileOrMap(appId: string,fileName: string, projectEnv: string, projectVersion: string, isSourceMap: boolean): Promise<string | null> {
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_HOST}/dist-upload/findDistPackages?fileName=${fileName}&env=${projectEnv}&appId=${appId}&projectVersion=${projectVersion}&isSourceMap=${isSourceMap}`
+      );
+      console.log('response', response);
+        if (projectEnv == 'development') {
+          return await response.text();
+        } else {
+          return await response.json();
+        }
+    } catch (error) {
+      console.error('加载源码映射失败:', error);
+      throw new Error(error);
+    }
+  }
+
   static async findCodeBySourceMap({
     appId,
     fileName,
+    projectEnv,
+    projectVersion,
+    isSourceMap,
     line,
     column,
   }: {
     appId: string;
     fileName: string;
+    projectEnv: string;
+    projectVersion: string;
+    isSourceMap: boolean;
     line: number;
     column: number;
   }): Promise<any> {
     try {
-    const sourceData: any = await this.loadSourceMap(appId, fileName);
+    const sourceData: any = await this.loadCodeFileOrMap(appId, fileName, projectEnv, projectVersion, isSourceMap);
 
     if (!sourceData) return;
 

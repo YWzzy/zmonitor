@@ -64,7 +64,11 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
   const handleUpload = async () => {
     const formData = new FormData();
     fileList.forEach(file => {
-      formData.append('files', file.originFileObj as Blob);
+      if ((import.meta.env.VITE_ISSOURCEMAP || import.meta.env.VITE_ISSOURCEMAP === 'true') && file.name.endsWith('.map')) {
+        formData.append('files', file.originFileObj as Blob);
+      } else if ((!import.meta.env.VITE_ISSOURCEMAP || import.meta.env.VITE_ISSOURCEMAP === 'false') && !file.name.endsWith('.map')) {
+        formData.append('files', file.originFileObj as Blob);
+      }
     });
     formData.append('appId', import.meta.env.VITE_APPID);
     formData.append('projectEnv', import.meta.env.VITE_ENV);
@@ -92,12 +96,19 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
       setFileList(newFileList);
     },
     beforeUpload: (file) => {
-      setFileList(prevList => [...prevList, {
+      const isSourceMap = import.meta.env.VITE_ISSOURCEMAP === 'true';
+      // 当isSourceMap为true时，只上传sourceMap文件；当isSourceMap为false时，只上传非sourceMap文件
+      if ((isSourceMap && !file.name.endsWith('.map')) || (!isSourceMap && file.name.endsWith('.map'))) {
+        console.error(`文件 ${file.name} 不符合上传条件`);
+        return false;
+      }
+      const uploadFile: UploadFile = {
         uid: file.uid,
         name: file.name,
         status: 'done',
         originFileObj: file,
-      }]);
+      };
+      setFileList(prevList => [...prevList, uploadFile]);
       return false; // 阻止自动上传
     },
     showUploadList: true,

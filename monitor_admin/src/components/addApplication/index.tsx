@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Form, Radio, Input, message } from 'antd';
 import { createApp } from '@/src/api';
-import { AppTypes, AppType } from '@/src/constants';
+import { AppTypes, AppType, ProjectEnvType, ProjectEnvTypes } from '@/src/constants';
 import { useAppStore, useUserStore } from '@/src/hooks';
 
 interface AddApplicationIn {
@@ -24,7 +24,7 @@ export const AddApplication: React.FC<AddApplicationIn> = ({ open, onClose }) =>
         try {
           await form.validateFields();
           setLoading(true);
-          const params = {...form.getFieldsValue(), userKey: userInfo.account};
+          const params = { ...form.getFieldsValue(), userKey: userInfo.account };
           await createApp(params);
           await appDispatch.getAppList(userInfo.account);
           setLoading(false);
@@ -47,13 +47,27 @@ export const AddApplication: React.FC<AddApplicationIn> = ({ open, onClose }) =>
         </Form.Item>
         <Form.Item
           name="appType"
-          label="应用名称"
+          label="应用类型"
           initialValue={AppType.WEB}
           rules={[{ required: true }]}
         >
           <Radio.Group>
             {AppTypes.map(item => (
               <Radio value={item.value} disabled={item.value !== AppType.WEB} key={item.value}>
+                {item.label}
+              </Radio>
+            ))}
+          </Radio.Group>
+        </Form.Item>
+        <Form.Item
+          name="projectEnv"
+          label="应用环境"
+          initialValue={ProjectEnvType.DEVELOPMENT}
+          rules={[{ required: true }]}
+        >
+          <Radio.Group>
+            {ProjectEnvTypes.map(item => (
+              <Radio value={item.value} key={item.value}>
                 {item.label}
               </Radio>
             ))}

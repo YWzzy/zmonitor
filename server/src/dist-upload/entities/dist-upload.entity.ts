@@ -42,6 +42,13 @@ export class DistUpload {
   @Column({
     type: "varchar",
     length: 255,
+    comment: "子包文件名称",
+  })
+  fileName: string;
+
+  @Column({
+    type: "varchar",
+    length: 255,
     comment: "项目包地址",
   })
   path: string;

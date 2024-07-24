@@ -39,6 +39,14 @@ export class Application {
   appType: number;
 
   @Column({
+    type: "varchar",
+    length: 48,
+    default: "development",
+    comment: "项目环境",
+  })
+  projectEnv: string;
+
+  @Column({
     comment: "应用状态",
   })
   appStatus: number;

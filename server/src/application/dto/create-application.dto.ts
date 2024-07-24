@@ -31,6 +31,11 @@ export class CreateApplicationDto {
   @IsNotEmpty({ message: "应用类型不能为空" })
   appType: number;
 
+  @IsString()
+  @IsOptional()
+  @Length(1, 48, { message: "应用名称长度必须在1到48个字符之间" })
+  projectEnv?: string;
+
   @IsOptional()
   appStatus: number;
 

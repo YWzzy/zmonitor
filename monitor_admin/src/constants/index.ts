@@ -13,3 +13,29 @@ export const AppTypes = [
     value: AppType.WXMIN,
   },
 ];
+
+export enum ProjectEnvType {
+  DEVELOPMENT = 'development',
+  PRODUCTION = 'production',
+  LOCALDEV = 'localdev',
+  TEST = 'test',
+}
+
+export const ProjectEnvTypes = [
+  {
+    label: 'dev',
+    value: ProjectEnvType.DEVELOPMENT,
+  },
+  {
+    label: 'prod',
+    value: ProjectEnvType.PRODUCTION,
+  },
+  {
+    label: 'local',
+    value: ProjectEnvType.LOCALDEV,
+  },
+  {
+    label: 'test',
+    value: ProjectEnvType.TEST,
+  },
+];

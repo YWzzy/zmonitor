@@ -93,16 +93,18 @@ export class DistUploadController {
     }
   }
 
-  @Get()
+  @Get("findDistPackages")
   @ApiOperation({ summary: "查询指定条件下的dist包" })
   @ApiQuery({ name: "appId", required: false, type: "string" })
   @ApiQuery({ name: "projectEnv", required: false, type: "string" })
   @ApiQuery({ name: "projectVersion", required: false, type: "string" })
+  @ApiQuery({ name: "fileName", required: false, type: "string" })
   @ApiQuery({ name: "userId", required: false, type: "string" })
   async findDistPackages(
     @Query("appId") appId?: string,
     @Query("projectEnv") projectEnv?: string,
     @Query("projectVersion") projectVersion?: string,
+    @Query("fileName") fileName?: string,
     @Query("userId") userId?: string
   ): Promise<DistUpload[]> {
     try {
@@ -110,6 +112,7 @@ export class DistUploadController {
         appId,
         projectEnv,
         projectVersion,
+        fileName,
         userId,
       });
     } catch (error) {

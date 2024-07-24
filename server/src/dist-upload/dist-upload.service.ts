@@ -34,6 +34,15 @@ export class DistUploadService {
   ): Promise<DistUploadLog> {
     try {
       const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100M
+      const logs = await this.distUploadLogRepository.find({
+        where: { appId, projectEnv, projectVersion },
+      });
+      if (logs.length > 0) {
+        throw new CustomHttpException(
+          500,
+          `Dist package with appId ${appId}, projectEnv ${projectEnv}, projectVersion ${projectVersion} already exists`
+        );
+      }
       const application = await this.applicationRepository.findOne({
         where: { appId },
       });
@@ -66,6 +75,7 @@ export class DistUploadService {
 
         const distUpload = new DistUpload();
         distUpload.appId = appId;
+        distUpload.fileName = file.originalname;
         distUpload.projectEnv = projectEnv;
         distUpload.projectVersion = projectVersion;
         distUpload.isSourceMap = isSourceMap ? 1 : 0;
@@ -134,7 +144,15 @@ export class DistUploadService {
 
   async findDistPackages(query: Partial<DistUpload>): Promise<DistUpload[]> {
     try {
-      return await this.distUploadRepository.find({ where: query });
+      // 过滤掉空的字段
+      const queryParams = Object.entries(query).reduce((acc, [key, value]) => {
+        if (value) {
+          acc[key] = value;
+        }
+        return acc;
+      }
+      , {});
+      return await this.distUploadRepository.find({ where: queryParams });
     } catch (error) {
       throw new BadRequestException(
         `Failed to find dist packages: ${error.message}`
