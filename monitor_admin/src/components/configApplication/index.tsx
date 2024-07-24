@@ -130,7 +130,6 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
           await updateAppConfig(formData);
           await appDispatch.getAppList(userInfo.account);
           setLoading(false);
-          await handleUpload(); // 在提交配置后上传文件
           message.success('应用配置成功更新！');
           onClose();
         } catch (error) {

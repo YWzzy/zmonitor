@@ -100,7 +100,10 @@ export class ApplicationService {
       if (!application) {
         throw new CustomHttpException(500, "Application not found");
       }
-      if (updateApplicationDto.appSecret) {
+      if (
+        updateApplicationDto.appSecret &&
+        updateApplicationDto.appSecret !== application.appSecret
+      ) {
         throw new CustomHttpException(500, "Cannot update appSecret");
       }
       if (updateApplicationDto.appType) {
@@ -141,7 +144,7 @@ export class ApplicationService {
       application.updateTime = new Date(); // 更新 updateTime
       return this.applicationRepository.save(application);
     } catch (error) {
-      throw new Error(error);
+      throw new CustomHttpException(500, error.message);
     }
   }
 
