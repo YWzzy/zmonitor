@@ -9,6 +9,7 @@ import {
   Query,
   UseInterceptors,
   UploadedFiles,
+  Res,
 } from "@nestjs/common";
 import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import {
@@ -19,6 +20,7 @@ import {
   ApiParam,
   ApiQuery,
 } from "@nestjs/swagger";
+import { Response } from "express";
 import { DistUploadService } from "./dist-upload.service";
 import { DistUpload } from "./entities/dist-upload.entity";
 import { CustomHttpException } from "src/common/exception";
@@ -101,6 +103,7 @@ export class DistUploadController {
   @ApiQuery({ name: "fileName", required: false, type: "string" })
   @ApiQuery({ name: "userId", required: false, type: "string" })
   async findDistPackages(
+    @Res() res: Response,
     @Query("appId") appId?: string,
     @Query("projectEnv") projectEnv?: string,
     @Query("projectVersion") projectVersion?: string,
@@ -108,13 +111,16 @@ export class DistUploadController {
     @Query("userId") userId?: string
   ): Promise<DistUpload[]> {
     try {
-      return await this.distUploadService.findDistPackages({
-        appId,
-        projectEnv,
-        projectVersion,
-        fileName,
-        userId,
-      });
+      return await this.distUploadService.findDistPackages(
+        {
+          appId,
+          projectEnv,
+          projectVersion,
+          fileName,
+          userId,
+        },
+        res
+      );
     } catch (error) {
       throw new CustomHttpException(error.status, error.message);
     }

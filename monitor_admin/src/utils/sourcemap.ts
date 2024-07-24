@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import sourceMap from 'source-map-js';
 import { message } from 'antd';
+import {extractFileName} from '@/src/utils/index';
+// import { findDistPackages } from '../api';
 
 interface CodeDetail {
   source: string;
@@ -59,14 +61,22 @@ export default class SourceMapUtils {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_HOST}/dist-upload/findDistPackages?fileName=${fileName}&env=${projectEnv}&appId=${appId}&projectVersion=${projectVersion}&isSourceMap=${isSourceMap}`
+        `${import.meta.env.VITE_API_HOST}/dist-upload/findDistPackages?fileName=${extractFileName(fileName, isSourceMap)}&env=${projectEnv}&appId=${appId}&projectVersion=${projectVersion}&isSourceMap=${isSourceMap}`
       );
-      console.log('response', response);
-        if (projectEnv == 'development') {
-          return await response.text();
-        } else {
-          return await response.json();
-        }
+      // const response = await findDistPackages({
+      //   fileName: extractFileName(fileName, isSourceMap),
+      //   projectEnv,
+      //   appId,
+      //   projectVersion,
+      //   isSourceMap
+      // })
+      return response.json();
+        // if (projectEnv == 'development') {
+        //   return await response.text();
+        // } else {
+        //   return await response.json();
+        // }
+
     } catch (error) {
       console.error('加载源码映射失败:', error);
       throw new Error(error);
@@ -98,7 +108,7 @@ export default class SourceMapUtils {
     let result: CodeDetail;
     let codeList: string[];
 
-    if (import.meta.env.VITE_ENV == 'development') {
+    if (!isSourceMap) {
       const source = this.getFileLink(fileName);
       
       let isStart = false;
@@ -144,6 +154,9 @@ export default class SourceMapUtils {
       codeList = code.split('\n');
     }
 
+    console.log("result", result);
+    
+
     const row = result.line;
     const len = codeList.length - 1;
     const start = row - 5 >= 0 ? row - 5 : 0;
@@ -174,8 +187,6 @@ export default class SourceMapUtils {
     if (result.hasOwnProperty('name')) {
       info.originalPosition.name = result['name'];
     }
-
-    console.log('info', info);
 
     return info;
     } catch (error) {

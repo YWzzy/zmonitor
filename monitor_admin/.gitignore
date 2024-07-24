@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+./distProject/*
 dist-ssr
 *.local
 
@@ -24,4 +25,3 @@ dist-ssr
 *.sw?
 
 build
-node_modules

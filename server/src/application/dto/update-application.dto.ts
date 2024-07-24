@@ -29,6 +29,14 @@ export class UpdateApplicationDto {
   @IsOptional()
   appSecret: string;
 
+  @IsString()
+  @IsOptional()
+  projectEnv?: string;
+
+  @IsString()
+  @IsOptional()
+  projectVersion?: string;
+
   @IsNumber()
   @IsOptional()
   appType: number;

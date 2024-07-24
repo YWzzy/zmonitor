@@ -85,6 +85,7 @@ const HttpSearch = () => {
       requestType,
       sorterName: sorter.order ? sorter.field : '',
       sorterKey: sorter.order ? (sorter.order === 'ascend' ? 'asc' : 'desc') : '',
+      projectEnv: import.meta.env.VITE_ENV,
     };
     setPageIn({
       current: pagination.current,

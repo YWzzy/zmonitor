@@ -196,3 +196,7 @@ export const uploadDistFiles = async (data: FormData): CustomResponse<any> =>
       'Content-Type': 'multipart/form-data',
     },
   });
+
+// 查询项目包文件
+export const findDistPackages = async (params: any): CustomResponse<any> =>
+  await http.get('/dist-upload/findDistPackages', { params });

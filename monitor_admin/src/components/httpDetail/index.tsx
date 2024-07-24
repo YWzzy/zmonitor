@@ -14,6 +14,7 @@ const initQuery = {
   link: '',
   beginTime: '',
   endTime: '',
+  projectEnv: import.meta.env.VITE_ENV,
   // requestType: '',
 };
 export const HttpDetail = () => {

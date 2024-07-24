@@ -56,6 +56,7 @@ export const ErrorSearch = forwardRef<ErrorSearchHandle>((props, ref) => {
       endTime: date ? dayjs(date[1].format('YYYY-MM-DD 23:59:59')).valueOf() : undefined,
       page,
       pageSize,
+      projectEnv: import.meta.env.VITE_ENV
     };
     search(query);
   };

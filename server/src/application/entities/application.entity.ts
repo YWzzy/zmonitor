@@ -47,6 +47,14 @@ export class Application {
   projectEnv: string;
 
   @Column({
+    type: "varchar",
+    length: 48,
+    default: "1.0.0",
+    comment: "项目当前版本",
+  })
+  projectVersion: string;
+
+  @Column({
     comment: "应用状态",
   })
   appStatus: number;

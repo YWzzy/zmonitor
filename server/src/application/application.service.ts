@@ -97,6 +97,7 @@ export class ApplicationService {
       const application = await this.applicationRepository.findOne({
         where: { appId: appId },
       });
+
       if (!application) {
         throw new CustomHttpException(500, "Application not found");
       }
@@ -106,8 +107,18 @@ export class ApplicationService {
       ) {
         throw new CustomHttpException(500, "Cannot update appSecret");
       }
+      application.isSourceMap = updateApplicationDto.isSourceMap;
       if (updateApplicationDto.appType) {
         application.appType = updateApplicationDto.appType;
+      }
+      if (updateApplicationDto.projectEnv) {
+        application.projectEnv = updateApplicationDto.projectEnv;
+      }
+      if (updateApplicationDto.userKey) {
+        application.userKey = updateApplicationDto.userKey;
+      }
+      if (updateApplicationDto.projectVersion) {
+        application.projectVersion = updateApplicationDto.projectVersion;
       }
       if (updateApplicationDto.appName) {
         application.appName = updateApplicationDto.appName;

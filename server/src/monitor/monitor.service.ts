@@ -174,6 +174,7 @@ export class MonitorService {
     endTime: string,
     page: string,
     pageSize: string,
+    projectEnv: string,
     res: any
   ): Promise<any> {
     try {
@@ -191,6 +192,7 @@ export class MonitorService {
         endTime,
         pageNo: pageNumber,
         pageSize: pageSizeNumber,
+        projectEnv,
         types: [
           "error",
           "unhandledrejection",
@@ -230,6 +232,7 @@ export class MonitorService {
     requestType: string,
     sorterKey: string,
     sorterName: string,
+    projectEnv: string,
     res: any
   ): Promise<any> {
     try {
@@ -251,6 +254,7 @@ export class MonitorService {
         requestType,
         sorterKey,
         sorterName,
+        projectEnv,
         types: [
           "fetch",
           "xmlhttprequest",
@@ -322,10 +326,6 @@ export class MonitorService {
       } else {
         const data = await coBody.json(req);
         if (!data || !data.projectEnv) return;
-
-        if(data.projectEnv === "development") {
-          throw new CustomHttpException(500, 'Development environment is not allowed to report data.');
-        }
 
         await this.saveLogByType(data.type, data, req);
       }

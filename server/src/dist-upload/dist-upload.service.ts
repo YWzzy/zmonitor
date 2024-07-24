@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  HttpStatus,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -12,6 +13,7 @@ import * as dayjs from "dayjs";
 import { DistUploadLog } from "./entities/dist-upload-log.entity";
 import { Application } from "src/application/entities/application.entity";
 import { CustomHttpException } from "src/common/exception";
+import { Response } from "express";
 
 @Injectable()
 export class DistUploadService {
@@ -48,6 +50,7 @@ export class DistUploadService {
       });
       const currentDate = dayjs().format("YYYY-MM-DD");
       const directoryPath = path.join(
+        // __dirname,
         application.packageUrl,
         `/distProject/${currentDate}/${appId}/${projectEnv}/${projectVersion}/${
           isSourceMap ? "sourceMap" : "NoSourceMap"
@@ -142,7 +145,10 @@ export class DistUploadService {
     }
   }
 
-  async findDistPackages(query: Partial<DistUpload>): Promise<DistUpload[]> {
+  async findDistPackages(
+    query: Partial<DistUpload>,
+    res: Response
+  ): Promise<any> {
     try {
       // 过滤掉空的字段
       const queryParams = Object.entries(query).reduce((acc, [key, value]) => {
@@ -150,9 +156,20 @@ export class DistUploadService {
           acc[key] = value;
         }
         return acc;
+      }, {});
+      const logs = await this.distUploadRepository.find({ where: queryParams });
+      // 取第一条
+      const distLog = logs[0];
+      const distChildPackagePath = distLog.path;
+      console.log("====================================");
+      console.log(distChildPackagePath);
+      console.log("====================================");
+      try {
+        const data = await fs.promises.readFile(distChildPackagePath);
+        return res.status(HttpStatus.OK).send(data);
+      } catch (err) {
+        throw new CustomHttpException(500, err.message);
       }
-      , {});
-      return await this.distUploadRepository.find({ where: queryParams });
     } catch (error) {
       throw new BadRequestException(
         `Failed to find dist packages: ${error.message}`

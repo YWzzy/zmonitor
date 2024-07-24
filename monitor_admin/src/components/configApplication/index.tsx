@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Switch, message, Spin, Button, Upload, UploadFile, Row, Col, Card } from 'antd';
+import { Modal, Form, Input, Switch, message, Spin, Button, Upload, UploadFile, Row, Col, Card, Radio } from 'antd';
 import { updateAppConfig, uploadDistFiles } from '@/src/api';
 import { useAppStore, useUserStore } from '@/src/hooks';
 import { UploadOutlined, CloseOutlined } from '@ant-design/icons';
+import { ProjectEnvType, ProjectEnvTypes } from '@/src/constants';
 
 interface ConfigApplicationIn {
   open: boolean;
@@ -20,6 +21,7 @@ interface AppConfig {
   appDesc?: string;
   enableRecording: boolean;
   reportErrorsOnly: boolean;
+  isSourceMap: boolean;
 }
 
 export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose, appId }) => {
@@ -39,6 +41,7 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
   useEffect(() => {
     const fetchAppConfig = async () => {
       setFetching(true);
+      setFileList([]); // 清空文件列表
       try {
         const config = await appDispatch.getConfigApp(appId);
         setAppConfig(config);
@@ -64,16 +67,16 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
   const handleUpload = async () => {
     const formData = new FormData();
     fileList.forEach(file => {
-      if ((import.meta.env.VITE_ISSOURCEMAP || import.meta.env.VITE_ISSOURCEMAP === 'true') && file.name.endsWith('.map')) {
+      if (appConfig['isSourceMap'] && file.name.endsWith('.map')) {
         formData.append('files', file.originFileObj as Blob);
-      } else if ((!import.meta.env.VITE_ISSOURCEMAP || import.meta.env.VITE_ISSOURCEMAP === 'false') && !file.name.endsWith('.map')) {
+      } else if (!appConfig['isSourceMap'] && !file.name.endsWith('.map')) {
         formData.append('files', file.originFileObj as Blob);
       }
     });
-    formData.append('appId', import.meta.env.VITE_APPID);
-    formData.append('projectEnv', import.meta.env.VITE_ENV);
-    formData.append('projectVersion', import.meta.env.VITE_VERSION);
-    formData.append('isSourceMap', JSON.stringify(import.meta.env.VITE_ISSOURCEMAP));
+    formData.append('appId', appConfig['appId']);
+    formData.append('projectEnv', appConfig['projectEnv']);
+    formData.append('projectVersion', appConfig['projectVersion']);
+    formData.append('isSourceMap', appConfig['isSourceMap']);
     formData.append('userId', import.meta.env.VITE_USERID);
 
     setUploading(true);
@@ -96,12 +99,18 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
       setFileList(newFileList);
     },
     beforeUpload: (file) => {
-      const isSourceMap = import.meta.env.VITE_ISSOURCEMAP === 'true';
-      // 当isSourceMap为true时，只上传sourceMap文件；当isSourceMap为false时，只上传非sourceMap文件
-      if ((isSourceMap && !file.name.endsWith('.map')) || (!isSourceMap && file.name.endsWith('.map'))) {
-        console.error(`文件 ${file.name} 不符合上传条件`);
+      const isSourceMap = appConfig['isSourceMap'];
+      const allowedNonSourceMapExtensions = ['.js', '.ts', '.cjs', '.css', '.html', '.htm'];
+
+      const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      const isValidNonSourceMapFile = allowedNonSourceMapExtensions.includes(fileExtension);
+
+      // 当isSourceMap为true时，只上传sourceMap文件；当isSourceMap为false时，只上传指定后缀的非sourceMap文件
+      if ((isSourceMap && !file.name.endsWith('.map')) || (!isSourceMap && (!isValidNonSourceMapFile || file.name.endsWith('.map')))) {
+        console.warn(`文件 ${file.name} 不符合上传条件,因为isSourceMap = ${isSourceMap},所以被过滤`);
         return false;
       }
+
       const uploadFile: UploadFile = {
         uid: file.uid,
         name: file.name,
@@ -111,6 +120,7 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
       setFileList(prevList => [...prevList, uploadFile]);
       return false; // 阻止自动上传
     },
+
     showUploadList: true,
     multiple: true,
     directory: true,
@@ -131,6 +141,7 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
           await appDispatch.getAppList(userInfo.account);
           setLoading(false);
           message.success('应用配置成功更新！');
+          setFileList([]); // 清空文件列表
           onClose();
         } catch (error) {
           setLoading(false);
@@ -155,6 +166,9 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
               <Form.Item name="appId" label="appId">
                 <Input disabled />
               </Form.Item>
+              <Form.Item name="projectVersion" label="当前项目版本" rules={[{ required: true }]}>
+                <Input placeholder='当前项目版本, eg：1.2.1' />
+              </Form.Item>
               <Form.Item name="deployServer" label="应用部署服务器地址" rules={[{ required: true }]}>
                 <Input />
               </Form.Item>
@@ -170,12 +184,35 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
               <Form.Item name="appDesc" label="应用描述">
                 <TextArea placeholder="请输入应用描述" autoSize={{ minRows: 3, maxRows: 5 }} />
               </Form.Item>
-              <Form.Item name="enableRecording" label="是否开启录屏" valuePropName="checked">
-                <Switch />
-              </Form.Item>
-              <Form.Item name="reportErrorsOnly" label="是否只异常上报" valuePropName="checked">
-                <Switch />
-              </Form.Item>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item name="enableRecording" label="是否开启录屏" valuePropName="checked">
+                    <Switch />
+                  </Form.Item>
+                  <Form.Item name="reportErrorsOnly" label="是否只异常上报" valuePropName="checked">
+                    <Switch />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item name="isSourceMap" label="是否是sourcemap" valuePropName="checked">
+                    <Switch />
+                  </Form.Item>
+                  <Form.Item
+                    name="projectEnv"
+                    label="应用环境"
+                    initialValue={ProjectEnvType.DEVELOPMENT}
+                    rules={[{ required: true }]}
+                  >
+                    <Radio.Group>
+                      {ProjectEnvTypes.map(item => (
+                        <Radio value={item.value} key={item.value}>
+                          {item.label}
+                        </Radio>
+                      ))}
+                    </Radio.Group>
+                  </Form.Item>
+                </Col>
+              </Row>
             </Form>
           </Col>
           <Col span={12}>

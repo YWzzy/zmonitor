@@ -68,6 +68,7 @@ export class MonitorController {
     @Query("endTime") endTime: string,
     @Query("page") page: string,
     @Query("pageSize") pageSize: string,
+    @Query("projectEnv") projectEnv: string,
     @Res() res: Response
   ): Promise<void> {
     this.monitorService.findPaginatedAndFiltered(
@@ -76,6 +77,7 @@ export class MonitorController {
       endTime,
       page,
       pageSize,
+      projectEnv,
       res
     );
   }
@@ -96,6 +98,7 @@ export class MonitorController {
     @Query("requestType") requestType: string,
     @Query("sorterKey") sorterKey: string,
     @Query("sorterName") sorterName: string,
+    @Query("projectEnv") projectEnv: string,
     @Res() res: Response
   ): Promise<void> {
     this.monitorService.getHttpErrorListPage(
@@ -108,6 +111,7 @@ export class MonitorController {
       requestType,
       sorterKey,
       sorterName,
+      projectEnv,
       res
     );
   }
