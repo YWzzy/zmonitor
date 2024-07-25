@@ -25,10 +25,7 @@ import { DistUploadService } from "./dist-upload.service";
 import { DistUpload } from "./entities/dist-upload.entity";
 import { CustomHttpException } from "src/common/exception";
 import { DistUploadLog } from "./entities/dist-upload-log.entity";
-
-interface DistFile extends Express.Multer.File {
-  webkitRelativePath: string;
-}
+import { Auth } from "src/decorator/Auth";
 
 @ApiTags("DistUpload")
 @Controller("dist-upload")
@@ -52,15 +49,24 @@ export class DistUploadController {
       },
     },
   })
+  @Auth()
   async uploadDistPackage(
     @Body() body: any,
-    @UploadedFiles() files: DistFile[]
+    @UploadedFiles() files: Express.Multer.File[]
   ): Promise<DistUploadLog> {
     try {
-      const { appId, projectEnv, projectVersion, isSourceMap, userId } = body;
+      const {
+        appId,
+        projectEnv,
+        projectVersion,
+        webkitRelativePathMap,
+        isSourceMap,
+        userId,
+      } = body;
       return await this.distUploadService.uploadDistPackage(
         appId,
         files,
+        webkitRelativePathMap,
         projectEnv,
         projectVersion,
         isSourceMap,
@@ -77,6 +83,7 @@ export class DistUploadController {
   @Put(":id")
   @ApiOperation({ summary: "更新指定的dist包" })
   @ApiParam({ name: "id", type: "number", description: "dist包ID" })
+  @Auth()
   async updateDistPackage(
     @Param("id") id: number,
     @Body() updateDistDto: Partial<DistUpload>
@@ -91,6 +98,7 @@ export class DistUploadController {
   @Delete(":id")
   @ApiOperation({ summary: "删除dist包" })
   @ApiParam({ name: "id", type: "number", description: "dist包ID" })
+  @Auth()
   async deleteDistPackage(@Param("id") id: number): Promise<void> {
     try {
       await this.distUploadService.deleteDistPackage(id);
@@ -105,13 +113,16 @@ export class DistUploadController {
   @ApiQuery({ name: "projectEnv", required: false, type: "string" })
   @ApiQuery({ name: "projectVersion", required: false, type: "string" })
   @ApiQuery({ name: "fileName", required: false, type: "string" })
+  @ApiQuery({ name: "webkitRelativePath", required: false, type: "string" })
   @ApiQuery({ name: "userId", required: false, type: "string" })
+  @Auth()
   async findDistPackages(
     @Res() res: Response,
     @Query("appId") appId?: string,
     @Query("projectEnv") projectEnv?: string,
     @Query("projectVersion") projectVersion?: string,
     @Query("fileName") fileName?: string,
+    @Query("webkitRelativePath") webkitRelativePath?: string,
     @Query("userId") userId?: string
   ): Promise<DistUpload[]> {
     try {
@@ -121,6 +132,7 @@ export class DistUploadController {
           projectEnv,
           projectVersion,
           fileName,
+          webkitRelativePath,
           userId,
         },
         res

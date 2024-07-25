@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
 import { message } from 'antd';
 // import { config } from '@/src/config';
@@ -44,7 +43,7 @@ http.interceptors.response.use(
   (error) => {
     const { response } = error;
     if (response) {
-      response?.data?.message ? message.error(`请求错误: ${response.status} - ${response.statusText} - ${response?.data?.message}`) : message.error(`请求错误: ${response.status} - ${response.statusText}`);
+      response?.data?.message ? message.error(`${response.status} - ${response?.data?.message}`) : message.error(`${response.status} - ${response.statusText}`);
       const res = response.data as CustomRes<any>;
       if (res.code === CustomResponseCode.NOLOGIN || res.code === CustomResponseCode.NOTFOUNDACCOUNT) {
         if (!isShowNoLogin) {

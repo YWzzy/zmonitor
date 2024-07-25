@@ -12,6 +12,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-unused-expressions': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    "no-useless-escape": "off",
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
   },
 };

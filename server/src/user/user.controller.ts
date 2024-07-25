@@ -89,21 +89,21 @@ export class UserController {
     summary: "用户注册",
     description: "用户注册接口，创建新用户",
   })
-  @Auth() // 暂关闭注册功能
   @ApiBody({ type: CreateUserDto, description: "注册信息，包括账号和密码" })
   async register(@Body() createUserDto: CreateUserDto) {
-    const { account, password } = createUserDto;
-    const existingUser = await this.userService.findUserByAccount(account);
-    if (existingUser) {
-      throw new CustomHttpException(1004, "用户已存在");
-    }
+    throw new CustomHttpException(500, "注册功能暂时关闭");
+    // const { account, password } = createUserDto;
+    // const existingUser = await this.userService.findUserByAccount(account);
+    // if (existingUser) {
+    //   throw new CustomHttpException(1004, "用户已存在");
+    // }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await this.userService.createUser({
-      ...createUserDto,
-      password: hashedPassword,
-    });
-    return { code: 200, message: "注册成功" };
+    // const hashedPassword = await bcrypt.hash(password, 10);
+    // await this.userService.createUser({
+    //   ...createUserDto,
+    //   password: hashedPassword,
+    // });
+    // return { code: 200, message: "注册成功" };
   }
 
   @Get("getUserInfo")

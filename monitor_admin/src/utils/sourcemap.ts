@@ -1,9 +1,7 @@
 /* eslint-disable no-prototype-builtins */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import sourceMap from 'source-map-js';
 import { message } from 'antd';
-import {extractFileName} from '@/src/utils/index';
-// import { findDistPackages } from '../api';
+import { extractFileName, extractRelativeFileName } from '@/src/utils/index';
 
 interface CodeDetail {
   source: string;
@@ -61,15 +59,8 @@ export default class SourceMapUtils {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_HOST}/dist-upload/findDistPackages?fileName=${extractFileName(fileName, isSourceMap)}&env=${projectEnv}&appId=${appId}&projectVersion=${projectVersion}&isSourceMap=${isSourceMap}`
+        `${import.meta.env.VITE_API_HOST}/dist-upload/findDistPackages?fileName=${extractFileName(fileName, isSourceMap)}&env=${projectEnv}&appId=${appId}&projectVersion=${projectVersion}&isSourceMap=${isSourceMap}&webkitRelativePath=${extractRelativeFileName(fileName, isSourceMap)}`
       );
-      // const response = await findDistPackages({
-      //   fileName: extractFileName(fileName, isSourceMap),
-      //   projectEnv,
-      //   appId,
-      //   projectVersion,
-      //   isSourceMap
-      // })
       return response.json();
         // if (projectEnv == 'development') {
         //   return await response.text();

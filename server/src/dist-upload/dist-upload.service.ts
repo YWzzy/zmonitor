@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   HttpStatus,
+  Logger,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -14,10 +15,6 @@ import { DistUploadLog } from "./entities/dist-upload-log.entity";
 import { Application } from "src/application/entities/application.entity";
 import { CustomHttpException } from "src/common/exception";
 import { Response } from "express";
-
-interface DistFile extends Express.Multer.File {
-  webkitRelativePath: string;
-}
 
 @Injectable()
 export class DistUploadService {
@@ -32,7 +29,8 @@ export class DistUploadService {
 
   async uploadDistPackage(
     appId: string,
-    files: DistFile[],
+    files: Express.Multer.File[],
+    webkitRelativePathMap: string,
     projectEnv: string,
     projectVersion: string,
     isSourceMap: boolean,
@@ -69,16 +67,28 @@ export class DistUploadService {
       const distUploadLog = new DistUploadLog();
       // 生成一个uuid作为logId
       const logId = require("uuid").v4();
+      const webkitPathMap = JSON.parse(webkitRelativePathMap);
 
-      for (const file of files) {
+      for (let i = 0, len = files.length; i < len; i++) {
+        const file = files[i];
         if (file.size > MAX_FILE_SIZE) {
           throw new CustomHttpException(
             500,
             `File ${file.originalname} is too large`
           );
         }
-        const webkitRelativePath = file.webkitRelativePath;
-        const filePath = path.join(directoryPath, webkitRelativePath);
+        const webkitRelativePath =
+          webkitPathMap[`${file.originalname}${file.size}`];
+        const filePath = path.join(
+          directoryPath,
+          webkitRelativePath ? webkitRelativePath : file.originalname
+        );
+
+        // 确保文件路径的所有目录都已存在
+        const fileDir = path.dirname(filePath);
+        if (!fs.existsSync(fileDir)) {
+          fs.mkdirSync(fileDir, { recursive: true });
+        }
         fs.writeFileSync(filePath, file.buffer);
 
         const distUpload = new DistUpload();
@@ -90,6 +100,7 @@ export class DistUploadService {
         distUpload.userId = userId;
         distUpload.path = filePath;
         distUpload.logId = logId;
+        distUpload.webkitRelativePath = webkitRelativePath;
 
         const savedDistUpload = await this.distUploadRepository.save(
           distUpload
@@ -110,6 +121,7 @@ export class DistUploadService {
 
       return savedDistUploadlog;
     } catch (error) {
+      Logger.error(error.message);
       throw new CustomHttpException(
         500,
         `Failed to upload dist package: ${error.message}`
@@ -166,9 +178,6 @@ export class DistUploadService {
       // 取第一条
       const distLog = logs[0];
       const distChildPackagePath = distLog.path;
-      console.log("====================================");
-      console.log(distChildPackagePath);
-      console.log("====================================");
       try {
         const data = await fs.promises.readFile(distChildPackagePath);
         return res.status(HttpStatus.OK).send(data);

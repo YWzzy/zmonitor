@@ -42,9 +42,18 @@ export class DistUpload {
   @Column({
     type: "varchar",
     length: 255,
+    default: "",
     comment: "子包文件名称",
   })
   fileName: string;
+
+  @Column({
+    type: "varchar",
+    length: 255,
+    default: "",
+    comment: "子包文件目录path",
+  })
+  webkitRelativePath: string;
 
   @Column({
     type: "varchar",

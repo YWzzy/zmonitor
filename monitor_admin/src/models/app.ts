@@ -50,6 +50,17 @@ const appModel = createModel<RootModel>()({
         showConfigModal: show,
       };
     },
+    resetAppModel() {
+      return {
+        apps: [],
+        isLoading: true,
+        showAddModal: false,
+        showConfigModal: false,
+        active: '',
+        curConfAppId: '',
+        needFetch: false,
+      };
+    }
   },
   // 异步操作
   effects: (dispatch) => ({

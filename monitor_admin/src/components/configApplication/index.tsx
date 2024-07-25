@@ -75,14 +75,13 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
     });
     const formData = new FormData();
     const formLocalData = form.getFieldsValue();
+    const webkitRelativePathMap = new Map();
     const isSourceMap = formLocalData['isSourceMap'];
-    fileList.forEach(file => {
-      if (isSourceMap && file.name.endsWith('.map')) {
-        formData.append('files', file.originFileObj as Blob);
-      } else if (!isSourceMap && !file.name.endsWith('.map')) {
-        formData.append('files', file.originFileObj as Blob);
-      }
+    fileList.forEach((file) => {
+      formData.append('files', file.originFileObj as Blob);
+      webkitRelativePathMap.set(file.originFileObj.name + file.originFileObj.size, file.webkitRelativePath);
     });
+    formData.append(`webkitRelativePathMap`, JSON.stringify(Object.fromEntries(webkitRelativePathMap)));
     formData.append('appId', appConfig['appId']);
     formData.append('projectEnv', formLocalData['projectEnv']);
     formData.append('projectVersion', formLocalData['projectVersion']);
@@ -112,7 +111,7 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
       const formLocalData = form.getFieldsValue();
       const isSourceMap = formLocalData['isSourceMap'];
       // const isSourceMap = appConfig['isSourceMap'];
-      const allowedNonSourceMapExtensions = ['.js', '.ts', '.cjs', '.css', '.html', '.htm'];
+      const allowedNonSourceMapExtensions = ['.js', '.jsx', '.tsx', '.ts', '.cjs', '.scss', '.less', '.css', '.html', '.htm'];
 
       const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
       const isValidNonSourceMapFile = allowedNonSourceMapExtensions.includes(fileExtension);

@@ -144,6 +144,7 @@ function Home() {
                   onOk: async () => {
                     await loginOut();
                     dispatch.user.resetUserInfo();
+                    dispatch.app.resetAppModel();
                     navigate('/login');
                   },
                 });
