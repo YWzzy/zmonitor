@@ -39,18 +39,15 @@ export const HighFrequency = () => {
       dataIndex: 'method',
       key: 'method',
       align: 'center',
-      width: 100,
     },
     {
       title: '错误量',
       dataIndex: 'count',
       key: 'count',
       align: 'center',
-      width: 100,
     },
     {
       title: '操作',
-      width: 120,
       align: 'center',
       render: (_, record) => (
         <a
@@ -117,7 +114,7 @@ export const HighFrequency = () => {
           total: data.length,
           pageSize: 10,
         }}
-        scroll={{ x: 1300 }}
+        scroll={{ x: 1000 }}
       />
     </Card>
   );

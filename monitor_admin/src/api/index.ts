@@ -112,10 +112,10 @@ export const getTodayTraffic = async (appId: string): CustomResponse<TodayTraffi
   await http.get('/analyse/getTodayTraffic', { params: { appId } });
 
 export const getTrafficTimes = async (params: TrafficTimesReq): CustomResponse<TrafficTimesRes> =>
-  await http.get('/traffic/getTrafficTimes', { params });
+  await http.get('/analyse/getTrafficTimes', { params });
 
 export const getTrafficDays = async (params: TrafficDaysReq): CustomResponse<TrafficTimesRes> =>
-  await http.get('/traffic/getTrafficDays', { params });
+  await http.get('/analyse/getTrafficDays', { params });
 
 export const getDayActiveUsers = async (params: AnalyseReq): CustomResponse<number> =>
   await http.get('/analyse/getDayActiveUsers', { params });

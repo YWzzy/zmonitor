@@ -22,7 +22,7 @@ export const UserData: React.FC<UserDataIn> = ({ appId }) => {
         endTime: date[1].format('YYYY-MM-DD'),
       }).then(({ data }) => {
         const xAxis = data.map(item => item.label);
-        const values = data.map(item => item.value);
+        const values = data.map(item => item.count);
         const maxValue = Math.max(...(values as number[]));
         const option = {
           grid: {

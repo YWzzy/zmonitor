@@ -6,6 +6,7 @@ import { CreateAnalyseDto } from "./dto/create-analyse.dto";
 import { UpdateAnalyseDto } from "./dto/update-analyse.dto";
 import * as dayjs from "dayjs";
 import { ErrorMonitor } from "src/error-monitor/entities/error-monitor.entity";
+import { CustomHttpException } from "src/common/exception";
 
 @Injectable()
 export class AnalyseService {
@@ -16,7 +17,7 @@ export class AnalyseService {
     private readonly analyseRepository: Repository<Analyse>,
     @InjectRepository(ErrorMonitor)
     private readonly errorMonitorRepository: Repository<ErrorMonitor>
-  ) {}
+  ) { }
 
   async create(createAnalyseDto: CreateAnalyseDto): Promise<Analyse> {
     const newAnalyse = this.analyseRepository.create(createAnalyseDto);
@@ -139,54 +140,64 @@ export class AnalyseService {
           .getRawMany();
       }
     } catch (error) {
-      this.logger.error(`Error in getWebVisitTop: ${error.message}`);
+      Logger.error(`Error in getWebVisitTop: ${error.message}`);
       throw error;
     }
   }
 
   async getNewUsers(appId: string, date: string): Promise<number> {
-    return this.getUsersCount(appId, date);
+    try {
+      return this.getUsersCount(appId, date);
+    } catch (error) {
+      Logger.error(`Error in getNewUsers: ${error.message}`);
+      throw new CustomHttpException(500, `Error in getNewUsers: ${error.message}`);
+    }
   }
 
   async getActiveUsers(appId: string, beginTime: string, endTime: string) {
-    const startDate = dayjs(beginTime).startOf("day");
-    const endDate = dayjs(endTime).endOf("day");
-    const days = [];
-    let currentDate = startDate;
+    try {
+      const startDate = dayjs(beginTime).startOf("day");
+      const endDate = dayjs(endTime).endOf("day");
+      const days = [];
+      let currentDate = startDate;
 
-    // 提取日期范围内的每一天
-    while (
-      currentDate.isBefore(endDate) ||
-      currentDate.isSame(endDate, "day")
-    ) {
-      days.push(currentDate.format("YYYY-MM-DD"));
-      currentDate = currentDate.add(1, "day");
+      // 提取日期范围内的每一天
+      while (
+        currentDate.isBefore(endDate) ||
+        currentDate.isSame(endDate, "day")
+      ) {
+        days.push(currentDate.format("YYYY-MM-DD"));
+        currentDate = currentDate.add(1, "day");
+      }
+
+      const result = [];
+
+      for (const day of days) {
+        const dayStart = dayjs(day).startOf("day").format("YYYY-MM-DD HH:mm:ss");
+        const dayEnd = dayjs(day).endOf("day").format("YYYY-MM-DD HH:mm:ss");
+
+        const users = await this.analyseRepository
+          .createQueryBuilder("analyse")
+          .select("analyse.userId")
+          .distinct(true)
+          .where("analyse.appId = :appId", { appId })
+          .andWhere("analyse.createTime BETWEEN :dayStart AND :dayEnd", {
+            dayStart,
+            dayEnd,
+          })
+          .getRawMany();
+
+        result.push({
+          label: day,
+          count: users.length,
+        });
+      }
+
+      return result;
+    } catch (error) {
+      Logger.error(`Error in getActiveUsers: ${error.message}`);
+      throw new CustomHttpException(500, `Error in getActiveUsers: ${error.message}`);
     }
-
-    const result = [];
-
-    for (const day of days) {
-      const dayStart = dayjs(day).startOf("day").format("YYYY-MM-DD HH:mm:ss");
-      const dayEnd = dayjs(day).endOf("day").format("YYYY-MM-DD HH:mm:ss");
-
-      const users = await this.analyseRepository
-        .createQueryBuilder("analyse")
-        .select("analyse.userId")
-        .distinct(true)
-        .where("analyse.appId = :appId", { appId })
-        .andWhere("analyse.createTime BETWEEN :dayStart AND :dayEnd", {
-          dayStart,
-          dayEnd,
-        })
-        .getRawMany();
-
-      result.push({
-        date: day,
-        userCount: users.length,
-      });
-    }
-
-    return result;
   }
 
   async getActiveUsersBetween(
@@ -194,14 +205,19 @@ export class AnalyseService {
     beginTime: string,
     endTime: string
   ): Promise<any[]> {
-    const formattedBeginTime = dayjs(beginTime).format("YYYY-MM-DD");
-    const formattedEndTime = dayjs(endTime).format("YYYY-MM-DD");
-    return this.analyseRepository.find({
-      where: {
-        appId,
-        createTime: Between(formattedBeginTime, formattedEndTime),
-      },
-    });
+    try {
+      const formattedBeginTime = dayjs(beginTime).format("YYYY-MM-DD");
+      const formattedEndTime = dayjs(endTime).format("YYYY-MM-DD");
+      return this.analyseRepository.find({
+        where: {
+          appId,
+          createTime: Between(formattedBeginTime, formattedEndTime),
+        },
+      });
+    } catch (error) {
+      Logger.error(`Error in getActiveUsersBetween: ${error.message}`);
+      throw new CustomHttpException(500, `Error in getActiveUsersBetween: ${error.message}`);
+    }
   }
 
   /**
@@ -210,49 +226,222 @@ export class AnalyseService {
    * @return {Promise<number>} - 不同用户ID的总数
    */
   async getAllUsers(appId: string): Promise<number> {
-    const count = await this.analyseRepository
-      .createQueryBuilder("analyse")
-      .select("COUNT(DISTINCT analyse.userId)", "count")
-      .where("analyse.appId = :appId", { appId })
-      .getRawOne();
+    try {
+      const count = await this.analyseRepository
+        .createQueryBuilder("analyse")
+        .select("COUNT(DISTINCT analyse.userId)", "count")
+        .where("analyse.appId = :appId", { appId })
+        .getRawOne();
 
-    return parseInt(count.count, 10);
+      return parseInt(count.count, 10);
+    } catch (error) {
+      Logger.error(`Error in getAllUsers: ${error.message}`);
+      throw new CustomHttpException(500, `Error in getAllUsers: ${error.message}`);
+    }
   }
 
   async getTodayTraffic(appId: string): Promise<any> {
-    const today = dayjs().format("YYYY-MM-DD");
-    const lastDay = dayjs().subtract(1, "day").format("YYYY-MM-DD");
+    try {
+      const today = dayjs().format("YYYY-MM-DD");
+      const lastDay = dayjs().subtract(1, "day").format("YYYY-MM-DD");
 
-    const allUsers = await this.getAllUsers(appId);
-    const [activeUsers, activeUsers2] = await Promise.all([
-      this.getDayActiveUsers(appId, today),
-      this.getDayActiveUsers(appId, lastDay),
-    ]);
-    const [newUsers, newUsers2] = await Promise.all([
-      this.getNewUsers(appId, today),
-      this.getNewUsers(appId, lastDay),
-    ]);
+      const allUsers = await this.getAllUsers(appId);
+      const [activeUsers, activeUsers2] = await Promise.all([
+        this.getDayActiveUsers(appId, today),
+        this.getDayActiveUsers(appId, lastDay),
+      ]);
+      const [newUsers, newUsers2] = await Promise.all([
+        this.getNewUsers(appId, today),
+        this.getNewUsers(appId, lastDay),
+      ]);
 
-    const pv = await this.analyseRepository.count({
-      where: { appId, createTime: Like(`${today}%`) }, // 使用 Like 操作符匹配以 '2024-07-23' 开头的所有记录
-    });
+      const pv = await this.analyseRepository.count({
+        where: { appId, createTime: Like(`${today}%`) }, // 使用 Like 操作符匹配以 '2024-07-23' 开头的所有记录
+      });
 
-    const pv2 = await this.analyseRepository.count({
-      where: { appId, createTime: Like(`${lastDay}%`) },
-    });
-    const ip = await this.analyseRepository.count({
-      where: { appId, createTime: Like(`${today}%`) },
-    });
-    const ip2 = await this.analyseRepository.count({
-      where: { appId, createTime: Like(`${lastDay}%`) },
-    });
+      const pv2 = await this.analyseRepository.count({
+        where: { appId, createTime: Like(`${lastDay}%`) },
+      });
+      const ip = await this.analyseRepository.count({
+        where: { appId, createTime: Like(`${today}%`) },
+      });
+      const ip2 = await this.analyseRepository.count({
+        where: { appId, createTime: Like(`${lastDay}%`) },
+      });
 
-    return {
-      allUsers,
-      activeUsers: [activeUsers, activeUsers2],
-      newUsers: [newUsers, newUsers2],
-      pv: [pv, pv2],
-      ip: [ip, ip2],
-    };
+      return {
+        allUsers,
+        activeUsers: [activeUsers, activeUsers2],
+        newUsers: [newUsers, newUsers2],
+        pv: [pv, pv2],
+        ip: [ip, ip2],
+      };
+    } catch (error) {
+      Logger.error(`Error in getTodayTraffic: ${error.message}`);
+      throw new CustomHttpException(500, `Error in getTodayTraffic: ${error.message}`);
+    }
+  }
+
+  async getTrafficTimes(appId: string, date: string, pageUrl: string) {
+    try {
+      const startOfDay = dayjs(date).startOf('day').format('YYYY-MM-DD HH:mm:ss');
+      const endOfDay = dayjs(date).endOf('day').format('YYYY-MM-DD HH:mm:ss');
+
+      // Query to get page views, unique IPs, and unique visitors
+      const query = this.analyseRepository
+        .createQueryBuilder('analyse')
+        .select('HOUR(analyse.createTime)', 'hour')
+        .addSelect('COUNT(*)', 'count')
+        .where('analyse.appId = :appId', { appId })
+        .andWhere('analyse.createTime BETWEEN :startOfDay AND :endOfDay', { startOfDay, endOfDay });
+
+      if (pageUrl) {
+        query.andWhere('analyse.pageUrl = :pageUrl', { pageUrl });
+      }
+
+      const pageViews = await query
+        .groupBy('HOUR(analyse.createTime)')
+        .orderBy('HOUR(analyse.createTime)', 'ASC')
+        .getRawMany();
+
+      // Parse pageViews data
+      const pageViewsData = pageViews.reduce((acc, row) => {
+        acc[row.hour] = Number(row.count);
+        return acc;
+      }, {});
+
+      // Query to get unique IPs count
+      const uniqueIPsCount = await this.analyseRepository
+        .createQueryBuilder('analyse')
+        .select('HOUR(analyse.createTime)', 'hour')
+        .addSelect('COUNT(DISTINCT analyse.ip)', 'count')
+        .where('analyse.appId = :appId', { appId })
+        .andWhere('analyse.createTime BETWEEN :startOfDay AND :endOfDay', { startOfDay, endOfDay })
+        .andWhere('analyse.pageUrl = :pageUrl', { pageUrl })
+        .groupBy('HOUR(analyse.createTime)')
+        .orderBy('HOUR(analyse.createTime)', 'ASC')
+        .getRawMany();
+
+      // Parse uniqueIPsCount data
+      const uniqueIPsCountData = uniqueIPsCount.reduce((acc, row) => {
+        acc[row.hour] = Number(row.count);
+        return acc;
+      }, {});
+
+      // Query to get unique visitors count
+      const uniqueVisitors = await this.analyseRepository
+        .createQueryBuilder('analyse')
+        .select('HOUR(analyse.createTime)', 'hour')
+        .addSelect('COUNT(DISTINCT analyse.userId)', 'count')
+        .where('analyse.appId = :appId', { appId })
+        .andWhere('analyse.createTime BETWEEN :startOfDay AND :endOfDay', { startOfDay, endOfDay })
+        .andWhere('analyse.pageUrl = :pageUrl', { pageUrl })
+        .groupBy('HOUR(analyse.createTime)')
+        .orderBy('HOUR(analyse.createTime)', 'ASC')
+        .getRawMany();
+
+      // Parse uniqueVisitors data
+      const uniqueVisitorsData = uniqueVisitors.reduce((acc, row) => {
+        acc[row.hour] = Number(row.count);
+        return acc;
+      }, {});
+
+      return {
+        pageViews: pageViewsData,
+        uniqueIPsCount: uniqueIPsCountData,
+        uniqueVisitors: uniqueVisitorsData,
+      };
+    } catch (error) {
+      Logger.error(`Error in getTrafficTimes: ${error.message}`);
+      throw new CustomHttpException(500, `Error in getTrafficTimes: ${error.message}`);
+    }
+  }
+
+
+  async getTrafficDays(appId: string, beginTime: string, endTime: string, pageUrl: string) {
+
+    try {
+      const startOfDay = dayjs(beginTime).startOf('day').format('YYYY-MM-DD HH:mm:ss');
+      const endOfDay = dayjs(endTime).endOf('day').format('YYYY-MM-DD HH:mm:ss');
+
+      // Query to get page views, unique IPs, and unique visitors
+      const query = this.analyseRepository
+        .createQueryBuilder('analyse')
+        .select('DATE(analyse.createTime)', 'date')
+        .addSelect('COUNT(*)', 'count')
+        .where('analyse.appId = :appId', { appId })
+        .andWhere('analyse.createTime BETWEEN :startOfDay AND :endOfDay', { startOfDay, endOfDay });
+
+      if (pageUrl) {
+        query.andWhere('analyse.pageUrl = :pageUrl', { pageUrl });
+      }
+
+      const pageViews = await query
+        .groupBy('DATE(analyse.createTime)')
+        .orderBy('DATE(analyse.createTime)', 'ASC')
+        .getRawMany();
+
+      // Parse pageViews data
+      const pageViewsData = pageViews.reduce((acc, row) => {
+        acc[dayjs(row.date).format('YYYY-MM-DD')] = Number(row.count);
+        return acc;
+      }, {});
+
+      // Query to get unique IPs count
+      const uniqueIPsCountQuery = this.analyseRepository
+        .createQueryBuilder('analyse')
+        .select('DATE(analyse.createTime)', 'date')
+        .addSelect('COUNT(DISTINCT analyse.ip)', 'count')
+        .where('analyse.appId = :appId', { appId })
+        .andWhere('analyse.createTime BETWEEN :startOfDay AND :endOfDay', { startOfDay, endOfDay });
+
+      if (pageUrl) {
+        uniqueIPsCountQuery.andWhere('analyse.pageUrl = :pageUrl', { pageUrl });
+      }
+
+      const uniqueIPsCount = await uniqueIPsCountQuery
+        .groupBy('DATE(analyse.createTime)')
+        .orderBy('DATE(analyse.createTime)', 'ASC')
+        .getRawMany();
+
+      // Parse uniqueIPsCount data
+      const uniqueIPsCountData = uniqueIPsCount.reduce((acc, row) => {
+        acc[dayjs(row.date).format('YYYY-MM-DD')] = Number(row.count);
+        return acc;
+      }, {});
+
+      // Query to get unique visitors count
+      const uniqueVisitorsQuery = this.analyseRepository
+        .createQueryBuilder('analyse')
+        .select('DATE(analyse.createTime)', 'date')
+        .addSelect('COUNT(DISTINCT analyse.userId)', 'count')
+        .where('analyse.appId = :appId', { appId })
+        .andWhere('analyse.createTime BETWEEN :startOfDay AND :endOfDay', { startOfDay, endOfDay });
+
+      if (pageUrl) {
+        uniqueVisitorsQuery.andWhere('analyse.pageUrl = :pageUrl', { pageUrl });
+      }
+
+      const uniqueVisitors = await uniqueVisitorsQuery
+        .groupBy('DATE(analyse.createTime)')
+        .orderBy('DATE(analyse.createTime)', 'ASC')
+        .getRawMany();
+
+      // Parse uniqueVisitors data
+      const uniqueVisitorsData = uniqueVisitors.reduce((acc, row) => {
+        acc[dayjs(row.date).format('YYYY-MM-DD')] = Number(row.count);
+        return acc;
+      }, {});
+
+      return {
+        pageViews: pageViewsData,
+        uniqueIPsCount: uniqueIPsCountData,
+        uniqueVisitors: uniqueVisitorsData,
+      };
+
+    } catch (error) {
+      Logger.error(`Error in getTrafficDays: ${error.message}`);
+      throw new CustomHttpException(500, `Error in getTrafficDays: ${error.message}`);
+    }
   }
 }

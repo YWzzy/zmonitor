@@ -30,7 +30,7 @@ import { Auth } from "src/decorator/Auth";
 @ApiTags("分析")
 @Controller("analyse")
 export class AnalyseController {
-  constructor(private readonly analyseService: AnalyseService) {}
+  constructor(private readonly analyseService: AnalyseService) { }
 
   @ApiOperation({ summary: "创建新的分析记录" })
   @ApiCreatedResponse({ description: "分析记录创建成功", type: Analyse })
@@ -143,5 +143,25 @@ export class AnalyseController {
   @Get("getTodayTraffic")
   getTodayTraffic(@Query("appId") appId: string) {
     return this.analyseService.getTodayTraffic(appId);
+  }
+
+  @ApiOperation({ summary: "获取分时流量数据" })
+  @ApiOkResponse({ description: "获取分时流量数据" })
+  @Auth()
+  @Get("getTrafficTimes")
+  getTrafficTimes(@Query("appId") appId: string, @Query("date") date: string, @Query("pageUrl") pageUrl: string) {
+    return this.analyseService.getTrafficTimes(appId, date, pageUrl);
+  }
+
+  @ApiOperation({ summary: "获取每日走势" })
+  @ApiOkResponse({ description: "获取每日走势" })
+  @Auth()
+  @Get("getTrafficDays")
+  getTrafficDays(
+    @Query("appId") appId: string,
+    @Query("beginTime") beginTime: string,
+    @Query("endTime") endTime: string,
+    @Query("pageUrl") pageUrl: string) {
+    return this.analyseService.getTrafficDays(appId, beginTime, endTime, pageUrl);
   }
 }
