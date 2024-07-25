@@ -21,6 +21,7 @@ zMonitor.init({
   silentWhiteScreen: true,
   skeletonProject: true,
   repeatCodeError: true,
+  // reportErrorsOnly: false,
   userId,
   getProjectConfig() {
     return {

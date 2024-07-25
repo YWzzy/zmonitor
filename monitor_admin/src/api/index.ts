@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { message } from 'antd';
-// import { config } from '@/src/config';
+import { config } from '@/src/config';
+
 
 let isShowNoLogin = false;
 
@@ -16,11 +17,30 @@ enum CustomResponseCode {
 }
 
 export const http = axios.create({
-  baseURL: `/api/`,
-  // baseURL: `${config.apiHost}/`,
+  baseURL: `${config.baseURL}/`,
   withCredentials: true,
 });
 
+// 请求拦截器
+http.interceptors.request.use((config) => {
+  const app = localStorage.getItem('app');
+  if(app) {
+    const appData = JSON.parse(app);
+    if(appData.active) {
+      appData.apps.filter(item => {
+          if(item.appId === appData.active) {
+            config.headers['Appid'] = item.appId;
+            config.headers['Projectenv'] = item.projectEnv;
+          }
+        }
+      );
+    }
+  }
+  return config;
+}
+);
+
+// 响应拦截器
 http.interceptors.response.use(
   (response) => {
     const { data, status } = response;

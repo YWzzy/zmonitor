@@ -311,13 +311,18 @@ export class AnalyseService {
       }, {});
 
       // Query to get unique IPs count
-      const uniqueIPsCount = await this.analyseRepository
+      const uniqueIPsCountQuery = this.analyseRepository
         .createQueryBuilder('analyse')
         .select('HOUR(analyse.createTime)', 'hour')
         .addSelect('COUNT(DISTINCT analyse.ip)', 'count')
         .where('analyse.appId = :appId', { appId })
         .andWhere('analyse.createTime BETWEEN :startOfDay AND :endOfDay', { startOfDay, endOfDay })
-        .andWhere('analyse.pageUrl = :pageUrl', { pageUrl })
+
+      if (pageUrl) {
+        uniqueIPsCountQuery.andWhere('analyse.pageUrl = :pageUrl', { pageUrl });
+      }
+
+      const uniqueIPsCount = await uniqueIPsCountQuery
         .groupBy('HOUR(analyse.createTime)')
         .orderBy('HOUR(analyse.createTime)', 'ASC')
         .getRawMany();
@@ -329,13 +334,19 @@ export class AnalyseService {
       }, {});
 
       // Query to get unique visitors count
-      const uniqueVisitors = await this.analyseRepository
+      const uniqueVisitorsQuery = this.analyseRepository
         .createQueryBuilder('analyse')
         .select('HOUR(analyse.createTime)', 'hour')
         .addSelect('COUNT(DISTINCT analyse.userId)', 'count')
         .where('analyse.appId = :appId', { appId })
         .andWhere('analyse.createTime BETWEEN :startOfDay AND :endOfDay', { startOfDay, endOfDay })
-        .andWhere('analyse.pageUrl = :pageUrl', { pageUrl })
+
+
+      if (pageUrl) {
+        uniqueVisitorsQuery.andWhere('analyse.pageUrl = :pageUrl', { pageUrl });
+      }
+
+      const uniqueVisitors = await uniqueVisitorsQuery
         .groupBy('HOUR(analyse.createTime)')
         .orderBy('HOUR(analyse.createTime)', 'ASC')
         .getRawMany();
