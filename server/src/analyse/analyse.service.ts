@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, Between } from "typeorm";
+import { Repository, Between, Like } from "typeorm";
 import { Analyse } from "./entities/analyse.entity";
 import { CreateAnalyseDto } from "./dto/create-analyse.dto";
 import { UpdateAnalyseDto } from "./dto/update-analyse.dto";
 import * as dayjs from "dayjs";
+import { ErrorMonitor } from "src/error-monitor/entities/error-monitor.entity";
 
 @Injectable()
 export class AnalyseService {
@@ -12,7 +13,9 @@ export class AnalyseService {
 
   constructor(
     @InjectRepository(Analyse)
-    private readonly analyseRepository: Repository<Analyse>
+    private readonly analyseRepository: Repository<Analyse>,
+    @InjectRepository(ErrorMonitor)
+    private readonly errorMonitorRepository: Repository<ErrorMonitor>
   ) {}
 
   async create(createAnalyseDto: CreateAnalyseDto): Promise<Analyse> {
@@ -145,18 +148,45 @@ export class AnalyseService {
     return this.getUsersCount(appId, date);
   }
 
-  async getActiveUsers(appId: string, date: string) {
-    const formattedBeginTime = dayjs(date).format("YYYY-MM-DD 00:00:00");
-    const formattedEndTime = dayjs(date).format("YYYY-MM-DD 23:59:59");
-    console.log("====================================");
-    console.log(formattedBeginTime);
-    console.log("====================================");
-    return this.analyseRepository.find({
-      where: {
-        appId,
-        createTime: Between(formattedBeginTime, formattedEndTime),
-      },
-    });
+  async getActiveUsers(appId: string, beginTime: string, endTime: string) {
+    const startDate = dayjs(beginTime).startOf("day");
+    const endDate = dayjs(endTime).endOf("day");
+    const days = [];
+    let currentDate = startDate;
+
+    // 提取日期范围内的每一天
+    while (
+      currentDate.isBefore(endDate) ||
+      currentDate.isSame(endDate, "day")
+    ) {
+      days.push(currentDate.format("YYYY-MM-DD"));
+      currentDate = currentDate.add(1, "day");
+    }
+
+    const result = [];
+
+    for (const day of days) {
+      const dayStart = dayjs(day).startOf("day").format("YYYY-MM-DD HH:mm:ss");
+      const dayEnd = dayjs(day).endOf("day").format("YYYY-MM-DD HH:mm:ss");
+
+      const users = await this.analyseRepository
+        .createQueryBuilder("analyse")
+        .select("analyse.userId")
+        .distinct(true)
+        .where("analyse.appId = :appId", { appId })
+        .andWhere("analyse.createTime BETWEEN :dayStart AND :dayEnd", {
+          dayStart,
+          dayEnd,
+        })
+        .getRawMany();
+
+      result.push({
+        date: day,
+        userCount: users.length,
+      });
+    }
+
+    return result;
   }
 
   async getActiveUsersBetween(
@@ -202,17 +232,19 @@ export class AnalyseService {
       this.getNewUsers(appId, today),
       this.getNewUsers(appId, lastDay),
     ]);
+
     const pv = await this.analyseRepository.count({
-      where: { appId, createTime: today },
+      where: { appId, createTime: Like(`${today}%`) }, // 使用 Like 操作符匹配以 '2024-07-23' 开头的所有记录
     });
+
     const pv2 = await this.analyseRepository.count({
-      where: { appId, createTime: lastDay },
+      where: { appId, createTime: Like(`${lastDay}%`) },
     });
     const ip = await this.analyseRepository.count({
-      where: { appId, createTime: today },
+      where: { appId, createTime: Like(`${today}%`) },
     });
     const ip2 = await this.analyseRepository.count({
-      where: { appId, createTime: lastDay },
+      where: { appId, createTime: Like(`${lastDay}%`) },
     });
 
     return {

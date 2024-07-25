@@ -31,18 +31,18 @@ export const munuRouters = [
 ];
 
 export const hasAppRouters = [
-  {
-    path: '/issues',
-    name: '错误日志',
-    icon: BarChartOutlined,
-    element: lazyLoad(() => import('../pages/issues')),
-  },
   // {
-  //   path: '/visitorStats',
-  //   name: '流量分析',
+  //   path: '/issues',
+  //   name: '错误日志',
   //   icon: BarChartOutlined,
-  //   element: lazyLoad(() => import('../pages/visitorStats')),
+  //   element: lazyLoad(() => import('../pages/issues')),
   // },
+  {
+    path: '/visitorStats',
+    name: '流量分析',
+    icon: BarChartOutlined,
+    element: lazyLoad(() => import('../pages/visitorStats')),
+  },
   {
     path: '/performance',
     name: '性能分析',
