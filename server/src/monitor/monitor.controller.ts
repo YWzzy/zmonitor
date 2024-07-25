@@ -19,11 +19,12 @@ import { MonitorService } from "./monitor.service";
 import { ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 import { Auth } from "src/decorator/Auth";
+import { ProjectInfo } from "src/decorator/ProjectInfo";
 
 @Controller("monitor")
 @ApiTags("系统监控")
 export class MonitorController {
-  constructor(private readonly monitorService: MonitorService) {}
+  constructor(private readonly monitorService: MonitorService) { }
 
   // @Post()
   // create(@Body() createMonitorDto: CreateMonitorDto) {
@@ -69,6 +70,7 @@ export class MonitorController {
     @Query("page") page: string,
     @Query("pageSize") pageSize: string,
     @Query("projectEnv") projectEnv: string,
+    @ProjectInfo() projectInfo: { appId: string; projectEnv: string; isSourceMap: string },
     @Res() res: Response
   ): Promise<void> {
     this.monitorService.findPaginatedAndFiltered(
@@ -77,7 +79,7 @@ export class MonitorController {
       endTime,
       page,
       pageSize,
-      projectEnv,
+      projectEnv || projectInfo.projectEnv,
       res
     );
   }

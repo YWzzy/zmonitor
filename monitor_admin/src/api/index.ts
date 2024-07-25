@@ -29,8 +29,9 @@ http.interceptors.request.use((config) => {
     if(appData.active) {
       appData.apps.filter(item => {
           if(item.appId === appData.active) {
-            config.headers['Appid'] = item.appId;
-            config.headers['Projectenv'] = item.projectEnv;
+            config.headers['appId'] = item.appId;
+            config.headers['projectEnv'] = item.projectEnv;
+            config.headers['isSourceMap'] = item.isSourceMap;
           }
         }
       );
