@@ -220,3 +220,7 @@ export const uploadDistFiles = async (data: FormData): CustomResponse<any> =>
 // 查询项目包文件
 export const findDistPackages = async (params: any): CustomResponse<any> =>
   await http.get('/dist-upload/findDistPackages', { params });
+
+// 上传包之前 - 获取上传批次信息
+export const getUploadBatch = async (params: any): CustomResponse<any> =>
+  await http.get('/dist-upload/getUploadBatch', { params });

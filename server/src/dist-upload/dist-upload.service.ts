@@ -6,7 +6,7 @@ import {
   Logger,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Connection, Repository } from "typeorm";
 import { DistUpload } from "./entities/dist-upload.entity";
 import * as fs from "fs";
 import * as path from "path";
@@ -24,20 +24,20 @@ export class DistUploadService {
     @InjectRepository(DistUploadLog)
     private readonly distUploadLogRepository: Repository<DistUploadLog>,
     @InjectRepository(Application)
-    private readonly applicationRepository: Repository<Application>
-  ) {}
+    private readonly applicationRepository: Repository<Application>,
+    private readonly connection: Connection,
+  ) { }
 
-  async uploadDistPackage(
+  async getUploadBatch(
     appId: string,
-    files: Express.Multer.File[],
-    webkitRelativePathMap: string,
     projectEnv: string,
     projectVersion: string,
     isSourceMap: boolean,
-    userId: string
-  ): Promise<DistUploadLog> {
+    userId: string,
+    filesNumber: string,
+    filesSize: string
+  ): Promise<{ logId: string }> {
     try {
-      const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100M
       const logs = await this.distUploadLogRepository.find({
         where: { appId, projectEnv, projectVersion },
       });
@@ -54,59 +54,15 @@ export class DistUploadService {
       const directoryPath = path.join(
         // __dirname,
         application.packageUrl,
-        `/distProject/${currentDate}/${appId}/${projectEnv}/${projectVersion}/${
-          isSourceMap ? "sourceMap" : "NoSourceMap"
+        `/distProject/${currentDate}/${appId}/${projectEnv}/${projectVersion}/${isSourceMap ? "sourceMap" : "NoSourceMap"
         }`
       );
 
       if (!fs.existsSync(directoryPath)) {
         fs.mkdirSync(directoryPath, { recursive: true });
       }
-
-      const distUploads: DistUpload[] = [];
-      const distUploadLog = new DistUploadLog();
-      // 生成一个uuid作为logId
       const logId = require("uuid").v4();
-      const webkitPathMap = JSON.parse(webkitRelativePathMap);
-
-      for (let i = 0, len = files.length; i < len; i++) {
-        const file = files[i];
-        if (file.size > MAX_FILE_SIZE) {
-          throw new CustomHttpException(
-            500,
-            `File ${file.originalname} is too large`
-          );
-        }
-        const webkitRelativePath =
-          webkitPathMap[`${file.originalname}${file.size}`];
-        const filePath = path.join(
-          directoryPath,
-          webkitRelativePath ? webkitRelativePath : file.originalname
-        );
-
-        // 确保文件路径的所有目录都已存在
-        const fileDir = path.dirname(filePath);
-        if (!fs.existsSync(fileDir)) {
-          fs.mkdirSync(fileDir, { recursive: true });
-        }
-        fs.writeFileSync(filePath, file.buffer);
-
-        const distUpload = new DistUpload();
-        distUpload.appId = appId;
-        distUpload.fileName = file.originalname;
-        distUpload.projectEnv = projectEnv;
-        distUpload.projectVersion = projectVersion;
-        distUpload.isSourceMap = isSourceMap ? 1 : 0;
-        distUpload.userId = userId;
-        distUpload.path = filePath;
-        distUpload.logId = logId;
-        distUpload.webkitRelativePath = webkitRelativePath;
-
-        const savedDistUpload = await this.distUploadRepository.save(
-          distUpload
-        );
-        distUploads.push(savedDistUpload);
-      }
+      const distUploadLog = new DistUploadLog();
       distUploadLog.appId = appId;
       distUploadLog.projectEnv = projectEnv;
       distUploadLog.projectVersion = projectVersion;
@@ -114,6 +70,8 @@ export class DistUploadService {
       distUploadLog.userId = userId;
       distUploadLog.rootPath = directoryPath;
       distUploadLog.logId = logId;
+      distUploadLog.filesNumber = parseInt(filesNumber);
+      distUploadLog.filesSize = parseInt(filesSize);
 
       const savedDistUploadlog = await this.distUploadLogRepository.save(
         distUploadLog
@@ -121,14 +79,77 @@ export class DistUploadService {
 
       return savedDistUploadlog;
     } catch (error) {
+      throw new CustomHttpException(
+        500,
+        `Failed to get upload batch: ${error.message}`
+      );
+    }
+  }
+
+  // 上传dist包
+  async uploadDistPackage(
+    appId: string,
+    file: Express.Multer.File,
+    webkitRelativePath: string,
+    projectEnv: string,
+    projectVersion: string,
+    isSourceMap: boolean,
+    userId: string,
+    rootPath: string,
+    logId: string,
+    fileName: string,
+    fileSize: string
+  ): Promise<DistUpload> {
+
+    // 创建一个queryRunner，用于事务处理
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+
+      if (file.size > MAX_FILE_SIZE) {
+        throw new CustomHttpException(
+          500,
+          `File ${fileName} is too large`
+        );
+
+      }
+
+      const distUpload = new DistUpload();
+      const filePath = path.join(
+        rootPath,
+        webkitRelativePath ? webkitRelativePath : fileName
+      );
+      distUpload.appId = appId;
+      distUpload.fileName = fileName;
+      distUpload.rootPath = rootPath;
+      distUpload.projectEnv = projectEnv;
+      distUpload.projectVersion = projectVersion;
+      distUpload.isSourceMap = isSourceMap ? 1 : 0;
+      distUpload.userId = userId;
+      distUpload.path = filePath;
+      distUpload.logId = logId;
+      distUpload.webkitRelativePath = webkitRelativePath;
+
+      const savedDistUpload = await queryRunner.manager.save(distUpload);
+
+      await queryRunner.commitTransaction();
+      return savedDistUpload;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
       Logger.error(error.message);
       throw new CustomHttpException(
         500,
         `Failed to upload dist package: ${error.message}`
       );
+    } finally {
+      // 释放queryRunner
+      await queryRunner.release();
     }
   }
 
+  // 更新dist包
   async updateDistPackage(
     id: number,
     updateDistDto: Partial<DistUpload>

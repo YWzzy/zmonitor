@@ -30,47 +30,78 @@ import { Auth } from "src/decorator/Auth";
 @ApiTags("DistUpload")
 @Controller("dist-upload")
 export class DistUploadController {
-  constructor(private readonly distUploadService: DistUploadService) {}
+  constructor(private readonly distUploadService: DistUploadService) { }
+
+
+  @Get('getUploadBatch')
+  @ApiOperation({ summary: "获取上传批次信息" })
+  @Auth()
+  async getUploadBatch(
+    @Query('appId') appId: string,
+    @Query('projectEnv') projectEnv: string,
+    @Query('projectVersion') projectVersion: string,
+    @Query('isSourceMap') isSourceMap: boolean,
+    @Query('userId') userId: string,
+    @Query('filesNumber') filesNumber: string,
+    @Query('filesSize') filesSize: string
+  ): Promise<{ logId: string }> {
+    try {
+      return await this.distUploadService.getUploadBatch(appId, projectEnv, projectVersion, isSourceMap, userId, filesNumber, filesSize);
+    } catch (error) {
+      throw new CustomHttpException(error.status, error.message);
+    }
+  }
 
   @Post("upload")
   @ApiOperation({ summary: "上传dist包" })
   @ApiConsumes("multipart/form-data")
-  @UseInterceptors(FilesInterceptor("files"))
+  @UseInterceptors(FilesInterceptor("file"))
   @ApiBody({
     schema: {
       type: "object",
       properties: {
         appId: { type: "string" },
         projectEnv: { type: "string" },
+        logId: { type: "string" },
+        rootPath: { type: "string" },
         projectVersion: { type: "string" },
         isSourceMap: { type: "boolean" },
         userId: { type: "string" },
-        files: { type: "array", items: { type: "string", format: "binary" } },
+        fileName: { type: "string" },
+        file: { type: "string", format: "binary" },
       },
     },
   })
   @Auth()
   async uploadDistPackage(
     @Body() body: any,
-    @UploadedFiles() files: Express.Multer.File[]
-  ): Promise<DistUploadLog> {
+    @UploadedFiles() file: Express.Multer.File
+  ): Promise<DistUpload> {
     try {
       const {
         appId,
         projectEnv,
         projectVersion,
-        webkitRelativePathMap,
+        webkitRelativePath,
         isSourceMap,
         userId,
+        rootPath,
+        logId,
+        fileName,
+        fileSize,
       } = body;
       return await this.distUploadService.uploadDistPackage(
         appId,
-        files,
-        webkitRelativePathMap,
+        file,
+        webkitRelativePath,
         projectEnv,
         projectVersion,
         isSourceMap,
-        userId
+        userId,
+        rootPath,
+        logId,
+        fileName,
+        fileSize
       );
     } catch (error) {
       throw new CustomHttpException(

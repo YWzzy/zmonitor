@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Switch, message, Spin, Button, Upload, UploadFile, Row, Col, Card, Radio } from 'antd';
-import { updateAppConfig, uploadDistFiles } from '@/src/api';
+import { getUploadBatch, updateAppConfig, uploadDistFiles } from '@/src/api';
 import { useAppStore, useUserStore } from '@/src/hooks';
 import { UploadOutlined, CloseOutlined } from '@ant-design/icons';
 import { ProjectEnvType, ProjectEnvTypes } from '@/src/constants';
+import pLimit from 'p-limit';
 
 interface ConfigApplicationIn {
   open: boolean;
@@ -65,7 +66,21 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
   // 清除dist文件
   const clearDistFiles = () => {
     setFileList([]);
-  }
+  };
+
+  // 上传单个文件
+  const uploadSingleFile: any = async (file: UploadOriginFile, formData: FormData) => {
+    formData.set(`webkitRelativePath`, file['webkitRelativePath']);
+    formData.set('fileName', file.name);
+    formData.set('fileSize', String(file.size));
+    formData.set('file', file.originFileObj as Blob);
+    try {
+      const response = await uploadDistFiles(formData);
+      return { status: 'fulfilled', data: response };
+    } catch (error) {
+      throw new Error(`文件 ${file.name} 上传失败`);
+    }
+  };
 
   // 上传dist文件
   const handleUpload = async () => {
@@ -73,31 +88,58 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
       content: '文件上传中...',
       key: 'uploading',
     });
-    const formData = new FormData();
-    const formLocalData = form.getFieldsValue();
-    const webkitRelativePathMap = new Map();
-    const isSourceMap = formLocalData['isSourceMap'];
-    fileList.forEach((file) => {
-      formData.append('files', file.originFileObj as Blob);
-      webkitRelativePathMap.set(file.originFileObj.name + file.originFileObj.size, file.webkitRelativePath);
-    });
-    formData.append(`webkitRelativePathMap`, JSON.stringify(Object.fromEntries(webkitRelativePathMap)));
-    formData.append('appId', appConfig['appId']);
-    formData.append('projectEnv', formLocalData['projectEnv']);
-    formData.append('projectVersion', formLocalData['projectVersion']);
-    formData.append('isSourceMap', isSourceMap);
-    formData.append('userId', import.meta.env.VITE_USERID);
 
     setUploading(true);
-    try {
-      await uploadDistFiles(formData);
-      message.success('文件上传成功！');
-      setFileList([]); // 清空文件列表
-    } catch (error) {
-      message.error('文件上传失败！');
-    } finally {
-      setUploading(false);
+    const params = {
+      appId: appConfig['appId'],
+      projectEnv: form.getFieldValue('projectEnv'),
+      projectVersion: form.getFieldValue('projectVersion'),
+      isSourceMap: form.getFieldValue('isSourceMap'),
+      userId: import.meta.env.VITE_USERID,
+      filesNumber: fileList.length,
+      filesSize: fileList.reduce((acc, file) => acc + file.size, 0),
     }
+    // 获取上传批次，成功后上传文件
+    await getUploadBatch(params).then(async (res) => {
+      if (res.code === 200) {
+        const formData = new FormData();
+        const { appId, isSourceMap, projectEnv, projectVersion, rootPath, userId, logId } = res.data;
+        formData.append('appId', appId);
+        formData.append('projectEnv', projectEnv);
+        formData.append('projectVersion', projectVersion);
+        formData.append('isSourceMap', isSourceMap);
+        formData.append('userId', userId);
+        formData.append('logId', logId);
+        formData.append('rootPath', rootPath);
+
+        const limit = pLimit(8);
+        const uploadPromises = fileList.map(file => limit(() => uploadSingleFile(file, formData)));
+        try {
+          const uploadRes = await Promise.all(uploadPromises);
+          const fulfilledUploads = uploadRes.filter(result => result.status === 'fulfilled');
+          const rejectedUploads = uploadRes.filter(result => result.status === 'rejected');
+
+          if (rejectedUploads.length > 0) {
+            const errors = rejectedUploads.map(result => result.reason.message).join(', ');
+            message.error(`部分文件上传失败: ${errors}`);
+          }
+
+          if (fulfilledUploads.length > 0) {
+            message.success('文件上传成功！');
+          }
+          setFileList([]); // 清空文件列表
+        } catch (error) {
+          message.error(`文件上传失败:${error.message}`);
+        } finally {
+          setUploading(false);
+        }
+      }
+    }).catch((error) => {
+      message.error(`获取上传批次失败:${error.message}`);
+    }).finally(() => {
+      message.destroy('uploading');
+      setUploading(false);
+    });
   };
 
   const uploadProps = {
@@ -110,7 +152,6 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
     beforeUpload: (file: UploadOriginFile) => {
       const formLocalData = form.getFieldsValue();
       const isSourceMap = formLocalData['isSourceMap'];
-      // const isSourceMap = appConfig['isSourceMap'];
       const allowedNonSourceMapExtensions = ['.js', '.jsx', '.tsx', '.ts', '.cjs', '.scss', '.less', '.css', '.html', '.htm'];
 
       const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
@@ -125,6 +166,7 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
       const uploadFile: any = {
         uid: file.uid,
         name: file.name,
+        size: file.size,
         status: 'done',
         originFileObj: file,
         webkitRelativePath: file.webkitRelativePath,
