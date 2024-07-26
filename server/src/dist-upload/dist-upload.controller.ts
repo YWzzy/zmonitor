@@ -115,7 +115,6 @@ export class DistUploadController {
   @ApiQuery({ name: "fileName", required: false, type: "string" })
   @ApiQuery({ name: "webkitRelativePath", required: false, type: "string" })
   @ApiQuery({ name: "userId", required: false, type: "string" })
-  @Auth()
   async findDistPackages(
     @Res() res: Response,
     @Query("appId") appId?: string,

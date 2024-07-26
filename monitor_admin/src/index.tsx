@@ -18,16 +18,18 @@ const isSourceMap = import.meta.env.VITE_ISSOURCEMAP === 'true' ? true : false;
 zMonitor.init({
   dsn,
   appId: import.meta.env.VITE_APPID,
+  appSecret: import.meta.env.VITE_APPSECRET,
+  appSecretKey: import.meta.env.VITE_APPSECRET_KEY,
   silentWhiteScreen: true,
   skeletonProject: true,
   repeatCodeError: true,
-  // reportErrorsOnly: false,
+  reportErrorsOnly: false,
   userId,
   getProjectConfig() {
     return {
       projectEnv,
       projectVersion,
-      projectIp: 'unkown',
+      projectIp: import.meta.env.VITE_SERVER_IP,
       isSourceMap,
     }
   },

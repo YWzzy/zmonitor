@@ -2035,55 +2035,55 @@
   resolved "https://registry.npmjs.org/@zmonitor/common/-/common-5.2.2.tgz#d33478e9bc04787dc4570f0ebdeff16437111815"
   integrity sha512-Ie2RfAkGBhc6/CwcO61ly6MgN8wCzHbKaQPyOE2+NaI6cWuAIA5g6uVj/ghN+Rd95+wo0mpqRDLqxDQ9GEZlYg==
 
-"@zmonitor/core@5.5.2", "@zmonitor/core@^5.5.2":
-  version "5.5.2"
-  resolved "https://registry.npmjs.org/@zmonitor/core/-/core-5.5.2.tgz#e998f9ba0230fa10ebd7426e06848feeda859490"
-  integrity sha512-YKqL/5vv3Ld0Gn8Sz6zs2W4okWUExcOnkNh08uWhLx9Hu47EpaJP65tCbXkyKn69etWExl3hb7kjPa24ooSwWQ==
+"@zmonitor/core@5.5.3", "@zmonitor/core@^5.5.3":
+  version "5.5.3"
+  resolved "https://registry.npmjs.org/@zmonitor/core/-/core-5.5.3.tgz#c3b8b6f7c3c55fac476c97c8b941f733d672f429"
+  integrity sha512-6pxyPtdxaj9hlG+LnJ0BJ42AUmr5es+8OybtSyilHVH2KbptU+WcyDiw/ta9WTYwLStUHzE/UeAcm6R5SIIo2g==
   dependencies:
     "@zmonitor/common" "5.2.2"
-    "@zmonitor/types" "5.2.2"
-    "@zmonitor/utils" "5.2.4"
+    "@zmonitor/types" "5.2.3"
+    "@zmonitor/utils" "5.2.5"
 
-"@zmonitor/performance@^5.3.3":
-  version "5.3.3"
-  resolved "https://registry.npmjs.org/@zmonitor/performance/-/performance-5.3.3.tgz#8c11d78297122af104983e1732d5e1b62b6294cf"
-  integrity sha512-LKnI95CuzNgTj1LTSacXG3eiSSvtgpt9eIX7ZXVnUrnvvx5xBml9XuVb66KMNUvMyxwtV030d+0KHgRLQzkIyQ==
+"@zmonitor/performance@^5.3.4":
+  version "5.3.4"
+  resolved "https://registry.npmjs.org/@zmonitor/performance/-/performance-5.3.4.tgz#9954b05b2b33c37144db7dc4c9305f00587dd934"
+  integrity sha512-U5/oqAANC74ldxH7GVClCXZIOgUPP4/HPczpHWxcFMdYlX/h0n0iCdfdD/TOO1DaIT+Ko9KF4HYIcu7d7/tikQ==
   dependencies:
     "@zmonitor/common" "5.2.2"
-    "@zmonitor/types" "5.2.2"
-    "@zmonitor/utils" "5.2.4"
+    "@zmonitor/types" "5.2.3"
+    "@zmonitor/utils" "5.2.5"
     web-vitals "^3.1.0"
 
-"@zmonitor/recordscreen@^5.2.4":
-  version "5.2.4"
-  resolved "https://registry.npmjs.org/@zmonitor/recordscreen/-/recordscreen-5.2.4.tgz#a621637de41a69af33b1193c689a41c6a4d7a23c"
-  integrity sha512-DEOOWcyMdCMNbGekuVxHAE68q8l6fbbk9o+uByST5ApYCceeD899BvDRXRUwbAbCQ5k/C20G069TcOQ+eh+seA==
+"@zmonitor/recordscreen@^5.2.5":
+  version "5.2.5"
+  resolved "https://registry.npmjs.org/@zmonitor/recordscreen/-/recordscreen-5.2.5.tgz#ab09fe44ed07d999b1b9fd1f739b5c29c22bfbd4"
+  integrity sha512-ynbzr7ugEfmsUSIsJ8+K9EVK7whbO23GplXl92PpMMEzHZhJEmN3hA2ojN6DOD4JXJ4HGR9I5wjJz3qkl4VnYw==
   dependencies:
     "@types/pako" "^2.0.0"
     "@zmonitor/common" "5.2.2"
-    "@zmonitor/types" "5.2.2"
-    "@zmonitor/utils" "5.2.4"
+    "@zmonitor/types" "5.2.3"
+    "@zmonitor/utils" "5.2.5"
     js-base64 "3.7.3"
     pako "2.1.0"
     rrweb "1.1.3"
 
-"@zmonitor/types@5.2.2", "@zmonitor/types@^5.2.2":
-  version "5.2.2"
-  resolved "https://registry.npmjs.org/@zmonitor/types/-/types-5.2.2.tgz#3b2da840440d0cc957d8afe965f165617d0283ec"
-  integrity sha512-6z/pGzvETR0fQ0wvj/hWgVaYk3dnkN/7QzbwXYAJJpukamPWCcmzE4oqm/xq6vdu4vq+2UyfYGllBExPSkO3zQ==
+"@zmonitor/types@5.2.3", "@zmonitor/types@^5.2.3":
+  version "5.2.3"
+  resolved "https://registry.npmjs.org/@zmonitor/types/-/types-5.2.3.tgz#88ab2bc632455013c03f7419316bfafec2d272a1"
+  integrity sha512-VtxRchcb23SyMwcis8FDi709Qj5dfDLIJQ0qWlfUlxlzui9dBH8r/ekYyHgQauhnpYSGh56iW6tyWRTUzt7jhw==
   dependencies:
     "@zmonitor/common" "5.2.2"
 
-"@zmonitor/utils@5.2.4", "@zmonitor/utils@^5.2.4":
-  version "5.2.4"
-  resolved "https://registry.npmjs.org/@zmonitor/utils/-/utils-5.2.4.tgz#e478a7886b835ba7301c1aaf6049c3a489c66903"
-  integrity sha512-M0DyEwTw02aIwnQ6bJE6wtG1q57by3X6uBPtsi9L5u0BaEZofYz8EUJgGOigQhguJYzPTYM0h/55nO/DsnyMdA==
+"@zmonitor/utils@5.2.5", "@zmonitor/utils@^5.2.5":
+  version "5.2.5"
+  resolved "https://registry.npmjs.org/@zmonitor/utils/-/utils-5.2.5.tgz#80df3eb6113afd9e1f29116c61f52fe68a2f9c53"
+  integrity sha512-aFhFk2GxjcanRmnm4bBcx89zBhWPuQAZhLIuLpHeLlSeABhJTQs8m26BZm6ZUNBOTf6rLAFtRyu7vbdSQ46PJg==
   dependencies:
     "@types/node" "^20.14.12"
     "@types/ua-parser-js" "^0.7.36"
     "@zmonitor/common" "5.2.2"
-    "@zmonitor/core" "5.5.2"
-    "@zmonitor/types" "5.2.2"
+    "@zmonitor/core" "5.5.3"
+    "@zmonitor/types" "5.2.3"
     crypto-js "^4.2.0"
     ua-parser-js "1.0.32"
 
