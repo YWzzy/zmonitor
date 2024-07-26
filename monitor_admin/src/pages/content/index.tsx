@@ -51,7 +51,7 @@ function Home() {
     }));
   }, [apps.length]);
 
-  const leftSideWidth = collapsed ? 80 : 255;
+  const leftSideWidth = collapsed ? 80 : 200;
 
   return (
     <div className={stylels.content}>

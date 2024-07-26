@@ -1,5 +1,5 @@
 import React from 'react';
-// import './app.css';
+import './app.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { GlobalModal } from '@/src/components/globalModal';
@@ -10,11 +10,8 @@ const router = createBrowserRouter(routes);
 function App() {
   return (
     <Provider store={store}>
-      <div className='bg-red-400'>
-        <RouterProvider router={router} />
-
-        <GlobalModal />
-      </div>
+      <RouterProvider router={router} />
+      <GlobalModal />
     </Provider>
   );
 }
