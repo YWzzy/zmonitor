@@ -121,6 +121,7 @@ export class DistUploadService {
         rootPath,
         webkitRelativePath ? webkitRelativePath : fileName
       );
+      fs.writeFileSync(filePath, file.buffer);
       distUpload.appId = appId;
       distUpload.fileName = fileName;
       distUpload.rootPath = rootPath;
