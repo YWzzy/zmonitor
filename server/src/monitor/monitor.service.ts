@@ -26,7 +26,7 @@ export class MonitorService {
     private readonly recordingService: RecordingService,
     private readonly fileUploadService: FileUploadService,
     private readonly performanceService: PerformanceService
-  ) {}
+  ) { }
 
   // 存储录屏数据
   async saveRecordScreen(data: any): Promise<void> {
@@ -73,6 +73,11 @@ export class MonitorService {
         if (data.apikey) {
           createErrorMonitorDto.appId = data.apikey;
         }
+        if (data.isSourceMap || data.isSourceMap === 'true') {
+          createErrorMonitorDto.isSourceMap = true;
+        } else {
+          createErrorMonitorDto.isSourceMap = false;
+        }
         await this.errorMonitorService.create(req, createErrorMonitorDto);
       }
     } catch (err) {
@@ -110,8 +115,7 @@ export class MonitorService {
     if (application && application.packageUrl) {
       mapPath = path.join(
         application.packageUrl,
-        `${originalFileName ? originalFileName : fileName}${
-          application.isSourceMap ? ".map" : ""
+        `${originalFileName ? originalFileName : fileName}${application.isSourceMap ? ".map" : ""
         }`
       );
       return mapPath; // 返回应用程序的录屏存储路径
@@ -120,8 +124,7 @@ export class MonitorService {
         __dirname,
         "..",
         "publicClient/js",
-        `${originalFileName ? originalFileName : fileName}${
-          application.isSourceMap ? ".map" : ""
+        `${originalFileName ? originalFileName : fileName}${application.isSourceMap ? ".map" : ""
         }`
       );
       return mapPath; // 默认使用公共目录
