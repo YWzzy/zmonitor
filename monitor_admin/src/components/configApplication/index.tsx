@@ -69,7 +69,16 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
   };
 
   // 上传单个文件
-  const uploadSingleFile: any = async (file: UploadOriginFile, formData: FormData) => {
+  const uploadSingleFile: any = async (batchInfo, file: UploadOriginFile) => {
+    const formData = new FormData();
+    const { appId, isSourceMap, projectEnv, projectVersion, rootPath, userId, logId } = batchInfo;
+    formData.append('appId', appId);
+    formData.append('projectEnv', projectEnv);
+    formData.append('projectVersion', projectVersion);
+    formData.append('isSourceMap', isSourceMap);
+    formData.append('userId', userId);
+    formData.append('logId', logId);
+    formData.append('rootPath', rootPath);
     formData.set(`webkitRelativePath`, file['webkitRelativePath']);
     formData.set('fileName', file.name);
     formData.set('fileSize', String(file.size));
@@ -102,18 +111,8 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
     // 获取上传批次，成功后上传文件
     await getUploadBatch(params).then(async (res) => {
       if (res.code === 200) {
-        const formData = new FormData();
-        const { appId, isSourceMap, projectEnv, projectVersion, rootPath, userId, logId } = res.data;
-        formData.append('appId', appId);
-        formData.append('projectEnv', projectEnv);
-        formData.append('projectVersion', projectVersion);
-        formData.append('isSourceMap', isSourceMap);
-        formData.append('userId', userId);
-        formData.append('logId', logId);
-        formData.append('rootPath', rootPath);
-
         const limit = pLimit(8);
-        const uploadPromises = fileList.map(file => limit(() => uploadSingleFile(file, formData)));
+        const uploadPromises = fileList.map(file => limit(() => uploadSingleFile(res.data, file)));
         try {
           const uploadRes = await Promise.all(uploadPromises);
           const fulfilledUploads = uploadRes.filter(result => result.status === 'fulfilled');
@@ -178,6 +177,7 @@ export const ConfigApplication: React.FC<ConfigApplicationIn> = ({ open, onClose
     showUploadList: true,
     multiple: true,
     directory: true,
+    name: 'file',
     fileList,
   };
 

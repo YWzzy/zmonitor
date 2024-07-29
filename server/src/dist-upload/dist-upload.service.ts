@@ -42,10 +42,11 @@ export class DistUploadService {
         where: { appId, projectEnv, projectVersion },
       });
       if (logs.length > 0) {
-        throw new CustomHttpException(
-          500,
-          `Dist package with appId ${appId}, projectEnv ${projectEnv}, projectVersion ${projectVersion} already exists`
-        );
+        // throw new CustomHttpException(
+        //   500,
+        //   `Dist package with appId ${appId}, projectEnv ${projectEnv}, projectVersion ${projectVersion} already exists`
+        // );
+        return logs[0];
       }
       const application = await this.applicationRepository.findOne({
         where: { appId },
@@ -57,10 +58,6 @@ export class DistUploadService {
         `/distProject/${currentDate}/${appId}/${projectEnv}/${projectVersion}/${isSourceMap ? "sourceMap" : "NoSourceMap"
         }`
       );
-
-      if (!fs.existsSync(directoryPath)) {
-        fs.mkdirSync(directoryPath, { recursive: true });
-      }
       const logId = require("uuid").v4();
       const distUploadLog = new DistUploadLog();
       distUploadLog.appId = appId;
@@ -107,7 +104,6 @@ export class DistUploadService {
     await queryRunner.startTransaction();
     try {
       const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
-
       if (file.size > MAX_FILE_SIZE) {
         throw new CustomHttpException(
           500,
@@ -119,8 +115,21 @@ export class DistUploadService {
       const distUpload = new DistUpload();
       const filePath = path.join(
         rootPath,
-        webkitRelativePath ? webkitRelativePath : fileName
+        webkitRelativePath || fileName
       );
+      // 确保文件的目录存在
+      const directoryPath = path.dirname(filePath);
+      if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath, { recursive: true });
+      } else if (!fs.statSync(directoryPath).isDirectory()) {
+        throw new Error(`路径应该是目录，但它不是: ${directoryPath}`);
+      }
+
+      // 确保 filePath 不是目录
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
+        throw new Error(`路径是一个目录而不是文件: ${filePath}`);
+      }
+
       fs.writeFileSync(filePath, file.buffer);
       distUpload.appId = appId;
       distUpload.fileName = fileName;
@@ -140,6 +149,7 @@ export class DistUploadService {
     } catch (error) {
       await queryRunner.rollbackTransaction();
       Logger.error(error.message);
+      // 如果存在上传记录但是不存在对应文件，删除本次上传记录和文件
       throw new CustomHttpException(
         500,
         `Failed to upload dist package: ${error.message}`

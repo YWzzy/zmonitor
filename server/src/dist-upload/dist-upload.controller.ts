@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UploadedFiles,
   Res,
+  UploadedFile,
 } from "@nestjs/common";
 import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import {
@@ -55,7 +56,7 @@ export class DistUploadController {
   @Post("upload")
   @ApiOperation({ summary: "上传dist包" })
   @ApiConsumes("multipart/form-data")
-  @UseInterceptors(FilesInterceptor("file"))
+  @UseInterceptors(FileInterceptor("file"))
   @ApiBody({
     schema: {
       type: "object",
@@ -75,7 +76,7 @@ export class DistUploadController {
   @Auth()
   async uploadDistPackage(
     @Body() body: any,
-    @UploadedFiles() file: Express.Multer.File
+    @UploadedFile() file: Express.Multer.File
   ): Promise<DistUpload> {
     try {
       const {
@@ -106,7 +107,7 @@ export class DistUploadController {
     } catch (error) {
       throw new CustomHttpException(
         error.status,
-        `Failed to upload dist package: ${error.message}`
+        `${error.message}`
       );
     }
   }
