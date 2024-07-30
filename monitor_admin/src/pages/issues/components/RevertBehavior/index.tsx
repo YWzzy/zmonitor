@@ -10,7 +10,7 @@ interface ActivityItem {
   data: any; // Adjust data type according to your actual structure
   message: string;
   createTime: string;
-  time: string; 
+  time: string;
 }
 
 interface RevertBehaviorProps {
@@ -31,7 +31,7 @@ export const RevertBehavior: React.FC<RevertBehaviorProps> = ({ breadcrumbMsg, o
       case 'Code_Error':
         return `代码报错：${item.data.message}`;
       case 'Resource_Error':
-        return `加载资源报错：${item.message}`;
+        return `加载资源报错：${item.data.message}`;
       case 'Route':
         return `路由变化：从 ${item.data.from} 页面切换到 ${item.data.to} 页面`;
       default:
@@ -70,7 +70,7 @@ export const RevertBehavior: React.FC<RevertBehaviorProps> = ({ breadcrumbMsg, o
                 flexDirection: 'column',
               }}
             >
-              <span>{getActivityContent(item)}</span>
+              <span dangerouslySetInnerHTML={{ __html: getActivityContent(item) }} />
               <span>{dayjs(Number(item.time)).format('YYYY-MM-DD HH:mm:ss')}</span>
             </div>
           </Timeline.Item>

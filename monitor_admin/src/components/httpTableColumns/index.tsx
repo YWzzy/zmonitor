@@ -14,7 +14,7 @@ export const httpTableColumns = (sorter: {
       width: 220,
       align: 'left',
       fixed: 'left',
-      render: url => TableItem.renderUrl(url, 30, true),
+      render: url => TableItem.renderUrl(url, 120, true),
     },
     {
       title: '请求类型',
