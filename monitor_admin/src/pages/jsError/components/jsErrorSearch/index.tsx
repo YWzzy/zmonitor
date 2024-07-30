@@ -132,7 +132,12 @@ export const JsErrorSearch = () => {
     <Card title="异常查询">
       <Form form={form} style={{ paddingBottom: 20 }} name="horizontal_login" layout="inline">
         <Form.Item name="date" label="日期" initialValue={[dayjs(), dayjs()]}>
-          <DatePicker.RangePicker />
+          <DatePicker.RangePicker
+            presets={[
+              { label: '1天内', value: [dayjs().startOf('day'), dayjs().endOf('day')] },
+              { label: '7天内', value: [dayjs().subtract(7, 'days'), dayjs().endOf('day')] },
+              { label: '30天内', value: [dayjs().subtract(1, 'month'), dayjs().endOf('day')] },
+            ]} />
         </Form.Item>
         <Form.Item>
           <Button onClick={toReset} title="Reset">

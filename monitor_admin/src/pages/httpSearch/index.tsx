@@ -146,7 +146,12 @@ const HttpSearch = () => {
           <Input placeholder="请输入接口地址" />
         </Form.Item>
         <Form.Item name="date" label="日期">
-          <DatePicker.RangePicker />
+          <DatePicker.RangePicker
+            presets={[
+              { label: '1天内', value: [dayjs().startOf('day'), dayjs().endOf('day')] },
+              { label: '7天内', value: [dayjs().subtract(7, 'days'), dayjs().endOf('day')] },
+              { label: '30天内', value: [dayjs().subtract(1, 'month'), dayjs().endOf('day')] },
+            ]} />
         </Form.Item>
         <Form.Item name="requestType" label="请求状态">
           <Radio.Group>
