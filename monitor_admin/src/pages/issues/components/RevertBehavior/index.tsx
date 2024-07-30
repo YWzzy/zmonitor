@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { Drawer, Timeline } from 'antd';
+import { Drawer, Timeline, Button } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useNavigate } from 'react-router-dom';
 
 interface ActivityItem {
   category: string;
@@ -10,7 +10,7 @@ interface ActivityItem {
   data: any; // Adjust data type according to your actual structure
   message: string;
   createTime: string;
-  time: string; 
+  time: string;
 }
 
 interface RevertBehaviorProps {
@@ -22,20 +22,36 @@ interface RevertBehaviorProps {
 }
 
 export const RevertBehavior: React.FC<RevertBehaviorProps> = ({ breadcrumbMsg, onClose }) => {
-  const getActivityContent = (item: ActivityItem): string => {
+  const navigate = useNavigate();
+
+  const handleViewClick = (data: object | undefined) => {
+    navigate('/httpSearch', { state: data });
+  };
+
+  const getActivityContent = (item: ActivityItem): JSX.Element => {
     switch (item.category) {
       case 'Click':
-        return `用户点击dom: ${item.data}`;
+        return <span>用户点击dom: {item.data}</span>;
       case 'Http':
-        return `调用接口: ${item.data.url}, ${item.status === 'ok' ? '请求成功' : '请求失败'}`;
+        return (
+          <span>
+            调用接口: {item.data.url}, {item.status === 'ok' ? '请求成功' : '请求失败'}
+            <Button
+              type="link"
+              onClick={() => handleViewClick(item.data)}
+            >
+              查看
+            </Button>
+          </span>
+        );
       case 'Code_Error':
-        return `代码报错：${item.data.message}`;
+        return <span>代码报错：{item.data.message}</span>;
       case 'Resource_Error':
-        return `加载资源报错：${item.message}`;
+        return <span>加载资源报错：{item.data.message}</span>;
       case 'Route':
-        return `路由变化：从 ${item.data.from} 页面切换到 ${item.data.to} 页面`;
+        return <span>路由变化：从 {item.data.from} 页面切换到 {item.data.to} 页面</span>;
       default:
-        return '';
+        return <span></span>;
     }
   };
 
@@ -70,7 +86,7 @@ export const RevertBehavior: React.FC<RevertBehaviorProps> = ({ breadcrumbMsg, o
                 flexDirection: 'column',
               }}
             >
-              <span>{getActivityContent(item)}</span>
+              {getActivityContent(item)}
               <span>{dayjs(Number(item.time)).format('YYYY-MM-DD HH:mm:ss')}</span>
             </div>
           </Timeline.Item>

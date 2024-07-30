@@ -20,11 +20,12 @@ import { ApiOperation, ApiQuery, ApiTags, ApiBody } from "@nestjs/swagger";
 import { Auth } from "src/decorator/Auth";
 import { CustomHttpException } from "src/common/exception";
 import { Request } from "express";
+import { ProjectInfo } from "src/decorator/ProjectInfo";
 
 @Controller("error-monitor")
 @ApiTags("错误日志")
 export class ErrorMonitorController {
-  constructor(private readonly errorMonitorService: ErrorMonitorService) {}
+  constructor(private readonly errorMonitorService: ErrorMonitorService) { }
 
   @Post("createError")
   @ApiOperation({
@@ -107,6 +108,7 @@ export class ErrorMonitorController {
     @Query("sorterKey") sorterKey: string,
     @Query("requestType") requestType: string,
     @Query("link") link: string,
+    @ProjectInfo() projectInfo: { appId: string; projectEnv: string; isSourceMap: string },
     @Res() res: Response
   ) {
     try {
@@ -122,6 +124,8 @@ export class ErrorMonitorController {
         pageNo: from,
         pageSize: size,
         // type: requestType === "done" ? "ok" : "error",
+        projectEnv: projectInfo.projectEnv,
+        // isSourceMap: projectInfo.isSourceMap,
         sorterName,
         sorterKey,
       });

@@ -1,7 +1,9 @@
 # compiled output
+dist
 /dist
 /node_modules
 /recordScreenFiles
+/distProject
 
 # Logs
 logs

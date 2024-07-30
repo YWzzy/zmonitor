@@ -1,6 +1,8 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+// import tailwindcss from "tailwindcss"
+// import autoprefixer from "autoprefixer"
 
 export default defineConfig(({ mode }) => {
   // 加载环境变量
@@ -14,7 +16,13 @@ export default defineConfig(({ mode }) => {
       },
     },
     css: {
-      postcss: './postcss.config.js',
+      postcss: path.resolve(__dirname, './postcss.config.js'),
+      // postcss: {
+      //       plugins: [
+      //           tailwindcss,
+      //           autoprefixer,
+      //       ]
+      //   }
     },
     server: {
       // 设置开发服务器代理

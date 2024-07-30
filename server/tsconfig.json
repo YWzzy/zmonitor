@@ -17,5 +17,10 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  "exclude": [
+    "distProject", // 排除 distProject 目录
+    "node_modules",
+    "build"
+  ]
 }

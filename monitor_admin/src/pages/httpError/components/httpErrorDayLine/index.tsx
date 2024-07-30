@@ -20,7 +20,7 @@ export const HttpErrorDayLine = () => {
     });
 
     const [xAxis, yAxis] = data.reduce(
-      ([xAxis, yAxis]: any, cur) => {
+      ([xAxis, yAxis]: any, cur: any) => {
         xAxis.push(dayjs(cur.label).format('MM-DD'));
         yAxis.push(cur.value);
         return [xAxis, yAxis];

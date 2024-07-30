@@ -26,6 +26,7 @@ export const AddApplication: React.FC<AddApplicationIn> = ({ open, onClose }) =>
           setLoading(true);
           const params = { ...form.getFieldsValue(), userKey: userInfo.account };
           await createApp(params);
+          await appDispatch.updateNeedFetch(true);
           await appDispatch.getAppList(userInfo.account);
           setLoading(false);
           message.success('应用成功创建！');

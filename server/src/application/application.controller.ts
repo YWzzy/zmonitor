@@ -26,7 +26,7 @@ import { Request } from "express";
 @ApiTags("监控应用")
 @Controller("applications")
 export class ApplicationController {
-  constructor(private readonly applicationService: ApplicationService) {}
+  constructor(private readonly applicationService: ApplicationService) { }
 
   @ApiOperation({ summary: "获取ip" })
   @ApiBadRequestResponse({ description: "获取ip失败" })

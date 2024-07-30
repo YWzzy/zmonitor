@@ -26,6 +26,17 @@ export class SearchErrorMonitorDto {
 
   @IsString()
   @IsOptional()
+  projectVersion?: string;
+
+  @IsString()
+  @IsOptional()
+  projectEnv?: string;
+
+  @IsOptional()
+  isSourceMap?: boolean;
+
+  @IsString()
+  @IsOptional()
   sorterKey: string;
 
   @IsString()

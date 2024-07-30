@@ -33,3 +33,41 @@ export const getProjectIp = async () => {
   const ip = await getAppIp();
   return ip.data? ip.data.ip : 'unkown';
 };
+
+/**
+ * 从URL中提取文件名
+ * @param {string} url - 完整的URL
+ * @returns {string} - 提取的文件名
+ */
+export const extractFileName =(url: string, isSourceMap: boolean) => {
+  // 使用URL构造函数解析URL
+  const parsedUrl = new URL(url);
+  // 获取路径名
+  const pathname = parsedUrl.pathname;
+  // 返回最后一个斜杠之后的部分，即文件名
+  const nodeFileName = pathname.substring(pathname.lastIndexOf('/') + 1);
+  return isSourceMap ? nodeFileName + '.map' : nodeFileName;
+}
+
+/**
+ * 从URL中提取文件名
+ * @param {string} url - 完整的URL
+ * @returns {string} - 提取的文件名
+ */
+export const  extractRelativeFileName =(url: string, isSourceMap: boolean) => {
+  // 使用正则表达式从URL中提取路径部分
+  const urlPattern = /^(?:https?:\/\/)?(?:www\.)?[^\/]+\/(.+)$/;
+  const match = url.match(urlPattern);
+  if (!match) {
+    throw new Error('Invalid URL');
+  }
+
+  let filePath = match[1];
+  // 如果 isSourceMap 为 true，添加 .map 后缀
+  if (isSourceMap) {
+    filePath += '.map';
+  }
+  filePath = 'dist/' + filePath;
+
+  return filePath;
+}

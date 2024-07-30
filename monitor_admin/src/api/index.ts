@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
 import { message } from 'antd';
-// import { config } from '@/src/config';
+import { config } from '@/src/config';
+
 
 let isShowNoLogin = false;
 
@@ -17,11 +17,31 @@ enum CustomResponseCode {
 }
 
 export const http = axios.create({
-  baseURL: `/api/`,
-  // baseURL: `${config.apiHost}/`,
+  baseURL: `${config.baseURL}/`,
   withCredentials: true,
 });
 
+// 请求拦截器
+http.interceptors.request.use((config) => {
+  const app = localStorage.getItem('app');
+  if(app) {
+    const appData = JSON.parse(app);
+    if(appData.active) {
+      appData.apps.filter(item => {
+          if(item.appId === appData.active) {
+            config.headers['appId'] = item.appId;
+            config.headers['projectEnv'] = item.projectEnv;
+            config.headers['isSourceMap'] = item.isSourceMap;
+          }
+        }
+      );
+    }
+  }
+  return config;
+}
+);
+
+// 响应拦截器
 http.interceptors.response.use(
   (response) => {
     const { data, status } = response;
@@ -44,7 +64,7 @@ http.interceptors.response.use(
   (error) => {
     const { response } = error;
     if (response) {
-      response?.data?.message ? message.error(`请求错误: ${response.status} - ${response.statusText} - ${response?.data?.message}`) : message.error(`请求错误: ${response.status} - ${response.statusText}`);
+      response?.data?.message ? message.error(`${response.status} - ${response?.data?.message}`) : message.error(`${response.status} - ${response.statusText}`);
       const res = response.data as CustomRes<any>;
       if (res.code === CustomResponseCode.NOLOGIN || res.code === CustomResponseCode.NOTFOUNDACCOUNT) {
         if (!isShowNoLogin) {
@@ -113,10 +133,10 @@ export const getTodayTraffic = async (appId: string): CustomResponse<TodayTraffi
   await http.get('/analyse/getTodayTraffic', { params: { appId } });
 
 export const getTrafficTimes = async (params: TrafficTimesReq): CustomResponse<TrafficTimesRes> =>
-  await http.get('/traffic/getTrafficTimes', { params });
+  await http.get('/analyse/getTrafficTimes', { params });
 
 export const getTrafficDays = async (params: TrafficDaysReq): CustomResponse<TrafficTimesRes> =>
-  await http.get('/traffic/getTrafficDays', { params });
+  await http.get('/analyse/getTrafficDays', { params });
 
 export const getDayActiveUsers = async (params: AnalyseReq): CustomResponse<number> =>
   await http.get('/analyse/getDayActiveUsers', { params });
@@ -196,3 +216,11 @@ export const uploadDistFiles = async (data: FormData): CustomResponse<any> =>
       'Content-Type': 'multipart/form-data',
     },
   });
+
+// 查询项目包文件
+export const findDistPackages = async (params: any): CustomResponse<any> =>
+  await http.get('/dist-upload/findDistPackages', { params });
+
+// 上传包之前 - 获取上传批次信息
+export const getUploadBatch = async (params: any): CustomResponse<any> =>
+  await http.get('/dist-upload/getUploadBatch', { params });

@@ -36,6 +36,11 @@ export class CreateApplicationDto {
   @Length(1, 48, { message: "应用名称长度必须在1到48个字符之间" })
   projectEnv?: string;
 
+  @IsString()
+  @IsOptional()
+  @Length(1, 48, { message: "应用当前版本必须在1到48个字符之间" })
+  projectVersion?: string;
+
   @IsOptional()
   appStatus: number;
 

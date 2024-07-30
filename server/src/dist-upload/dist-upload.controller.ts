@@ -9,6 +9,8 @@ import {
   Query,
   UseInterceptors,
   UploadedFiles,
+  Res,
+  UploadedFile,
 } from "@nestjs/common";
 import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import {
@@ -19,51 +21,93 @@ import {
   ApiParam,
   ApiQuery,
 } from "@nestjs/swagger";
+import { Response } from "express";
 import { DistUploadService } from "./dist-upload.service";
 import { DistUpload } from "./entities/dist-upload.entity";
 import { CustomHttpException } from "src/common/exception";
 import { DistUploadLog } from "./entities/dist-upload-log.entity";
+import { Auth } from "src/decorator/Auth";
 
 @ApiTags("DistUpload")
 @Controller("dist-upload")
 export class DistUploadController {
-  constructor(private readonly distUploadService: DistUploadService) {}
+  constructor(private readonly distUploadService: DistUploadService) { }
+
+
+  @Get('getUploadBatch')
+  @ApiOperation({ summary: "获取上传批次信息" })
+  @Auth()
+  async getUploadBatch(
+    @Query('appId') appId: string,
+    @Query('projectEnv') projectEnv: string,
+    @Query('projectVersion') projectVersion: string,
+    @Query('isSourceMap') isSourceMap: boolean,
+    @Query('userId') userId: string,
+    @Query('filesNumber') filesNumber: string,
+    @Query('filesSize') filesSize: string
+  ): Promise<{ logId: string }> {
+    try {
+      return await this.distUploadService.getUploadBatch(appId, projectEnv, projectVersion, isSourceMap, userId, filesNumber, filesSize);
+    } catch (error) {
+      throw new CustomHttpException(error.status, error.message);
+    }
+  }
 
   @Post("upload")
   @ApiOperation({ summary: "上传dist包" })
   @ApiConsumes("multipart/form-data")
-  @UseInterceptors(FilesInterceptor("files"))
+  @UseInterceptors(FileInterceptor("file"))
   @ApiBody({
     schema: {
       type: "object",
       properties: {
         appId: { type: "string" },
         projectEnv: { type: "string" },
+        logId: { type: "string" },
+        rootPath: { type: "string" },
         projectVersion: { type: "string" },
         isSourceMap: { type: "boolean" },
         userId: { type: "string" },
-        files: { type: "array", items: { type: "string", format: "binary" } },
+        fileName: { type: "string" },
+        file: { type: "string", format: "binary" },
       },
     },
   })
+  @Auth()
   async uploadDistPackage(
     @Body() body: any,
-    @UploadedFiles() files: Express.Multer.File[]
-  ): Promise<DistUploadLog> {
+    @UploadedFile() file: Express.Multer.File
+  ): Promise<DistUpload> {
     try {
-      const { appId, projectEnv, projectVersion, isSourceMap, userId } = body;
+      const {
+        appId,
+        projectEnv,
+        projectVersion,
+        webkitRelativePath,
+        isSourceMap,
+        userId,
+        rootPath,
+        logId,
+        fileName,
+        fileSize,
+      } = body;
       return await this.distUploadService.uploadDistPackage(
         appId,
-        files,
+        file,
+        webkitRelativePath,
         projectEnv,
         projectVersion,
         isSourceMap,
-        userId
+        userId,
+        rootPath,
+        logId,
+        fileName,
+        fileSize
       );
     } catch (error) {
       throw new CustomHttpException(
         error.status,
-        `Failed to upload dist package: ${error.message}`
+        `${error.message}`
       );
     }
   }
@@ -71,6 +115,7 @@ export class DistUploadController {
   @Put(":id")
   @ApiOperation({ summary: "更新指定的dist包" })
   @ApiParam({ name: "id", type: "number", description: "dist包ID" })
+  @Auth()
   async updateDistPackage(
     @Param("id") id: number,
     @Body() updateDistDto: Partial<DistUpload>
@@ -85,6 +130,7 @@ export class DistUploadController {
   @Delete(":id")
   @ApiOperation({ summary: "删除dist包" })
   @ApiParam({ name: "id", type: "number", description: "dist包ID" })
+  @Auth()
   async deleteDistPackage(@Param("id") id: number): Promise<void> {
     try {
       await this.distUploadService.deleteDistPackage(id);
@@ -99,22 +145,29 @@ export class DistUploadController {
   @ApiQuery({ name: "projectEnv", required: false, type: "string" })
   @ApiQuery({ name: "projectVersion", required: false, type: "string" })
   @ApiQuery({ name: "fileName", required: false, type: "string" })
+  @ApiQuery({ name: "webkitRelativePath", required: false, type: "string" })
   @ApiQuery({ name: "userId", required: false, type: "string" })
   async findDistPackages(
+    @Res() res: Response,
     @Query("appId") appId?: string,
     @Query("projectEnv") projectEnv?: string,
     @Query("projectVersion") projectVersion?: string,
     @Query("fileName") fileName?: string,
+    @Query("webkitRelativePath") webkitRelativePath?: string,
     @Query("userId") userId?: string
   ): Promise<DistUpload[]> {
     try {
-      return await this.distUploadService.findDistPackages({
-        appId,
-        projectEnv,
-        projectVersion,
-        fileName,
-        userId,
-      });
+      return await this.distUploadService.findDistPackages(
+        {
+          appId,
+          projectEnv,
+          projectVersion,
+          fileName,
+          webkitRelativePath,
+          userId,
+        },
+        res
+      );
     } catch (error) {
       throw new CustomHttpException(error.status, error.message);
     }

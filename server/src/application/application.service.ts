@@ -6,16 +6,24 @@ import { CreateApplicationDto } from "./dto/create-application.dto";
 import { UpdateApplicationDto } from "./dto/update-application.dto";
 import { CustomHttpException } from "src/common/exception";
 import { Request } from "express";
+import * as crypto from 'crypto';
+import * as dotenv from "dotenv";
+import * as path from "path";
+
+const envFilePath =
+  process.env.NODE_ENV === "production"
+    ? path.resolve(__dirname, "../src/config/production.env")
+    : path.resolve(__dirname, "../src/config/development.env");
+dotenv.config({ path: envFilePath });
 
 @Injectable()
 export class ApplicationService {
   constructor(
     @InjectRepository(Application)
     private readonly applicationRepository: Repository<Application>
-  ) {}
+  ) { }
 
-  private generateUniqueAppId(): string {
-    // 生成一个唯一的16位数字appId
+  private generateUniqueAppIdAndSecret(): { appId: string, appSecret: string } {
     const min = 1000000000000000; // 最小值
     const max = 9999999999999999; // 最大值
 
@@ -24,7 +32,12 @@ export class ApplicationService {
       newAppId = Math.floor(Math.random() * (max - min + 1) + min).toString();
     } while (!this.isAppIdUnique(newAppId)); // 确保appId唯一性
 
-    return newAppId;
+    const secretKey = process.env.APP_SECRET_KEY;
+    const appSecret = crypto.createHmac('sha256', newAppId)
+      .update(secretKey)
+      .digest('hex');
+
+    return { appId: newAppId, appSecret: appSecret };
   }
 
   private isAppIdUnique(appId: string): boolean {
@@ -41,22 +54,17 @@ export class ApplicationService {
     return ip as string;
   }
 
-  async create(
-    createApplicationDto: CreateApplicationDto
-  ): Promise<Application> {
+  async create(createApplicationDto: CreateApplicationDto): Promise<Application> {
     const application = await this.applicationRepository.findOne({
       where: { appName: createApplicationDto.appName },
     });
     if (application) {
       throw new CustomHttpException(500, "Application name already exists");
     }
-    // 如果createApplicationDto中没有appSecret，则生成一个uuid
-    if (!createApplicationDto.appSecret) {
-      createApplicationDto.appSecret = require("uuid").v4();
-    }
 
-    // 生成一个唯一appId, 16位数字，确保不会重复
-    createApplicationDto.appId = this.generateUniqueAppId();
+    const { appId, appSecret } = this.generateUniqueAppIdAndSecret();
+    createApplicationDto.appId = appId;
+    createApplicationDto.appSecret = appSecret;
 
     // 手动创建一个Application对象
     const newApplication = new Application();
@@ -73,6 +81,7 @@ export class ApplicationService {
     // 保存到数据库
     return await this.applicationRepository.save(newApplication);
   }
+
   async findAll(): Promise<Application[]> {
     return this.applicationRepository.find();
   }
@@ -89,14 +98,13 @@ export class ApplicationService {
     });
   }
 
-  async update(
-    updateApplicationDto: UpdateApplicationDto
-  ): Promise<Application> {
+  async update(updateApplicationDto: UpdateApplicationDto): Promise<Application> {
     try {
       const appId = updateApplicationDto.appId;
       const application = await this.applicationRepository.findOne({
         where: { appId: appId },
       });
+
       if (!application) {
         throw new CustomHttpException(500, "Application not found");
       }
@@ -106,8 +114,18 @@ export class ApplicationService {
       ) {
         throw new CustomHttpException(500, "Cannot update appSecret");
       }
+      application.isSourceMap = updateApplicationDto.isSourceMap;
       if (updateApplicationDto.appType) {
         application.appType = updateApplicationDto.appType;
+      }
+      if (updateApplicationDto.projectEnv) {
+        application.projectEnv = updateApplicationDto.projectEnv;
+      }
+      if (updateApplicationDto.userKey) {
+        application.userKey = updateApplicationDto.userKey;
+      }
+      if (updateApplicationDto.projectVersion) {
+        application.projectVersion = updateApplicationDto.projectVersion;
       }
       if (updateApplicationDto.appName) {
         application.appName = updateApplicationDto.appName;

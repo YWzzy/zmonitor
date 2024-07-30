@@ -61,6 +61,20 @@ export class DistUploadLog {
   userId: string;
 
   @Column({
+    type: "int",
+    default: 0,
+    comment: "该批次文件数量",
+  })
+  filesNumber: number;
+
+  @Column({
+    type: "int",
+    default: 0,
+    comment: "该批次文件总大小",
+  })
+  filesSize: number;
+
+  @Column({
     type: "varchar",
     length: 255,
     nullable: true,

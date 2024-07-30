@@ -6,7 +6,7 @@ import styles from './index.module.less';
 import { getStatusColor } from '@/src/utils/getStatusColor';
 import { copyTextToClipboard } from '@/src/utils';
 const renderHttpCost = (val: number) => (
-  <span style={{ color: getStatusColor(val, 'requestTime') }}>{val || val==0 ? Number(val).toFixed(0) : '-'}ms</span>
+  <span style={{ color: getStatusColor(val, 'requestTime') }}>{val || val == 0 ? Number(val).toFixed(0) : '-'}ms</span>
 );
 
 const renderUrl = (url: string, maxLen: number, copy: boolean) => {
@@ -39,13 +39,13 @@ const renderUrl = (url: string, maxLen: number, copy: boolean) => {
 
 const renderObject = (obj, maxLen, copy) => {
   if (!obj || Object.keys(obj).length === 0) return '-';
-  
+
   const formatObject = (obj) => {
     return JSON.stringify(obj, null, 2); // 格式化为带缩进的JSON字符串
   };
 
-  const displayStr = formatObject(obj).length > maxLen 
-    ? `${formatObject(obj).substring(0, maxLen)}...` 
+  const displayStr = formatObject(obj).length > maxLen
+    ? `${formatObject(obj).substring(0, maxLen)}...`
     : formatObject(obj);
 
   return (
@@ -90,7 +90,7 @@ const renderText = (url: string, maxLen: number, copy: boolean) => {
   );
 };
 
-const renderTime = (date: string) => dayjs(date).format('YYYY-MM-DD HH:mm:ss');
+const renderTime = (date: string) => dayjs(Number(date)).format('YYYY-MM-DD HH:mm:ss');
 
 export const TableItem = {
   renderHttpCost,

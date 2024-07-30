@@ -14,6 +14,20 @@ export class DistUpload {
   @Column({
     type: "varchar",
     length: 50,
+    comment: "应用ID",
+  })
+  appId: string;
+
+  @Column({
+    type: "varchar",
+    length: 50,
+    comment: "用户ID",
+  })
+  userId: string;
+
+  @Column({
+    type: "varchar",
+    length: 50,
     comment: "upload-log ID",
   })
   logId: string;
@@ -42,6 +56,7 @@ export class DistUpload {
   @Column({
     type: "varchar",
     length: 255,
+    default: "",
     comment: "子包文件名称",
   })
   fileName: string;
@@ -49,23 +64,33 @@ export class DistUpload {
   @Column({
     type: "varchar",
     length: 255,
+    default: "",
+    comment: "子包文件大小",
+  })
+  fileSize: string;
+
+  @Column({
+    type: "varchar",
+    length: 255,
+    default: "",
+    comment: "子包文件目录path",
+  })
+  webkitRelativePath: string;
+
+  @Column({
+    type: "varchar",
+    length: 255,
+    default: "",
+    comment: "dist存储根目录",
+  })
+  rootPath: string;
+
+  @Column({
+    type: "varchar",
+    length: 255,
     comment: "项目包地址",
   })
   path: string;
-
-  @Column({
-    type: "varchar",
-    length: 50,
-    comment: "应用ID",
-  })
-  appId: string;
-
-  @Column({
-    type: "varchar",
-    length: 50,
-    comment: "用户ID",
-  })
-  userId: string;
 
   @Column({
     type: "varchar",

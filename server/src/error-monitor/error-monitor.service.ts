@@ -151,6 +151,8 @@ export class ErrorMonitorService {
         sorterKey,
         sorterName,
         types,
+        projectEnv,
+        projectVersion,
         ...searchDto
       } = searchErrorMonitorDto;
 
@@ -181,6 +183,13 @@ export class ErrorMonitorService {
         whereConditions.url = Like(`%${url}%`);
       }
 
+      if (projectEnv) {
+        whereConditions.projectEnv = projectEnv;
+      }
+
+      if (projectVersion) {
+        whereConditions.projectVersion = projectVersion;
+      }
       if (requestType) {
         whereConditions.status = requestType === "error" ? "error" : "ok";
       }
