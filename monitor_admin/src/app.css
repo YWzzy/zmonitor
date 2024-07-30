@@ -48,6 +48,7 @@ table {
 }
 html,body,#root{
   height: 100%;
+  width: 100%;
 }
 .ant-layout-sider .ant-layout-sider-dark{
   width: 255px !important;

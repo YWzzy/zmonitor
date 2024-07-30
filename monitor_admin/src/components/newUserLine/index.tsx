@@ -1,11 +1,13 @@
 import React, { useEffect, memo } from 'react';
-import styles from './index.module.less';
 import { useEchart } from '@/src/hooks';
+
 interface LineIn {
   data: number[];
 }
-export const LineChart: React.FC<LineIn> = ({ data }) => {
+
+const LineChart: React.FC<LineIn> = ({ data }) => {
   const { ref, setOption } = useEchart();
+
   useEffect(() => {
     if (data.length > 0) {
       const option = {
@@ -24,7 +26,7 @@ export const LineChart: React.FC<LineIn> = ({ data }) => {
         },
         yAxis: {
           type: 'value',
-          show: false, // 隐藏X轴
+          show: false, // 隐藏Y轴
           min: 0,
         },
         series: [
@@ -39,8 +41,11 @@ export const LineChart: React.FC<LineIn> = ({ data }) => {
       };
       setOption(option);
     }
-  }, [ref.current, data]);
-  return <div ref={ref} className={styles.wrap} />;
+  }, [data, setOption]);
+
+  return <div ref={ref} className="w-full h-full" />;
 };
 
-export const NewUserLine = memo(LineChart, (prev, next) => prev !== next);
+const NewUserLine = memo(LineChart, (prev, next) => prev.data !== next.data);
+
+export { NewUserLine, LineChart };

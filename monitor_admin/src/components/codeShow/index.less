@@ -19,13 +19,6 @@ pre[data-line] {
 	white-space: pre;
 }
 
-@media print {
-	.line-highlight {
-    	-webkit-print-color-adjust: exact;
-		print-color-adjust: exact;
-	}
-}
-
 	.line-highlight:before,
 	.line-highlight[data-end]:after {
 		content: attr(data-start);

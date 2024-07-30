@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Menu, Modal, Select, Button } from 'antd';
+import { Layout, Menu, Modal, Select, Button, Drawer } from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   MenuUnfoldOutlined,
@@ -8,36 +8,28 @@ import {
   PlusCircleFilled,
 } from '@ant-design/icons';
 import { useDispatch } from 'react-redux';
-import stylels from './index.module.less';
-import { loginOut } from '@/src/api';
 import logoPng from '@/src/images/logo.png';
 import { checkAppStatus, AddApplication } from '@/src/components';
 import { munuRouters, hasAppRouters } from '@/src/router';
 import { useAppStore } from '@/src/hooks';
 import { ConfigApplication } from '@/src/components/configApplication';
+import { loginOut } from '@/src/api';
+
 const { Sider } = Layout;
 
 function Home() {
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
-
   const location = useLocation();
 
   useEffect(() => {
     setKey(location.pathname);
   }, [location]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setCollapsed(true);
-    }, 10);
-  }, []);
-
   const { pathname } = useLocation();
-
   const [openMenuKey, setKey] = useState(pathname);
 
   const { apps, active, showAddModal, showConfigModal, appDispatch, curConfAppId } = useAppStore();
@@ -51,114 +43,113 @@ function Home() {
     }));
   }, [apps.length]);
 
-  const leftSideWidth = collapsed ? 80 : 200;
+  const renderSidebar = () => (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center h-16 p-4 text-white bg-blue-500">
+        <img src={logoPng} alt="" className="w-8 h-8 mr-2 rounded-full" />
+        <span className={`${collapsed ? 'hidden' : ''} lg:inline`}>前端监控平台</span>
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        <Sider
+          breakpoint="lg"
+          collapsed={collapsed}
+          collapsible
+          trigger={null}
+          onCollapse={value => setCollapsed(value)}
+          className="h-full"
+        >
+          <Menu
+            selectedKeys={[openMenuKey]}
+            onClick={val => {
+              setKey(val.key);
+              setMobileDrawerOpen(false);
+            }}
+            theme="dark"
+            mode="inline"
+            defaultSelectedKeys={['4']}
+            onSelect={info => {
+              navigate(info.key);
+            }}
+            items={menus}
+          />
+        </Sider>
+      </div>
+    </div>
+  );
 
   return (
-    <div className={stylels.content}>
-      <div className={stylels.left} style={{ width: leftSideWidth }}>
-        {
-          <div className={stylels.logo}>
-            <div className={stylels['logo-content']}>
-              <img src={logoPng} alt="" />
-              <span>前端监控平台</span>
-            </div>
-          </div>
-        }
-        <div className={stylels['menu-wrap']}>
-          <Sider
-            breakpoint="lg"
-            style={{ width: leftSideWidth, maxWidth: leftSideWidth }}
-            collapsed={collapsed}
-            collapsible
-            trigger={null}
-            onCollapse={value => setCollapsed(value)}
-          >
-            <Menu
-              selectedKeys={[openMenuKey]}
-              onClick={val => {
-                setKey(val.key);
-              }}
-              theme="dark"
-              style={{ width: leftSideWidth, fontSize: 16 }}
-              mode="inline"
-              defaultSelectedKeys={['4']}
-              onSelect={info => {
-                navigate(info.key);
-              }}
-              items={menus}
-            />
-          </Sider>
-        </div>
+    <div className="flex h-screen overflow-hidden">
+      {/* Sidebar for larger screens */}
+      <div className="hidden lg:block">
+        {renderSidebar()}
       </div>
-      <div
-        className={stylels.right}
-        style={{ width: `calc(100vw - ${leftSideWidth}px)`, marginLeft: leftSideWidth }}
+
+      {/* Mobile drawer */}
+      <Drawer
+        placement="left"
+        onClose={() => setMobileDrawerOpen(false)}
+        visible={mobileDrawerOpen}
+        bodyStyle={{ padding: 0 }}
+        width="240px"
       >
-        <div className={stylels['right-wrap']}>
-          <div className={stylels.header}>
-            <span>
-              {collapsed ? (
-                <MenuUnfoldOutlined
-                  onClick={() => {
-                    setCollapsed(!collapsed);
-                  }}
-                />
-              ) : (
-                <MenuFoldOutlined
-                  onClick={() => {
-                    setCollapsed(!collapsed);
-                  }}
-                />
-              )}
-              {apps.length > 0 && (
-                <Select
-                  className={stylels.appSelect}
-                  onChange={val => {
-                    appDispatch.updateActive(val);
-                  }}
-                  value={active}
-                >
-                  {apps.map(item => (
-                    <Select.Option key={item.id} value={item.appId}>
-                      {item.appName}
-                    </Select.Option>
-                  ))}
-                </Select>
-              )}
-              <Button
-                type="primary"
-                onClick={() => {
-                  appDispatch.updateAddModalStatus(true);
-                }}
-                icon={<PlusCircleFilled />}
-              >
-                创建应用
-              </Button>
-            </span>
-            <PoweroffOutlined
-              onClick={() => {
-                Modal.confirm({
-                  title: '确定退出登录？',
-                  okText: '确定',
-                  cancelText: '取消',
-                  onOk: async () => {
-                    await loginOut();
-                    dispatch.user.resetUserInfo();
-                    dispatch.app.resetAppModel();
-                    navigate('/login');
-                  },
-                });
-              }}
-              className={stylels.poweroffOutlined}
+        {renderSidebar()}
+      </Drawer>
+
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <header className="flex items-center justify-between h-16 px-4 bg-white shadow-sm max-w-[100%]">
+          <div className="flex items-center">
+            <Button
+              icon={mobileDrawerOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+              onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
+              className="mr-4 lg:hidden"
             />
+            {apps.length > 0 && (
+              <Select
+                className="w-40 mr-4"
+                onChange={val => {
+                  appDispatch.updateActive(val);
+                }}
+                value={active}
+              >
+                {apps.map(item => (
+                  <Select.Option key={item.id} value={item.appId}>
+                    {item.appName}
+                  </Select.Option>
+                ))}
+              </Select>
+            )}
+            <Button
+              type="primary"
+              onClick={() => {
+                appDispatch.updateAddModalStatus(true);
+              }}
+              icon={<PlusCircleFilled />}
+            >
+              创建应用
+            </Button>
           </div>
-          <div className={stylels['page-wrap']}>
-            <div className={stylels['page-content']}>
-              <Outlet />
-            </div>
-          </div>
-        </div>
+          <PoweroffOutlined
+            onClick={() => {
+              Modal.confirm({
+                title: '确定退出登录？',
+                okText: '确定',
+                cancelText: '取消',
+                onOk: async () => {
+                  await loginOut();
+                  dispatch.user.resetUserInfo();
+                  dispatch.app.resetAppModel();
+                  navigate('/login');
+                },
+              });
+            }}
+            className="cursor-pointer"
+          />
+        </header>
+        <main className="flex-1 p-4 overflow-y-auto bg-gray-100 max-w-[100%]">
+          <Outlet />
+        </main>
       </div>
+
       <AddApplication
         open={showAddModal}
         onClose={() => {
