@@ -1,23 +1,32 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { Button, DatePicker, Form, Input, Radio, Table } from 'antd';
 import dayjs from 'dayjs';
 import { Card } from '@/src/components';
 import { getZMonitorHttpList } from '@/src/api';
-import { useAppStore } from '@/src/hooks';
+import { useAppStore, useQueryParams } from '@/src/hooks';
 import { httpTableColumns } from '@/src/components/httpTableColumns';
 
 const defaultSize = 10;
 
 const HttpSearch = () => {
+  const { state } = useQueryParams();
+  const { url: urlParam, time: timeParam, status: statusParam } = state || {};
+
+  const endDate = timeParam ? dayjs(Number(timeParam)) : dayjs();
+  const startDate = endDate;
+
+  // Initializing form values
+  const initialValues = {
+    url: urlParam || '',
+    date: [startDate, endDate],
+    requestType: statusParam || '',
+  };
+
+
   const [form] = Form.useForm();
-
   const [data, setData] = useState([]);
-
   const { active } = useAppStore();
-
   const [loading, setLoading] = useState(false);
-
   const [pagination, setPageIn] = useState({
     current: 1,
     pageSize: defaultSize,
@@ -105,7 +114,7 @@ const HttpSearch = () => {
     search(query);
   };
 
-  const search = async searchQuery => {
+  const search = async (searchQuery) => {
     setLoading(true);
     const {
       data: { total, list },
@@ -122,20 +131,24 @@ const HttpSearch = () => {
 
   useEffect(() => {
     if (active) {
-      toReset();
+      if (statusParam) {
+        toSearch();
+      } else {
+        toReset();
+      }
     }
-  }, [active]);
+  }, [active, state]);
 
   return (
     <Card title="请求查询">
-      <Form form={form} style={{ paddingBottom: 20 }} name="horizontal_login" layout="inline">
+      <Form form={form} style={{ paddingBottom: 20 }} name="horizontal_login" layout="inline" initialValues={initialValues}>
         <Form.Item name="url" label="接口地址">
           <Input placeholder="请输入接口地址" />
         </Form.Item>
-        <Form.Item name="date" label="日期" initialValue={[dayjs(), dayjs()]}>
+        <Form.Item name="date" label="日期">
           <DatePicker.RangePicker />
         </Form.Item>
-        <Form.Item name="requestType" initialValue="" label="请求状态">
+        <Form.Item name="requestType" label="请求状态">
           <Radio.Group>
             <Radio value="">不限</Radio>
             <Radio value="done">成功</Radio>
