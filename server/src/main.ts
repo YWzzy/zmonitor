@@ -17,7 +17,7 @@ import * as path from "path";
 
 var bodyParser = require("body-parser");
 
-const whiteList = ["/list", "/user"];
+const whiteList = ["/list", "/user", "/bookmarks"];
 
 function MiddlewareAll(req: Request, res: Response, next: NextFunction) {
   console.log("全局中间件", req.originalUrl);
@@ -34,9 +34,12 @@ const envFilePath =
     ? path.resolve(__dirname, "./src/config/production.env")
     : path.resolve(__dirname, "./src/config/development.env");
 dotenv.config({ path: envFilePath });
+console.log("NODE_ENV", process.env.NODE_ENV);
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: process.env.NODE_ENV === 'production' ? ['log', 'error', 'warn'] : ['log', 'error', 'warn', 'debug', 'verbose'],
+  });
 
   const options = new DocumentBuilder()
     .addBearerAuth()
@@ -71,14 +74,7 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
-  app.use(
-    session({
-      secret: "zzzyyykey",
-      rolling: true,
-      name: "zzy.sid",
-      cookie: { maxAge: 999999 },
-    })
-  );
+
   app.useGlobalPipes(new ValidationPipe());
   app.use(bodyParser.json({ limit: "100mb" }));
   app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));

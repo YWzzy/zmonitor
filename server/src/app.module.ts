@@ -25,6 +25,7 @@ import { AnalyseModule } from "./analyse/analyse.module";
 import { ReportPerformanceEsModule } from "./report-performance-es/report-performance-es.module";
 import { ConfigurationService } from "./config/config.service"; // 导入 ConfigurationService
 import { DistUploadModule } from './dist-upload/dist-upload.module';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
 import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
@@ -124,6 +125,7 @@ if (fs.existsSync(envFilePath)) {
     AnalyseModule,
     ReportPerformanceEsModule,
     DistUploadModule,
+    BookmarksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
