@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { BookmarksService } from './bookmarks.service';
+import { BookmarksService } from './bookmarks.service.js';
 import { BookmarksController } from './bookmarks.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Bookmark } from './entities/bookmark.entity';

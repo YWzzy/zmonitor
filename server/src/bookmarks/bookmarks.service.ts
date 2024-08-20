@@ -9,15 +9,20 @@ import { UpdateBookmarkDto } from './dto/update-bookmark.dto';
 import { isValidUrl, timestampToDateString } from 'src/utils';
 import { CustomHttpException } from 'src/common/exception';
 import { Bookmark } from './entities/bookmark.entity';
+import { ConcurrencyLimiter } from 'src/utils/limit';
 
 @Injectable()
 export class BookmarksService {
   private logger = new Logger(BookmarksService.name);
+  private readonly CONCURRENCY_LIMIT = 5; // 并发限制
+  private limiter: ConcurrencyLimiter;
 
   constructor(
     @InjectRepository(Bookmark)
     private readonly bookmarkRepository: Repository<Bookmark>,
-  ) { }
+  ) {
+    this.limiter = new ConcurrencyLimiter(this.CONCURRENCY_LIMIT);
+  }
 
   async parseBookmarks(file: Express.Multer.File): Promise<void> {
     try {
@@ -122,28 +127,38 @@ export class BookmarksService {
 
   // 通过url获取网页元数据
   async fetchUrlMetadata(url: string): Promise<any> {
-    if (!isValidUrl(url)) {
-      throw new CustomHttpException(400, 'Url is invalid.');
-    }
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (!isValidUrl(url)) {
+          throw new CustomHttpException(400, 'Url is invalid.');
+        }
 
-    const metadata = await page.evaluate(() => {
-      const getMetaContent = (name: string) =>
-        document.querySelector(`meta[name="${name}"]`)?.getAttribute('content') ||
-        document.querySelector(`meta[property="og:${name}"]`)?.getAttribute('content') ||
-        document.querySelector(`meta[name="twitter:${name}"]`)?.getAttribute('content');
-      return {
-        name: document.title,
-        description: getMetaContent('description'),
-        cover: getMetaContent('image'),
-        href: window.location.href,
-      };
+        const browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+        await page.goto(url, { waitUntil: 'domcontentloaded' });
+
+        const metadata = await page.evaluate(() => {
+          const getMetaContent = (name: string) =>
+            document.querySelector(`meta[name="${name}"]`)?.getAttribute('content') ||
+            document.querySelector(`meta[property="og:${name}"]`)?.getAttribute('content') ||
+            document.querySelector(`meta[name="twitter:${name}"]`)?.getAttribute('content');
+          return {
+            name: document.title,
+            description: getMetaContent('description'),
+            cover: getMetaContent('image'),
+            href: window.location.href,
+          };
+        });
+
+        await browser.close();
+        console.log('====================================');
+        console.log('metadata:', metadata);
+        console.log('====================================');
+        resolve(metadata);
+      } catch (error) {
+        reject(error);
+      }
     });
-
-    await browser.close();
-    return metadata;
   }
 
   private async createBookmarksInTransaction(bookmarks: any[], fileName: string): Promise<void> {
@@ -169,27 +184,32 @@ export class BookmarksService {
     });
 
     // 事务完成后异步更新元数据
-    const updateTasks = bookmarks
+    const updatePromises = bookmarks
       .filter(bookmark => bookmark.url)
-      .map(bookmark => this.updateBookmarkMetadata(bookmark.uuid, bookmark.url));
+      .map(bookmark => this.limiter.addTask(() => this.updateBookmarkMetadata(bookmark.uuid, bookmark.url)));
 
-    // 并发执行更新任务
-    await Promise.all(updateTasks);
+    // 并发执行更新任务，限制并发数量
+    await Promise.all(updatePromises);
   }
 
   // 更新书签元数据
   private async updateBookmarkMetadata(uuid: string, url: string): Promise<void> {
     try {
       const metadata = await this.fetchUrlMetadata(url);
-      await this.bookmarkRepository.update(uuid, {
-        name: metadata.name,
-        description: metadata.description,
-        cover: metadata.cover,
-        href: metadata.href,
-      });
-      this.logger.log(`Metadata updated for bookmark ${uuid}`);
+      const item = await this.bookmarkRepository.findOneBy({ uuid: uuid });
+      if (!item) {
+        throw new CustomHttpException(406, 'Bookmark not found.');
+      }
+      const updatedItem = { ...item, ...metadata };
+      await this.update(updatedItem.id, updatedItem);
+      // await this.bookmarkRepository.update(uuid, {
+      //   name: metadata?.name,
+      //   description: metadata?.description,
+      //   cover: metadata?.cover,
+      //   href: metadata?.href,
+      // });
     } catch (error) {
-      this.logger.error(`Failed to update metadata for bookmark ${uuid}:`, error);
+      this.logger.error(`Failed to update metadata for bookmark ${uuid}:`, error.message);
       throw new CustomHttpException(500, error.message);
     }
   }
