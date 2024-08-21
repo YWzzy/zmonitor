@@ -42,6 +42,30 @@ export class BookmarksController {
     }
   }
 
+  @ApiOperation({ summary: '获取指定条件下的整个目录结构数据' })
+  @Get('directory')
+  getDirectoryStructure(
+    @Query('fileName') fileName: string,
+    @Query('creator') creator: string,
+  ) {
+    try {
+      return this.bookmarksService.getDirectoryStructure(fileName, creator);
+    } catch (error) {
+      throw new CustomHttpException(500, error.message);
+    }
+  }
+
+  @ApiOperation({ summary: '根据目录的 uuid 查询子元素数据' })
+  @Post('children')
+  getChildrenByUuid(@Body() body: { uuid: string; childUUids: string[] }) {
+    try {
+      const { uuid, childUUids } = body;
+      return this.bookmarksService.getChildrenByUuid(uuid, childUUids);
+    } catch (error) {
+      throw new CustomHttpException(500, error.message);
+    }
+  }
+
   @ApiOperation({ summary: '创建新书签' })
   @Post()
   create(@Body() createBookmarkDto: CreateBookmarkDto) {

@@ -3,7 +3,7 @@ import * as parse5 from 'parse5';
 import * as puppeteer from 'puppeteer';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, EntityManager, Transaction } from 'typeorm';
+import { Repository, EntityManager, Transaction, In } from 'typeorm';
 import { CreateBookmarkDto } from './dto/create-bookmark.dto';
 import { UpdateBookmarkDto } from './dto/update-bookmark.dto';
 import { isValidUrl, timestampToDateString } from 'src/utils';
@@ -165,6 +165,7 @@ export class BookmarksService {
     await this.bookmarkRepository.manager.transaction(async (transactionalEntityManager: EntityManager) => {
       for (const bookmark of bookmarks) {
         const createBookmarkDto = {
+          type: bookmark.type,
           uuid: bookmark.uuid,
           pid: bookmark.pid,
           fileName: fileName,
@@ -212,6 +213,52 @@ export class BookmarksService {
       this.logger.error(`Failed to update metadata for bookmark ${uuid}:`, error.message);
       throw new CustomHttpException(500, error.message);
     }
+  }
+
+  // 获取指定条件下的目录结构
+  async getDirectoryStructure(fileName: string, creator: string): Promise<Bookmark[]> {
+    // 查询所有可能的根节点（pid为null或没有父节点的节点）
+    const allNodes = await this.bookmarkRepository.find({
+      where: { fileName, creator, type: 'folder' },
+    });
+
+    // 构建一个以uuid为key的Map，用于快速查找节点
+    const nodeMap = new Map<string, Bookmark>();
+    for (const node of allNodes) {
+      nodeMap.set(node.uuid, node);
+    }
+
+    // 将所有节点按pid分组
+    const rootNodes: Bookmark[] = [];
+    for (const node of allNodes) {
+      if (!node.pid || !nodeMap.has(node.pid)) {
+        // 如果节点没有pid或者pid不存在于nodeMap中，则为根节点
+        rootNodes.push(node);
+      } else {
+        // 将节点添加到其父节点的children数组中
+        const parent = nodeMap.get(node.pid);
+        if (parent) {
+          if (!parent['children']) {
+            parent['children'] = [];
+          }
+          parent['children'].push(node);
+        }
+      }
+    }
+
+    return rootNodes;
+  }
+
+
+  // 根据目录的uuid查询子元素数据
+  async getChildrenByUuid(uuid: string, childUUids: string[]): Promise<Bookmark[]> {
+    // 将逗号分隔的 childUUids 转换为数组
+    return this.bookmarkRepository.find({
+      where: [
+        { pid: uuid },
+        { pid: In(childUUids) },
+      ],
+    });
   }
 
   async create(createBookmarkDto: CreateBookmarkDto) {
