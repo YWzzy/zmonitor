@@ -142,7 +142,11 @@ export class BookmarksService {
           const getMetaContent = (name: string) =>
             document.querySelector(`meta[name="${name}"]`)?.getAttribute('content') ||
             document.querySelector(`meta[property="og:${name}"]`)?.getAttribute('content') ||
-            document.querySelector(`meta[name="twitter:${name}"]`)?.getAttribute('content');
+            document.querySelector(`meta[name="twitter:${name}"]`)?.getAttribute('content') ||
+            document.querySelector(`meta[itemprop="${name}"]`)?.getAttribute('content') ||
+            document.querySelector(`link[rel="image_src"]`)?.getAttribute('href') ||
+            document.querySelector(`link[rel="shortcut icon"]`)?.getAttribute('href') ||
+            document.querySelector('img')?.getAttribute('src');
           return {
             name: document.title,
             description: getMetaContent('description'),
