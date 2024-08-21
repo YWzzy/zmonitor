@@ -14,7 +14,7 @@ export class Bookmark {
     @Column({ type: 'varchar', length: 36 })
     uuid: string;
 
-    @Column({ type: 'int' })
+    @Column({ type: 'int', default: 0 })
     collectionId: number
 
     @Column({ type: 'varchar', length: 36, nullable: true })

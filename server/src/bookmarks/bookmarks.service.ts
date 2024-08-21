@@ -4,6 +4,7 @@ import * as puppeteer from 'puppeteer';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager, Transaction, In } from 'typeorm';
+import { parse as urlParse } from 'url';
 import { CreateBookmarkDto } from './dto/create-bookmark.dto';
 import { UpdateBookmarkDto } from './dto/update-bookmark.dto';
 import { isValidUrl, timestampToDateString } from 'src/utils';
@@ -164,6 +165,8 @@ export class BookmarksService {
   private async createBookmarksInTransaction(bookmarks: any[], fileName: string): Promise<void> {
     await this.bookmarkRepository.manager.transaction(async (transactionalEntityManager: EntityManager) => {
       for (const bookmark of bookmarks) {
+        // 解析 URL 并获取域名
+        const domain = bookmark.url ? urlParse(bookmark.url).hostname : null;
         const createBookmarkDto = {
           type: bookmark.type,
           uuid: bookmark.uuid,
@@ -178,6 +181,7 @@ export class BookmarksService {
           description: bookmark.description || null,
           cover: bookmark.cover || null,
           href: bookmark.href || null,
+          domain: domain
         };
 
         await transactionalEntityManager.save(Bookmark, createBookmarkDto)
