@@ -11,6 +11,7 @@ import { isValidUrl, timestampToDateString } from 'src/utils';
 import { CustomHttpException } from 'src/common/exception';
 import { Bookmark } from './entities/bookmark.entity';
 import { ConcurrencyLimiter } from 'src/utils/limit';
+import { BookmarkLog } from './entities/bookmarkLogs.entity';
 
 @Injectable()
 export class BookmarksService {
@@ -21,6 +22,8 @@ export class BookmarksService {
   constructor(
     @InjectRepository(Bookmark)
     private readonly bookmarkRepository: Repository<Bookmark>,
+    @InjectRepository(BookmarkLog)
+    private readonly bookmarkLogRepository: Repository<BookmarkLog>,
   ) {
     this.limiter = new ConcurrencyLimiter(this.CONCURRENCY_LIMIT);
   }
@@ -29,12 +32,12 @@ export class BookmarksService {
     try {
       const fileName = file.originalname;
       // 检查是否存在具有相同 fileName 的记录
-      const existingBookmark = await this.bookmarkRepository.findOne({
+      // 检查是否存在相同的日志记录
+      const existingLog = await this.bookmarkLogRepository.findOne({
         where: { fileName: fileName },
       });
-
-      if (existingBookmark) {
-        throw new ConflictException('Bookmark with the same fileName already exists.');
+      if (existingLog) {
+        throw new ConflictException('Log with the same fileName already exists.');
       }
       const htmlContent = file.buffer.toString('utf8');
       const parsedData = parse5.parse(htmlContent);
@@ -42,6 +45,7 @@ export class BookmarksService {
 
       // 使用事务保存书签
       await this.createBookmarksInTransaction(bookmarks, fileName);
+
     } catch (error) {
       console.error('Error parsing bookmarks file:', error);
       throw new CustomHttpException(500, error.message);
@@ -167,39 +171,56 @@ export class BookmarksService {
   }
 
   private async createBookmarksInTransaction(bookmarks: any[], fileName: string): Promise<void> {
-    await this.bookmarkRepository.manager.transaction(async (transactionalEntityManager: EntityManager) => {
-      for (const bookmark of bookmarks) {
-        // 解析 URL 并获取域名
-        const domain = bookmark.url ? urlParse(bookmark.url).hostname : null;
-        const createBookmarkDto = {
-          type: bookmark.type,
-          uuid: bookmark.uuid,
-          pid: bookmark.pid,
-          fileName: fileName,
-          creator: 'zzy', // 默认创建者
-          title: bookmark.title,
-          url: bookmark.url,
-          created: bookmark.created,
-          icon: bookmark.icon,
-          name: bookmark.title, // Assuming title as name for metadata
-          description: bookmark.description || null,
-          cover: bookmark.cover || null,
-          href: bookmark.href || null,
-          domain: domain
-        };
+    try {
+      await this.bookmarkRepository.manager.transaction(async (transactionalEntityManager: EntityManager) => {
+        // 1. 创建 BookmarkLog 实体
+        const bookmarkLog = new BookmarkLog();
+        bookmarkLog.fileName = fileName;
+        bookmarkLog.operator = 'zzy';
+        bookmarkLog.operation = 'Create';
+        bookmarkLog.note = 'Parsing bookmarks';
+        const savedLog = await this.bookmarkLogRepository.save(bookmarkLog);
+        for (const bookmark of bookmarks) {
+          // 解析 URL 并获取域名
+          const domain = bookmark.url ? urlParse(bookmark.url).hostname : null;
+          const createBookmarkDto = {
+            type: bookmark.type,
+            uuid: bookmark.uuid,
+            pid: bookmark.pid,
+            bookId: savedLog.id, // 使用 BookmarkLog 的 id 作为 bookId
+            fileName: fileName,
+            creator: 'zzy', // 默认创建者
+            title: bookmark.title,
+            url: bookmark.url,
+            created: bookmark.created,
+            icon: bookmark.icon,
+            name: bookmark.title, // Assuming title as name for metadata
+            description: bookmark.description || null,
+            cover: bookmark.cover || null,
+            href: bookmark.href || null,
+            domain: domain,
+            important: 1,
+            isExpanded: 1,
+            sort: bookmark.sort || 0,
+            removed: bookmark.removed || 0
+          };
 
-        await transactionalEntityManager.save(Bookmark, createBookmarkDto)
-      }
-    });
+          await transactionalEntityManager.save(Bookmark, createBookmarkDto)
+        }
+      });
+      // 事务完成后异步更新元数据
+      const updatePromises = bookmarks
+        .filter(bookmark => bookmark.url)
+        .map(bookmark => this.limiter.addTask(() => this.updateBookmarkMetadata(bookmark.uuid, bookmark.url)));
 
-    // 事务完成后异步更新元数据
-    const updatePromises = bookmarks
-      .filter(bookmark => bookmark.url)
-      .map(bookmark => this.limiter.addTask(() => this.updateBookmarkMetadata(bookmark.uuid, bookmark.url)));
-
-    // 并发执行更新任务，限制并发数量
-    await Promise.all(updatePromises);
+      // 并发执行更新任务，限制并发数量
+      await Promise.all(updatePromises);
+    } catch (error) {
+      console.error('Error creating bookmarks in transaction:', error);
+      throw new CustomHttpException(500, error.message);
+    }
   }
+
 
   // 更新书签元数据
   private async updateBookmarkMetadata(uuid: string, url: string): Promise<void> {
@@ -211,48 +232,61 @@ export class BookmarksService {
       }
       const updatedItem = { ...item, ...metadata };
       await this.update(updatedItem.id, updatedItem);
-      // await this.bookmarkRepository.update(uuid, {
-      //   name: metadata?.name,
-      //   description: metadata?.description,
-      //   cover: metadata?.cover,
-      //   href: metadata?.href,
-      // });
     } catch (error) {
       this.logger.error(`Failed to update metadata for bookmark ${uuid}:`, error.message);
-      throw new CustomHttpException(500, error.message);
     }
   }
 
   // 获取指定条件下的目录结构
   async getDirectoryStructure(fileName: string, creator: string): Promise<Bookmark[]> {
-    // 查询所有可能的根节点（pid为null或没有父节点的节点）
-    const allNodes = await this.bookmarkRepository.find({
+    // 查询所有文件夹节点
+    const allFolders = await this.bookmarkRepository.find({
       where: { fileName, creator, type: 'folder' },
+      order: { sort: 'ASC' }, // 假设有一个 sort 字段用于排序
     });
 
     // 构建一个以uuid为key的Map，用于快速查找节点
-    const nodeMap = new Map<string, Bookmark>();
-    for (const node of allNodes) {
-      nodeMap.set(node.uuid, node);
+    const folderMap = new Map<string, Bookmark>();
+    for (const folder of allFolders) {
+      folderMap.set(folder.uuid, folder);
+    }
+
+    // 计算每个文件夹下的书签数量
+    for (const folder of allFolders) {
+      folder['bookmarkCount'] = await this.bookmarkRepository.count({
+        where: { pid: folder.uuid, type: 'bookmark', fileName, creator }
+      });
     }
 
     // 将所有节点按pid分组
     const rootNodes: Bookmark[] = [];
-    for (const node of allNodes) {
-      if (!node.pid || !nodeMap.has(node.pid)) {
-        // 如果节点没有pid或者pid不存在于nodeMap中，则为根节点
-        rootNodes.push(node);
+    for (const folder of allFolders) {
+      if (!folder.pid || !folderMap.has(folder.pid)) {
+        // 如果节点没有pid或者pid不存在于folderMap中，则为根节点
+        rootNodes.push(folder);
       } else {
         // 将节点添加到其父节点的children数组中
-        const parent = nodeMap.get(node.pid);
+        const parent = folderMap.get(folder.pid);
         if (parent) {
           if (!parent['children']) {
             parent['children'] = [];
           }
-          parent['children'].push(node);
+          parent['children'].push(folder);
         }
       }
     }
+
+    // 递归函数，用于对每个文件夹的子文件夹进行排序
+    const sortChildren = (node: Bookmark) => {
+      if (node['children']) {
+        node['children'].sort((a, b) => a.sort - b.sort);
+        node['children'].forEach(sortChildren);
+      }
+    };
+
+    // 对根节点进行排序，并递归排序所有子节点
+    rootNodes.sort((a, b) => a.sort - b.sort);
+    rootNodes.forEach(sortChildren);
 
     return rootNodes;
   }

@@ -1,9 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { BookmarkLog } from './bookmarkLogs.entity';
 
 @Entity('bookmarks')
 export class Bookmark {
     @PrimaryGeneratedColumn({ comment: "主键ID" })
     id: number;
+
+    @Column({ type: 'varchar', length: 36 })
+    bookId: string;  // 这将对应 BookmarkLog 的 id
 
     @Column({ type: 'varchar', length: 12 })
     type: string;
@@ -15,7 +19,7 @@ export class Bookmark {
     uuid: string;
 
     @Column({ type: 'int', default: 0 })
-    collectionId: number
+    collectionId: number;
 
     @Column({ type: 'varchar', length: 36, nullable: true })
     pid: string | null;
@@ -26,18 +30,17 @@ export class Bookmark {
     @Column({ type: 'varchar', length: 255 })
     title: string;
 
-
     @Column({ type: 'varchar', length: 2083, default: null })
     url: string | null;
 
     @Column({ type: 'varchar', length: 128, default: null })
     domain: string | null;
 
-    @Column({ type: 'int', default: 0 })
-    isExpanded: boolean
+    @Column({ type: 'int', default: 1 })
+    isExpanded: number;
 
     @Column({ type: 'int', default: 0 })
-    important: boolean
+    important: number;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
     created: string | null;
@@ -64,9 +67,11 @@ export class Bookmark {
     note: string | null;
 
     @Column({ type: 'int', default: 0 })
-    sort: number
+    sort: number;
 
     @Column({ type: 'int', default: 0 })
-    removed: boolean
+    removed: boolean;
 
+    @ManyToOne(() => BookmarkLog, log => log.bookmarks)
+    log: BookmarkLog;
 }

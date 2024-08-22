@@ -54,11 +54,11 @@ export class CreateBookmarkDto {
 
     @IsBoolean()
     @IsOptional()
-    isExpanded?: boolean;
+    isExpanded?: number;
 
     @IsBoolean()
     @IsOptional()
-    important?: boolean;
+    important?: number;
 
     @IsString()
     @IsOptional()
