@@ -82,8 +82,13 @@ export class CreateBookmarkDto {
 
     @IsString()
     @IsOptional()
-    @Length(0, 255, { message: '封面长度必须在 0 到 255 个字符之间' })
+    @Length(0, 500, { message: '封面长度必须在 0 到 500 个字符之间' })
     cover?: string;
+
+    @IsString()
+    @IsOptional()
+    @Length(0, 36, { message: '封面长度必须在 0 到 36 个字符之间' })
+    coverType?: string;
 
     @IsString()
     @IsOptional()

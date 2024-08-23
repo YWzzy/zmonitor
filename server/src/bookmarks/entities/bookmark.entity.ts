@@ -54,8 +54,11 @@ export class Bookmark {
     @Column({ type: 'varchar', length: 2083, default: null })
     description: string | null;
 
-    @Column({ type: 'varchar', length: 255, default: null })
+    @Column({ type: 'varchar', length: 500, default: null })
     cover: string | null;
+
+    @Column({ type: 'varchar', length: 36, default: null })
+    coverType: string | null;
 
     @Column({ type: 'varchar', length: 2083, default: null })
     href: string | null;

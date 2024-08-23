@@ -1,6 +1,7 @@
 import { Injectable, Logger, ConflictException } from '@nestjs/common';
 import * as parse5 from 'parse5';
 import * as puppeteer from 'puppeteer';
+import * as sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager, Transaction, In } from 'typeorm';
@@ -12,6 +13,8 @@ import { CustomHttpException } from 'src/common/exception';
 import { Bookmark } from './entities/bookmark.entity';
 import { ConcurrencyLimiter } from 'src/utils/limit';
 import { BookmarkLog } from './entities/bookmarkLogs.entity';
+import * as fs from "fs";
+import * as path from "path";
 
 @Injectable()
 export class BookmarksService {
@@ -130,44 +133,103 @@ export class BookmarksService {
     return attribute ? attribute.value : '';
   }
 
+  private sanitizeFileName(url: string): string {
+    // 生成 URL 的散列值，以避免路径过长
+    const hash = require('crypto').createHash('sha256').update(url).digest('hex');
+
+    // 替换特殊字符，保持路径合法
+    const sanitizedUrl = url
+      .replace(/^[a-zA-Z]+:\/\//, '') // 去掉协议部分
+      .replace(/[\/\\?%*:|"<>]/g, '_') // 替换非法字符
+      .replace(/ /g, '_'); // 替换空格
+
+    // 使用散列值作为文件名，以确保唯一性和路径长度限制
+    return `${sanitizedUrl}_${hash}.webp`;
+  }
+
+  private ensureDirectoryExistence(filePath: string) {
+    const dirname = path.dirname(filePath);
+    if (fs.existsSync(dirname)) {
+      return;
+    }
+    this.ensureDirectoryExistence(dirname);
+    fs.mkdirSync(dirname);
+  }
+
   // 通过url获取网页元数据
   async fetchUrlMetadata(url: string): Promise<any> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        if (!isValidUrl(url)) {
-          throw new CustomHttpException(400, 'Url is invalid.');
-        }
+    if (!isValidUrl(url)) {
+      throw new CustomHttpException(400, 'Url is invalid.');
+    }
 
-        const browser = await puppeteer.launch({ headless: true });
-        const page = await browser.newPage();
-        await page.goto(url, { waitUntil: 'domcontentloaded' });
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
 
-        const metadata = await page.evaluate(() => {
-          const getMetaContent = (name: string) =>
-            document.querySelector(`meta[name="${name}"]`)?.getAttribute('content') ||
-            document.querySelector(`meta[property="og:${name}"]`)?.getAttribute('content') ||
-            document.querySelector(`meta[name="twitter:${name}"]`)?.getAttribute('content') ||
-            document.querySelector(`meta[itemprop="${name}"]`)?.getAttribute('content') ||
-            document.querySelector(`link[rel="image_src"]`)?.getAttribute('href') ||
-            document.querySelector(`link[rel="shortcut icon"]`)?.getAttribute('href') ||
-            document.querySelector('img')?.getAttribute('src');
-          return {
-            name: document.title,
-            description: getMetaContent('description'),
-            cover: getMetaContent('image'),
-            href: window.location.href,
-          };
-        });
+    // 创建目录
+    // 处理 URL 以生成合法的文件路径
+    const sanitizedFileName = this.sanitizeFileName(url);
+    const rootDir = path.resolve(__dirname, 'puppeteer_cover');
+    const fileDir = path.join(rootDir, sanitizedFileName);
+    this.ensureDirectoryExistence(fileDir);
 
-        await browser.close();
-        console.log('====================================');
-        console.log('metadata:', metadata);
-        console.log('====================================');
-        resolve(metadata);
-      } catch (error) {
-        reject(error);
+    try {
+      await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+
+      const metadata = await page.evaluate(() => {
+        const getMetaContent = (name: string) => {
+          const selectors = [
+            `meta[name="${name}"]`,
+            `meta[property="og:${name}"]`,
+            `meta[name="twitter:${name}"]`,
+            `meta[itemprop="${name}"]`,
+            'link[rel="image_src"]'
+          ];
+
+          for (const selector of selectors) {
+            const element = document.querySelector(selector);
+            if (element) {
+              const content = element.getAttribute('content') || element.getAttribute('href') || element.getAttribute('src');
+              if (content) return content;
+            }
+          }
+          return null;
+        };
+
+        return {
+          name: document.title,
+          description: getMetaContent('description'),
+          cover: getMetaContent('image'),
+          coverType: 'image',
+          href: window.location.href,
+        };
+      });
+
+      // 如果没有找到封面图像，则截取截图并保存
+      if (!metadata.cover) {
+        const screenshot = await page.screenshot({ fullPage: false });
+        const filePath = path.join(fileDir);
+        const resizedScreenshot = await sharp(screenshot)
+          .resize(1200, 630, { fit: 'inside' })
+          .webp({ quality: 80 })
+          .toBuffer();
+
+        fs.writeFileSync(filePath, resizedScreenshot);
+
+        metadata.cover = filePath;
+        metadata.coverType = 'base64';
       }
-    });
+
+      console.log('====================================');
+      console.log('metadata:', metadata);
+      console.log('====================================');
+
+      return metadata;
+    } catch (error) {
+      console.error('Error fetching metadata:', error);
+      throw error;
+    } finally {
+      await browser.close();
+    }
   }
 
   private async createBookmarksInTransaction(bookmarks: any[], fileName: string): Promise<void> {
