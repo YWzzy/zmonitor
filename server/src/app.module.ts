@@ -7,11 +7,9 @@ import { AppService } from "./app.service";
 import { UserModule } from "./user/user.module";
 // import { ConfigModule } from "./config/config.module";
 import { UploadModule } from "./upload/upload.module";
-import { SpiderModule } from "./spider/spider.module";
 import { GuardModule } from "./guard/guard.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { TestModule } from "./test/test.module";
-import { PachongModule } from "./pachong/pachong.module";
 import { MonitorModule } from "./monitor/monitor.module";
 import { PerformanceModule } from "./performance/performance.module";
 import { WhiteScreenModule } from "./white-screen/white-screen.module";
@@ -96,7 +94,6 @@ if (fs.existsSync(envFilePath)) {
     }),
     UserModule,
     UploadModule,
-    SpiderModule,
     GuardModule,
     // TypeOrmModule.forRoot({
     //   type: "mysql", //数据库类型
@@ -114,7 +111,6 @@ if (fs.existsSync(envFilePath)) {
     // }),
     TypeOrmModule.forFeature([Recording]), // 将Recording实体类传递给模块
     TestModule,
-    PachongModule,
     MonitorModule,
     PerformanceModule,
     WhiteScreenModule,

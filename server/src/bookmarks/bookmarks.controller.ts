@@ -13,11 +13,11 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { BookmarksService } from './bookmarks.service.js';
+import { BookmarksService } from './bookmarks.service';
 import { CreateBookmarkDto } from './dto/create-bookmark.dto';
 import { UpdateBookmarkDto } from './dto/update-bookmark.dto';
-import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiOkResponse } from '@nestjs/swagger';
-import { Response, Request } from "express";
+import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiOkResponse, ApiQuery, ApiParam } from '@nestjs/swagger';
+import { Response } from "express";
 import { ParseBookmarkDto } from './dto/parse-bookmark.dto';
 import { CustomHttpException } from 'src/common/exception';
 import { isValidUrl } from 'src/utils';
@@ -32,10 +32,9 @@ export class BookmarksController {
   @ApiBody({ description: '书签文件', type: ParseBookmarkDto })
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  parseBookmarks(@UploadedFile() file: Express.Multer.File) {
+  async parseBookmarks(@UploadedFile() file: Express.Multer.File) {
     try {
-
-      return this.bookmarksService.parseBookmarks(file);
+      return await this.bookmarksService.parseBookmarks(file);
     } catch (error) {
       console.error('Error parsing bookmarks file:', error); // 添加错误日志
       throw new CustomHttpException(500, error.message);
@@ -43,67 +42,94 @@ export class BookmarksController {
   }
 
   @ApiOperation({ summary: '获取指定条件下的整个目录结构数据' })
+  @ApiQuery({ name: 'id', type: String, description: '书签日志的 ID' })
+  @ApiOkResponse({ description: '成功返回目录结构数据' })
   @Get('directory')
-  getDirectoryStructure(
-    @Query('fileName') fileName: string,
-    @Query('creator') creator: string,
+  async getDirectoryStructure(
+    @Query('id') id: string,
   ) {
     try {
-      return this.bookmarksService.getDirectoryStructure(fileName, creator);
+      return await this.bookmarksService.getDirectoryStructure(id);
     } catch (error) {
       throw new CustomHttpException(500, error.message);
     }
   }
 
   @ApiOperation({ summary: '根据目录的 uuid 查询子元素数据' })
+  @ApiBody({
+    description: '包含父目录 UUID 和子目录 UUIDs 的请求体',
+  })
+  @ApiOkResponse({ description: '成功返回子元素数据' })
   @Post('children')
-  getChildrenByUuid(@Body() body: { uuid: string; childUUids: string[] }) {
+  async getChildrenByUuid(@Body() body: { uuid: string; childUUids: string[] }) {
     try {
       const { uuid, childUUids } = body;
-      return this.bookmarksService.getChildrenByUuid(uuid, childUUids);
+      return await this.bookmarksService.getChildrenByUuid(uuid, childUUids);
     } catch (error) {
       throw new CustomHttpException(500, error.message);
     }
   }
 
   @ApiOperation({ summary: '创建新书签' })
+  @ApiBody({ description: '创建书签的请求体', type: CreateBookmarkDto })
+  @ApiOkResponse({ description: '成功创建书签', type: CreateBookmarkDto })
   @Post()
-  create(@Body() createBookmarkDto: CreateBookmarkDto) {
-    return this.bookmarksService.create(createBookmarkDto);
+  async create(@Body() createBookmarkDto: CreateBookmarkDto) {
+    return await this.bookmarksService.create(createBookmarkDto);
+  }
+
+  @ApiOperation({ summary: '获取所有书签集合' })
+  @ApiOkResponse({ description: '成功返回所有书签集合', type: [CreateBookmarkDto] })
+  @Get('logs')
+  async findAllBookLogs() {
+    try {
+      return await this.bookmarksService.findAllBookLogs();
+    } catch (error) {
+      throw new CustomHttpException(500, error.message);
+    }
   }
 
   @ApiOperation({ summary: '获取所有书签' })
+  @ApiOkResponse({ description: '成功返回所有书签', type: [CreateBookmarkDto] })
   @Get()
-  findAll() {
-    return this.bookmarksService.findAll();
+  async findAll() {
+    return await this.bookmarksService.findAll();
   }
 
   @ApiOperation({ summary: '根据ID获取书签' })
+  @ApiParam({ name: 'id', type: String, description: '书签的 ID' })
+  @ApiOkResponse({ description: '成功返回书签数据', type: CreateBookmarkDto })
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     console.log('Url info retrieved: findOne'); // 添加日志
-    return this.bookmarksService.findOne(id);
+    return await this.bookmarksService.findOne(id);
   }
 
   @ApiOperation({ summary: '更新书签信息' })
+  @ApiParam({ name: 'id', type: String, description: '书签的 ID' })
+  @ApiBody({ description: '更新书签的请求体', type: UpdateBookmarkDto })
+  @ApiOkResponse({ description: '成功更新书签数据', type: UpdateBookmarkDto })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBookmarkDto: UpdateBookmarkDto) {
-    return this.bookmarksService.update(id, updateBookmarkDto);
+  async update(@Param('id') id: string, @Body() updateBookmarkDto: UpdateBookmarkDto) {
+    return await this.bookmarksService.update(id, updateBookmarkDto);
   }
 
   @ApiOperation({ summary: '删除书签' })
+  @ApiParam({ name: 'id', type: String, description: '书签的 ID' })
+  @ApiOkResponse({ description: '成功删除书签' })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.bookmarksService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.bookmarksService.remove(id);
   }
 
   @ApiOperation({ summary: '通过URL获取网页信息' })
+  @ApiQuery({ name: 'url', type: String, description: '需要获取信息的 URL' })
+  @ApiOkResponse({ description: '成功返回 URL 元数据', type: Object })
   @Post('fetchUrlMetadata')
   async fetchUrlMetadata(@Query('url') url: string, @Res() res: Response) {
-
     try {
       // 校验url合法性
-      if (!isValidUrl) {
+      if (!isValidUrl(url)) {
         throw new CustomHttpException(400, 'Url is invalid.');
       }
       const data = await this.bookmarksService.fetchUrlMetadata(url);

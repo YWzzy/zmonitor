@@ -300,10 +300,10 @@ export class BookmarksService {
   }
 
   // 获取指定条件下的目录结构
-  async getDirectoryStructure(fileName: string, creator: string): Promise<Bookmark[]> {
+  async getDirectoryStructure(id: string | number): Promise<Bookmark[]> {
     // 查询所有文件夹节点
     const allFolders = await this.bookmarkRepository.find({
-      where: { fileName, creator, type: 'folder' },
+      where: { bookId: String(id), type: 'folder' },
       order: { sort: 'ASC' }, // 假设有一个 sort 字段用于排序
     });
 
@@ -314,9 +314,9 @@ export class BookmarksService {
     }
 
     // 计算每个文件夹下的书签数量
-    for (const folder of allFolders) {
-      folder['bookmarkCount'] = await this.bookmarkRepository.count({
-        where: { pid: folder.uuid, type: 'bookmark', fileName, creator }
+    for (const bookmark of allFolders) {
+      bookmark['bookmarkCount'] = await this.bookmarkRepository.count({
+        where: { pid: bookmark.uuid, type: 'bookmark', bookId: String(id) }
       });
     }
 
@@ -363,6 +363,11 @@ export class BookmarksService {
         { pid: In(childUUids) },
       ],
     });
+  }
+
+  // 获取所有书签集合
+  async findAllBookLogs() {
+    return this.bookmarkLogRepository.find();
   }
 
   async create(createBookmarkDto: CreateBookmarkDto) {
